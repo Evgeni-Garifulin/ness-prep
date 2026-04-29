@@ -32,6 +32,9 @@ export default async function SectionPage({ params }: { params: Params }) {
     }),
   ]);
   const byQuestionId = new Map(answers.map((a) => [a.questionId, a.text]));
+  const confirmedByQuestionId = new Map(
+    answers.map((a) => [a.questionId, a.confirmed]),
+  );
   const noteByQuestionId = new Map(qNotes.map((n) => [n.questionId, n.content]));
 
   const groups: { subsection: string | null; items: typeof section.questions }[] = [];
@@ -112,6 +115,7 @@ export default async function SectionPage({ params }: { params: Params }) {
                     number={q.number}
                     text={q.text}
                     initialAnswer={byQuestionId.get(q.id) ?? ""}
+                    initialConfirmed={confirmedByQuestionId.get(q.id) ?? false}
                     initialNote={noteByQuestionId.get(q.id) ?? ""}
                     hintEasy={q.hintEasy}
                     hintFull={q.hintFull}

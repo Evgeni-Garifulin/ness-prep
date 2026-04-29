@@ -188,26 +188,29 @@ export function TrainerSession({
 
   return (
     <div className="mt-6">
-      {/* Прогресс — только во время прохождения */}
-      {phase === "running" && (
-        <>
-          <div className="flex items-end justify-between gap-4">
-            <span className="yzy-meta text-muted-foreground tabular-nums">
-              {String(index + 1).padStart(2, "0")} /{" "}
-              {String(total).padStart(2, "0")}
-            </span>
-            <span className="text-2xl sm:text-3xl font-medium tabular-nums leading-none">
-              {Math.round(((index + 1) / total) * 100)}%
-            </span>
-          </div>
-          <div className="mt-3 h-px w-full bg-foreground/20">
-            <div
-              className="h-px bg-foreground"
-              style={{ width: `${Math.round(((index + 1) / total) * 100)}%` }}
-            />
-          </div>
-        </>
-      )}
+      {/* Прогресс — только во время прохождения. Считается по числу
+          отвеченных карточек в текущем раунде (round.known + round.unknown),
+          а не по позиции. На стартовом первом вопросе это 0 / 25 = 0%. */}
+      {phase === "running" && (() => {
+        const answered = round.known + round.unknown;
+        const pct = total > 0 ? Math.round((answered / total) * 100) : 0;
+        return (
+          <>
+            <div className="flex items-end justify-between gap-4">
+              <span className="yzy-meta text-muted-foreground tabular-nums">
+                {String(answered).padStart(2, "0")} /{" "}
+                {String(total).padStart(2, "0")}
+              </span>
+              <span className="text-2xl sm:text-3xl font-medium tabular-nums leading-none">
+                {pct}%
+              </span>
+            </div>
+            <div className="mt-3 h-px w-full bg-foreground/20">
+              <div className="h-px bg-foreground" style={{ width: `${pct}%` }} />
+            </div>
+          </>
+        );
+      })()}
 
       {/* Карточка / экран начала / экран финала */}
       <div className="mt-6">

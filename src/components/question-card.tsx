@@ -88,6 +88,7 @@ type Props = {
   number: number;
   text: string;
   initialAnswer: string;
+  initialConfirmed?: boolean;
   initialNote?: string;
   hintEasy: string;
   hintFull: string;
@@ -167,12 +168,14 @@ function TechCard({
   number,
   text,
   initialAnswer,
+  initialConfirmed,
   initialNote,
   hintEasy,
   hintFull,
   correctAnswer,
 }: Props) {
   const [answer, setAnswer] = useState(initialAnswer ?? "");
+  const [confirmed, setConfirmed] = useState(initialConfirmed ?? false);
   const [showEasy, setShowEasy] = useState(false);
   const [showFull, setShowFull] = useState(false);
   const [showCorrect, setShowCorrect] = useState(false);
@@ -188,6 +191,20 @@ function TechCard({
 
   const lastSavedRef = useRef(initialAnswer ?? "");
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Тоггл +/-: явно помечает «ответ дан / забран». Хранится отдельно от текста
+  // в Answer.confirmed. Одновременно сворачивает карточку до заголовка.
+  const setConfirmedRemote = (next: boolean) => {
+    setConfirmed(next);
+    fetch("/api/answers", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ questionId, confirmed: next }),
+    }).catch(() => {
+      /* при ошибке сети оставляем optimistic — пользователь увидит расхождение
+         только если перезагрузит страницу */
+    });
+  };
 
   useEffect(() => {
     if (answer === lastSavedRef.current) return;
@@ -216,7 +233,6 @@ function TechCard({
     };
   }, [answer, questionId]);
 
-  const isAnswered = answer.trim().length > 0;
   const hasEasy = hintEasy.trim().length > 0;
   const hasFull = hintFull.trim().length > 0;
   const hasCorrect = correctAnswer.trim().length > 0;
@@ -230,18 +246,47 @@ function TechCard({
         <h3
           className={cn(
             "flex-1 min-w-0 text-sm sm:text-base leading-snug font-medium tracking-tight",
-            isAnswered && "line-through text-muted-foreground",
+            confirmed && "line-through text-muted-foreground",
           )}
         >
           {text}
         </h3>
-        {isAnswered && (
-          <span className="yzy-label shrink-0 text-foreground whitespace-nowrap self-center">
-            ANSWERED
-          </span>
-        )}
+        {/* +/− справа: явный жест «ответ дан / забран». Когда confirmed=true,
+            остальное тело карточки прячется (см. {!confirmed && ...}). */}
+        <div className="flex items-center gap-3 shrink-0">
+          <button
+            type="button"
+            onClick={() => setConfirmedRemote(true)}
+            aria-label="Пометить ответ данным"
+            disabled={confirmed}
+            className={cn(
+              "h-7 w-7 leading-none text-xl font-medium transition-colors",
+              confirmed
+                ? "text-muted-foreground/40 cursor-default"
+                : "text-foreground hover:text-muted-foreground",
+            )}
+          >
+            +
+          </button>
+          <button
+            type="button"
+            onClick={() => setConfirmedRemote(false)}
+            aria-label="Забрать ответ"
+            disabled={!confirmed}
+            className={cn(
+              "h-7 w-7 leading-none text-xl font-medium transition-colors",
+              !confirmed
+                ? "text-muted-foreground/40 cursor-default"
+                : "text-foreground hover:text-muted-foreground",
+            )}
+          >
+            −
+          </button>
+        </div>
       </header>
 
+      {!confirmed && (
+      <>
       <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-2 text-xs">
         <ToggleLink
           active={showEasy}
@@ -353,6 +398,8 @@ function TechCard({
         <p className="mt-4 yzy-meta text-muted-foreground">
           HINTS AND REFERENCE NOT YET FILLED IN.
         </p>
+      )}
+      </>
       )}
 
       {modalOpen && (

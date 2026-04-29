@@ -44,6 +44,10 @@ model Answer {
   username   String
   questionId String
   text       String   @db.Text
+  // Явный флаг «ответ дан». Включается кликом + в карточке вопроса,
+  // выключается кликом − . Текст в textarea сохраняется параллельно и сам по
+  // себе не делает запись «ответом» — нужен явный жест.
+  confirmed  Boolean  @default(false)
   updatedAt  DateTime @updatedAt
   createdAt  DateTime @default(now())
 
