@@ -33,6 +33,9 @@ export function QuestionCard(props: Props) {
 }
 
 function SocialCard({ number, text, correctAnswer }: Props) {
+  const [open, setOpen] = useState(false);
+  const hasAnswer = correctAnswer.trim().length > 0;
+
   return (
     <article className="border border-foreground bg-card p-4 sm:p-6">
       <header className="flex items-baseline gap-4">
@@ -44,12 +47,32 @@ function SocialCard({ number, text, correctAnswer }: Props) {
         </h3>
       </header>
 
-      {correctAnswer.trim().length > 0 ? (
-        <div className="mt-5 border border-foreground p-4">
-          <div className="yzy-label text-muted-foreground mb-2">
-            RECOMMENDED ANSWER WAY
-          </div>
-          <p className="text-sm leading-relaxed whitespace-pre-wrap">{correctAnswer}</p>
+      {hasAnswer ? (
+        <div className="mt-5">
+          <button
+            type="button"
+            onClick={() => setOpen((v) => !v)}
+            aria-expanded={open}
+            className={cn(
+              "yzy-label transition-colors",
+              open
+                ? "text-foreground"
+                : "text-muted-foreground hover:text-foreground",
+            )}
+          >
+            {open ? "HIDE RECOMMENDED ANSWER WAY" : "REVEAL RECOMMENDED ANSWER WAY"}
+          </button>
+
+          {open && (
+            <div className="mt-3 border border-foreground p-4">
+              <div className="yzy-label text-muted-foreground mb-2">
+                RECOMMENDED ANSWER WAY
+              </div>
+              <p className="text-sm leading-relaxed whitespace-pre-wrap">
+                {correctAnswer}
+              </p>
+            </div>
+          )}
         </div>
       ) : (
         <p className="mt-5 yzy-meta text-muted-foreground">
