@@ -31,8 +31,9 @@ model Question {
   hintFull    String   @default("") @db.Text
   answer      String   @default("") @db.Text
 
-  section Section  @relation(fields: [sectionSlug], references: [slug], onDelete: Cascade)
-  answers Answer[]
+  section       Section        @relation(fields: [sectionSlug], references: [slug], onDelete: Cascade)
+  answers       Answer[]
+  questionNotes QuestionNote[]
 
   @@index([sectionSlug, order])
 }
@@ -61,4 +62,20 @@ model Note {
   updatedAt DateTime @updatedAt
 
   @@index([username, updatedAt])
+}
+
+// Per-question заметка пользователя — отдельная сущность от Answer.
+// Уникальность по (username, questionId) — одна заметка на вопрос.
+model QuestionNote {
+  id         String   @id @default(cuid())
+  username   String
+  questionId String
+  content    String   @db.Text
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  question Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@unique([username, questionId])
+  @@index([username])
 }

@@ -22,13 +22,17 @@ export default async function SectionPage({ params }: { params: Params }) {
   });
   if (!section) notFound();
 
-  const answers = await prisma.answer.findMany({
-    where: {
-      username,
-      questionId: { in: section.questions.map((q) => q.id) },
-    },
-  });
+  const questionIds = section.questions.map((q) => q.id);
+  const [answers, qNotes] = await Promise.all([
+    prisma.answer.findMany({
+      where: { username, questionId: { in: questionIds } },
+    }),
+    prisma.questionNote.findMany({
+      where: { username, questionId: { in: questionIds } },
+    }),
+  ]);
   const byQuestionId = new Map(answers.map((a) => [a.questionId, a.text]));
+  const noteByQuestionId = new Map(qNotes.map((n) => [n.questionId, n.content]));
 
   const groups: { subsection: string | null; items: typeof section.questions }[] = [];
   for (const q of section.questions) {
@@ -108,6 +112,7 @@ export default async function SectionPage({ params }: { params: Params }) {
                     number={q.number}
                     text={q.text}
                     initialAnswer={byQuestionId.get(q.id) ?? ""}
+                    initialNote={noteByQuestionId.get(q.id) ?? ""}
                     hintEasy={q.hintEasy}
                     hintFull={q.hintFull}
                     correctAnswer={q.answer}
