@@ -132,14 +132,6 @@ export function TrainerSession({
     setPhase("running");
   };
 
-  const onRefresh = () => {
-    // Перезагружаем страницу — серверный шаффл выдаст новый набор.
-    router.refresh();
-    setPhase("idle");
-    setIndex(0);
-    setRound({ known: 0, unknown: 0 });
-  };
-
   const onClearAll = async () => {
     if (!confirm("Снести всю статистику тренажёра? Это нельзя откатить.")) return;
     try {
@@ -182,21 +174,10 @@ export function TrainerSession({
 
   return (
     <div className="mt-6">
-      {/* Сверху — REFRESH TEST */}
-      <div className="flex items-center justify-end">
-        <button
-          type="button"
-          onClick={onRefresh}
-          className="yzy-label text-muted-foreground hover:text-foreground transition-colors"
-        >
-          REFRESH TEST
-        </button>
-      </div>
-
       {/* Прогресс — только во время прохождения */}
       {phase === "running" && (
         <>
-          <div className="mt-6 flex items-end justify-between gap-4">
+          <div className="flex items-end justify-between gap-4">
             <span className="yzy-meta text-muted-foreground tabular-nums">
               {String(index + 1).padStart(2, "0")} /{" "}
               {String(total).padStart(2, "0")}
@@ -217,17 +198,16 @@ export function TrainerSession({
       {/* Карточка / экран начала / экран финала */}
       <div className="mt-6">
         {phase === "idle" && (
-          <div className="border border-foreground bg-card p-8 sm:p-12 flex flex-col items-center text-center">
-            <p className="yzy-label text-muted-foreground">READY?</p>
+          <div className="py-16 sm:py-24 flex flex-col items-center text-center">
             <button
               type="button"
               onClick={onStart}
-              className="mt-4 yzy-label text-foreground border border-foreground px-8 py-4 text-base hover:bg-foreground hover:text-background transition-colors"
+              className="text-3xl sm:text-5xl font-medium uppercase tracking-tight leading-none text-foreground hover:text-muted-foreground transition-colors"
             >
-              START
+              Start
             </button>
-            <p className="mt-4 yzy-meta text-muted-foreground">
-              {total} cards · self-assess each one
+            <p className="mt-6 yzy-meta text-muted-foreground whitespace-pre-wrap">
+              {total} CARDS    SELF-ASSESS EACH ONE
             </p>
           </div>
         )}
@@ -390,16 +370,16 @@ function RunningCard({
         </div>
       )}
 
-      {/* Аккуратные +/-: просто две кнопки в строке, без огромной обводки */}
-      <div className="mt-6 flex items-center justify-center gap-6">
+      {/* +/− без обводок, разнесены к разным краям карточки */}
+      <div className="mt-6 flex items-center justify-between">
         <button
           type="button"
           onClick={onPlus}
           disabled={busy}
           aria-label="Знаю ответ"
           className={cn(
-            "h-12 w-12 text-2xl font-medium border border-foreground transition-colors",
-            "hover:bg-foreground hover:text-background",
+            "h-12 w-12 text-3xl font-medium leading-none transition-colors",
+            "text-foreground hover:text-muted-foreground",
             "disabled:opacity-40 disabled:cursor-not-allowed",
           )}
         >
@@ -411,8 +391,8 @@ function RunningCard({
           disabled={busy}
           aria-label="Не знаю ответ"
           className={cn(
-            "h-12 w-12 text-2xl font-medium border border-foreground transition-colors",
-            "hover:bg-foreground hover:text-background",
+            "h-12 w-12 text-3xl font-medium leading-none transition-colors",
+            "text-foreground hover:text-muted-foreground",
             "disabled:opacity-40 disabled:cursor-not-allowed",
           )}
         >
@@ -475,12 +455,9 @@ function StatList({
 }) {
   return (
     <div>
-      <div className="flex items-baseline justify-between pb-2">
+      <div className="pb-2">
         <span className="yzy-label">
           {sign} {label}
-        </span>
-        <span className="yzy-meta text-muted-foreground tabular-nums">
-          {entries.length}
         </span>
       </div>
       {entries.length === 0 ? (
