@@ -1,7 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
 import { cn } from "@/lib/utils";
 
 type Question = {
@@ -45,7 +44,6 @@ export function TrainerSession({
   questions: Question[];
   initialStats: Stat[];
 }) {
-  const router = useRouter();
   const [phase, setPhase] = useState<Phase>("idle");
   const [index, setIndex] = useState(0);
   const [round, setRound] = useState({ known: 0, unknown: 0 });
@@ -132,6 +130,22 @@ export function TrainerSession({
     setPhase("running");
   };
 
+  // RESET-кнопка из шапки шлёт кастомное событие — слушаем его и откатываем
+  // тренажёр на стартовый экран. Прогресс раунда сбрасывается, accumulated
+  // stats остаются (их можно снести только CLEAR ALL STATS внизу страницы).
+  useEffect(() => {
+    const handler = () => {
+      setPhase("idle");
+      setIndex(0);
+      setRound({ known: 0, unknown: 0 });
+      setShowEasy(false);
+      setShowFull(false);
+      setShowAnswer(false);
+    };
+    window.addEventListener("trainer:reset", handler);
+    return () => window.removeEventListener("trainer:reset", handler);
+  }, []);
+
   const onClearAll = async () => {
     if (!confirm("Снести всю статистику тренажёра? Это нельзя откатить.")) return;
     try {
@@ -202,11 +216,12 @@ export function TrainerSession({
             <button
               type="button"
               onClick={onStart}
-              className="text-3xl sm:text-5xl font-medium uppercase tracking-tight leading-none text-foreground hover:text-muted-foreground transition-colors"
+              aria-label="Start trainer"
+              className="text-6xl sm:text-7xl font-bold uppercase tracking-tight leading-none text-foreground hover:text-muted-foreground transition-colors"
             >
-              Start
+              START
             </button>
-            <p className="mt-6 yzy-meta text-muted-foreground whitespace-pre-wrap">
+            <p className="mt-8 yzy-label text-muted-foreground whitespace-pre-wrap">
               {total} CARDS    SELF-ASSESS EACH ONE
             </p>
           </div>
@@ -238,24 +253,18 @@ export function TrainerSession({
         )}
 
         {phase === "done" && (
-          <div className="border border-foreground bg-card p-8 sm:p-12 flex flex-col items-center text-center">
-            <p className="yzy-label text-muted-foreground">RESULT</p>
-            <h2 className="mt-3 text-2xl sm:text-3xl font-medium uppercase tracking-tight">
-              Test passed
+          <div className="py-16 sm:py-24 flex flex-col items-center text-center">
+            <h2 className="text-5xl sm:text-6xl font-bold uppercase tracking-tight leading-none">
+              TEST FINISHED
             </h2>
-            <p className="mt-4 text-sm sm:text-base text-muted-foreground">
-              Your result for this round
-            </p>
-            <p className="mt-2 text-2xl sm:text-3xl font-medium tabular-nums">
+            <p className="mt-8 text-2xl sm:text-3xl font-medium tabular-nums">
               +{round.known} / −{round.unknown}
             </p>
             <button
               type="button"
-              onClick={() => {
-                router.refresh();
-                onStart();
-              }}
-              className="mt-6 yzy-label text-foreground border border-foreground px-8 py-4 text-base hover:bg-foreground hover:text-background transition-colors"
+              onClick={onStart}
+              aria-label="Start again"
+              className="mt-10 text-4xl sm:text-5xl font-bold uppercase tracking-tight leading-none text-foreground hover:text-muted-foreground transition-colors"
             >
               START AGAIN
             </button>
@@ -370,8 +379,8 @@ function RunningCard({
         </div>
       )}
 
-      {/* +/− без обводок, разнесены к разным краям карточки */}
-      <div className="mt-6 flex items-center justify-between">
+      {/* +/− без обводок. Равные интервалы: edge-to-+, +-to-−, −-to-edge. */}
+      <div className="mt-6 flex items-center justify-evenly">
         <button
           type="button"
           onClick={onPlus}

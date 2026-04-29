@@ -3,7 +3,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { SiteHeader } from "@/components/site-header";
 import { TrainerSession } from "@/components/trainer-session";
-import { RefreshTestButton } from "@/components/refresh-test-button";
+import { ResetTestButton } from "@/components/reset-test-button";
 import { categoryFor } from "@/lib/categories";
 
 export const dynamic = "force-dynamic";
@@ -51,7 +51,7 @@ export default async function TrainerPage() {
       <main className="mx-auto max-w-3xl px-4 sm:px-8 py-8 sm:py-12">
         <div className="flex items-baseline justify-between gap-4">
           <p className="yzy-label text-muted-foreground">SEASON — Q2 / 2026</p>
-          <RefreshTestButton />
+          <ResetTestButton />
         </div>
         <h1 className="mt-3 text-3xl sm:text-5xl font-medium uppercase leading-[1.05] tracking-tight">
           Trainer
