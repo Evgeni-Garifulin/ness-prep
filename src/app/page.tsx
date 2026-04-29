@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
@@ -7,6 +8,11 @@ import { ResetButton } from "@/components/reset-button";
 import { TRACKS, categoryFor } from "@/lib/categories";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "INDEX",
+  description: "DRILL THE INSTINCT    TWO TRACKS    ONE GOAL",
+};
 
 export default async function HomePage() {
   const username = getCurrentUser();

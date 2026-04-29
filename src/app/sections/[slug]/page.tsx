@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
@@ -11,6 +12,22 @@ import { stripSectionPrefix } from "@/lib/utils";
 export const dynamic = "force-dynamic";
 
 type Params = { slug: string };
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Params;
+}): Promise<Metadata> {
+  const section = await prisma.section.findUnique({
+    where: { slug: params.slug },
+    select: { title: true },
+  });
+  if (!section) return { title: "SECTION" };
+  return {
+    title: stripSectionPrefix(section.title).toUpperCase(),
+    description: `DRILL THE TOPIC    ${stripSectionPrefix(section.title).toUpperCase()}`,
+  };
+}
 
 export default async function SectionPage({ params }: { params: Params }) {
   const username = getCurrentUser();

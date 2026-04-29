@@ -1,3 +1,6 @@
+<!-- Этот файл больше не используется как фавиконка. Иконки генерируются
+     автоматически из app/icon.tsx (32×32 PNG, белый круг на чёрном) и
+     app/apple-icon.tsx (180×180 PNG, белый квадрат для iOS). -->
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
   <circle cx="8" cy="8" r="8" fill="#ffffff" />
 </svg>

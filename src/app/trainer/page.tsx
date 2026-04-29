@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
@@ -7,6 +8,12 @@ import { ResetTestButton } from "@/components/reset-test-button";
 import { categoryFor } from "@/lib/categories";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "TRAINER",
+  description:
+    "NO INPUT    NO TIMER    JUST RECALL    KNOW IT OR FACE IT",
+};
 
 const SESSION_SIZE = 25;
 

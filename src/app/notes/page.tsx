@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
@@ -5,6 +6,11 @@ import { SiteHeader } from "@/components/site-header";
 import { NotesEditor } from "@/components/notes-editor";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "NOTES",
+  description: "RAW DRAFTS    STAR STORIES    TALKING POINTS",
+};
 
 export default async function NotesPage() {
   const username = getCurrentUser();

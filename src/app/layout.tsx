@@ -9,12 +9,15 @@ const plexMono = IBM_Plex_Mono({
   display: "swap",
 });
 
+// Title template применяется ко всем страницам: индивидуальный title в page.tsx
+// автоматически оборачивается в " / NESS PREP".
 export const metadata: Metadata = {
-  title: "ness-prep — interview prep",
-  description: "Личный тренажёр для подготовки к собеседованию",
-  icons: {
-    icon: [{ url: "/favicon.svg", type: "image/svg+xml" }],
+  title: {
+    default: "NESS PREP",
+    template: "%s / NESS PREP",
   },
+  description:
+    "FRONTEND INTERVIEW DRILL    RECALL OVER MEMORY    KNOW IT OR FACE IT",
   robots: {
     index: false,
     follow: false,
