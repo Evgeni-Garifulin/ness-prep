@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, useTransition } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 
@@ -179,10 +179,9 @@ function TechCard({
   const [showEasy, setShowEasy] = useState(false);
   const [showFull, setShowFull] = useState(false);
   const [showCorrect, setShowCorrect] = useState(false);
-  const [savedState, setSavedState] = useState<"idle" | "saving" | "saved" | "error">(
+  const [saveState, setSaveState] = useState<"idle" | "saving" | "saved" | "error">(
     "idle",
   );
-  const [, startTransition] = useTransition();
 
   // Заметка пользователя (отдельная сущность от ответа). Хранится в БД через
   // /api/question-notes. modalOpen открывает попап для создания/редактирования.
@@ -190,10 +189,9 @@ function TechCard({
   const [modalOpen, setModalOpen] = useState(false);
 
   const lastSavedRef = useRef(initialAnswer ?? "");
-  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Тоггл +/-: явно помечает «ответ дан / забран». Хранится отдельно от текста
-  // в Answer.confirmed. Одновременно сворачивает карточку до заголовка.
+  // + только подтверждает (свернуть карточку), не трогает текст в БД.
+  // − только снимает подтверждение (раскрыть карточку), текст остаётся.
   const setConfirmedRemote = (next: boolean) => {
     setConfirmed(next);
     fetch("/api/answers", {
@@ -201,37 +199,30 @@ function TechCard({
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ questionId, confirmed: next }),
     }).catch(() => {
-      /* при ошибке сети оставляем optimistic — пользователь увидит расхождение
-         только если перезагрузит страницу */
+      /* при ошибке сети оставляем optimistic */
     });
   };
 
-  useEffect(() => {
-    if (answer === lastSavedRef.current) return;
-    setSavedState("saving");
-    if (timer.current) clearTimeout(timer.current);
-    timer.current = setTimeout(() => {
-      startTransition(async () => {
-        try {
-          const res = await fetch("/api/answers", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ questionId, text: answer }),
-          });
-          if (!res.ok) throw new Error("save failed");
-          lastSavedRef.current = answer;
-          setSavedState("saved");
-          setTimeout(() => setSavedState((s) => (s === "saved" ? "idle" : s)), 1200);
-        } catch {
-          setSavedState("error");
-        }
+  // SAVE: сохраняет текущий текст и одновременно подтверждает ответ
+  // (carтoчкa сворачивается). Аналог нажатия «+» с явным сохранением текста.
+  const onSave = async () => {
+    setSaveState("saving");
+    try {
+      const res = await fetch("/api/answers", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ questionId, text: answer, confirmed: true }),
       });
-    }, SAVE_DEBOUNCE_MS);
-
-    return () => {
-      if (timer.current) clearTimeout(timer.current);
-    };
-  }, [answer, questionId]);
+      if (!res.ok) throw new Error("save failed");
+      lastSavedRef.current = answer;
+      setConfirmed(true);
+      setSaveState("saved");
+      setTimeout(() => setSaveState((s) => (s === "saved" ? "idle" : s)), 1200);
+    } catch {
+      setSaveState("error");
+      setTimeout(() => setSaveState((s) => (s === "error" ? "idle" : s)), 1500);
+    }
+  };
 
   const hasEasy = hintEasy.trim().length > 0;
   const hasFull = hintFull.trim().length > 0;
@@ -321,17 +312,6 @@ function TechCard({
           </button>
         )}
         <CopyPromptButton question={text} />
-        <span
-          className={cn(
-            "ml-auto yzy-label tabular-nums text-muted-foreground",
-            savedState === "idle" && "opacity-0",
-          )}
-          aria-live="polite"
-        >
-          {savedState === "saving" && "SAVING…"}
-          {savedState === "saved" && "SAVED"}
-          {savedState === "error" && "ERROR"}
-        </span>
       </div>
 
       {showEasy && hasEasy && <Hint label="HINT A — LIGHT">{hintEasy}</Hint>}
@@ -348,6 +328,32 @@ function TechCard({
           placeholder="Type your answer…"
           className="text-sm"
         />
+        <div className="mt-2 flex items-center justify-end gap-4">
+          <span
+            className={cn(
+              "yzy-label text-muted-foreground transition-opacity",
+              saveState === "idle" && "opacity-0",
+            )}
+            aria-live="polite"
+          >
+            {saveState === "saving" && "SAVING…"}
+            {saveState === "saved" && "SAVED"}
+            {saveState === "error" && "ERROR"}
+          </span>
+          <button
+            type="button"
+            onClick={onSave}
+            disabled={saveState === "saving" || answer.trim().length === 0}
+            className={cn(
+              "yzy-label transition-colors",
+              answer.trim().length === 0 || saveState === "saving"
+                ? "text-muted-foreground/40 cursor-not-allowed"
+                : "text-foreground hover:text-muted-foreground",
+            )}
+          >
+            SAVE
+          </button>
+        </div>
       </div>
 
       {note.trim().length > 0 && (
