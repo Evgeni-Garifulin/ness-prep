@@ -264,7 +264,7 @@ export function TrainerSession({
               type="button"
               onClick={onStart}
               aria-label="Start again"
-              className="mt-10 text-4xl sm:text-5xl font-bold uppercase tracking-tight leading-none text-foreground hover:text-muted-foreground transition-colors"
+              className="mt-10 yzy-label text-muted-foreground hover:text-foreground transition-colors"
             >
               START AGAIN
             </button>

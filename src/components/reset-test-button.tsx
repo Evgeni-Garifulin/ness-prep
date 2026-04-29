@@ -12,7 +12,7 @@ export function ResetTestButton() {
       }}
       className="yzy-label text-muted-foreground hover:text-foreground transition-colors whitespace-nowrap"
     >
-      RESET
+      RESET TEST
     </button>
   );
 }
