@@ -1,5 +1,7 @@
 import type { Config } from "tailwindcss";
 
+// Yeezy-эстетика: квадратные углы, тонкие границы, uppercase + tracking,
+// всё в монохроме. Радиусы оставляем как переменные, но дефолты обнуляем.
 const config: Config = {
   darkMode: "class",
   content: ["./src/**/*.{ts,tsx,mdx}"],
@@ -37,13 +39,40 @@ const config: Config = {
         },
       },
       borderRadius: {
-        lg: "var(--radius)",
-        md: "calc(var(--radius) - 2px)",
-        sm: "calc(var(--radius) - 4px)",
+        none: "0",
+        sm: "0",
+        DEFAULT: "0",
+        md: "0",
+        lg: "0",
+        xl: "0",
+        "2xl": "0",
+        "3xl": "0",
+        full: "9999px",
+      },
+      letterSpacing: {
+        yzy: "0.18em",
       },
       fontFamily: {
-        sans: ["ui-sans-serif", "system-ui", "-apple-system", "Segoe UI", "Roboto", "sans-serif"],
-        mono: ["ui-monospace", "SFMono-Regular", "Menlo", "Consolas", "monospace"],
+        sans: [
+          "var(--font-plex-mono)",
+          "IBM Plex Mono",
+          "IBM Plex Mono Fallback",
+          "ui-monospace",
+          "SFMono-Regular",
+          "Menlo",
+          "Consolas",
+          "monospace",
+        ],
+        mono: [
+          "var(--font-plex-mono)",
+          "IBM Plex Mono",
+          "IBM Plex Mono Fallback",
+          "ui-monospace",
+          "SFMono-Regular",
+          "Menlo",
+          "Consolas",
+          "monospace",
+        ],
       },
     },
   },

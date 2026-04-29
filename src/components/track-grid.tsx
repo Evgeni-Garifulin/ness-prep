@@ -9,16 +9,9 @@ type Section = {
   displayNumber: number;
 };
 
-export function TrackGrid({
-  sections,
-  accent,
-}: {
-  sections: Section[];
-  accent: "emerald" | "sky";
-}) {
-  const accentBar = accent === "emerald" ? "bg-emerald-500" : "bg-sky-500";
+export function TrackGrid({ sections }: { sections: Section[] }) {
   return (
-    <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+    <ul className="border border-foreground divide-y divide-foreground">
       {sections.map((s) => {
         const pct = s.totalQuestions
           ? Math.round((s.answered / s.totalQuestions) * 100)
@@ -27,24 +20,24 @@ export function TrackGrid({
           <li key={s.slug}>
             <Link
               href={`/sections/${s.slug}`}
-              className="block h-full rounded-lg border border-border bg-card p-4 hover:bg-accent transition-colors"
+              className="group flex items-center gap-4 sm:gap-6 px-4 sm:px-6 py-4 sm:py-5 hover:bg-foreground hover:text-background transition-colors duration-150"
             >
-              <div className="flex items-start justify-between gap-2">
-                <div className="min-w-0">
-                  <p className="text-[11px] uppercase tracking-wide text-muted-foreground">
-                    {String(s.displayNumber).padStart(2, "0")}
-                  </p>
-                  <h2 className="text-sm sm:text-base font-semibold leading-snug">
-                    {s.title}
-                  </h2>
-                </div>
-                <span className="shrink-0 rounded-md border border-border px-2 py-0.5 text-xs text-muted-foreground">
-                  {s.answered}/{s.totalQuestions}
-                </span>
+              <span className="yzy-label tabular-nums w-10 shrink-0 opacity-60 group-hover:opacity-100">
+                {String(s.displayNumber).padStart(2, "0")}
+              </span>
+              <h2 className="flex-1 min-w-0 text-base sm:text-lg font-medium uppercase tracking-tight truncate">
+                {s.title}
+              </h2>
+              <span className="yzy-meta tabular-nums opacity-60 group-hover:opacity-100">
+                {s.answered}/{s.totalQuestions}
+              </span>
+              <div className="hidden sm:block w-24 h-px bg-current opacity-20 relative shrink-0">
+                <div
+                  className="absolute left-0 top-0 h-px bg-current"
+                  style={{ width: `${pct}%` }}
+                />
               </div>
-              <div className="mt-3 h-1 w-full rounded bg-muted overflow-hidden">
-                <div className={`h-full ${accentBar}`} style={{ width: `${pct}%` }} />
-              </div>
+              <span className="yzy-label opacity-60 group-hover:opacity-100">→</span>
             </Link>
           </li>
         );

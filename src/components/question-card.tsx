@@ -73,113 +73,121 @@ export function QuestionCard({
   return (
     <article
       className={cn(
-        "rounded-lg border border-border bg-card p-3 sm:p-5 shadow-sm",
-        isAnswered && "ring-1 ring-emerald-500/30",
+        "border border-foreground bg-card p-4 sm:p-6",
+        isAnswered && "bg-foreground text-background",
       )}
     >
-      <header className="flex items-start gap-3">
+      <header className="flex items-start gap-4">
         <div
           className={cn(
-            "mt-0.5 h-7 min-w-7 rounded-md border border-border px-2 text-center text-xs font-mono leading-7",
-            "shrink-0 text-muted-foreground",
-            isAnswered && "border-emerald-500/40 text-emerald-400",
+            "yzy-label tabular-nums shrink-0 mt-1 min-w-7",
+            isAnswered ? "opacity-100" : "opacity-60",
           )}
         >
-          {number}
+          {String(number).padStart(2, "0")}
         </div>
-        <h3 className="text-sm sm:text-base leading-snug font-medium">{text}</h3>
+        <h3 className="text-sm sm:text-base leading-snug font-medium tracking-tight">
+          {text}
+        </h3>
       </header>
 
-      <div className="mt-3 flex flex-wrap items-center gap-2">
-        <Button
-          size="sm"
-          variant={showEasy ? "secondary" : "outline"}
-          disabled={!hasEasy}
-          onClick={() => setShowEasy((v) => !v)}
-        >
-          {showEasy ? "Скрыть лёгкую" : "Лёгкая подсказка"}
-        </Button>
-        <Button
-          size="sm"
-          variant={showFull ? "secondary" : "outline"}
-          disabled={!hasFull}
-          onClick={() => setShowFull((v) => !v)}
-        >
-          {showFull ? "Скрыть полную" : "Полная подсказка"}
-        </Button>
-        <Button
-          size="sm"
-          variant={showCorrect ? "secondary" : "outline"}
+      <div className="mt-5 flex flex-wrap items-center gap-3 text-xs">
+        <ToggleLink active={showEasy} disabled={!hasEasy} onClick={() => setShowEasy((v) => !v)}>
+          {showEasy ? "Hide hint A" : "Hint A"}
+        </ToggleLink>
+        <ToggleLink active={showFull} disabled={!hasFull} onClick={() => setShowFull((v) => !v)}>
+          {showFull ? "Hide hint B" : "Hint B"}
+        </ToggleLink>
+        <ToggleLink
+          active={showCorrect}
           disabled={!hasCorrect}
           onClick={() => setShowCorrect((v) => !v)}
         >
-          {showCorrect ? "Скрыть ответ" : "Показать ответ"}
-        </Button>
+          {showCorrect ? "Hide answer" : "Reveal answer"}
+        </ToggleLink>
         <span
           className={cn(
-            "ml-auto text-xs",
-            savedState === "saving" && "text-muted-foreground",
-            savedState === "saved" && "text-emerald-400",
-            savedState === "error" && "text-destructive",
+            "ml-auto yzy-label tabular-nums",
+            savedState === "saving" && "opacity-60",
+            savedState === "saved" && "opacity-100",
+            savedState === "error" && "opacity-100",
+            savedState === "idle" && "opacity-0",
           )}
           aria-live="polite"
         >
-          {savedState === "saving" && "Сохраняю…"}
-          {savedState === "saved" && "Сохранено"}
-          {savedState === "error" && "Ошибка"}
+          {savedState === "saving" && "Saving…"}
+          {savedState === "saved" && "Saved"}
+          {savedState === "error" && "Error"}
         </span>
       </div>
 
-      {showEasy && hasEasy && (
-        <Hint kind="easy" text={hintEasy} />
-      )}
-      {showFull && hasFull && (
-        <Hint kind="full" text={hintFull} />
-      )}
+      {showEasy && hasEasy && <Hint label="Hint A — light">{hintEasy}</Hint>}
+      {showFull && hasFull && <Hint label="Hint B — full">{hintFull}</Hint>}
 
-      <div className="mt-3">
-        <label className="mb-1 block text-xs font-medium text-muted-foreground">
-          Твой ответ
-        </label>
+      <div className="mt-5">
+        <label className="yzy-label opacity-60 block mb-2">Your answer</label>
         <Textarea
           rows={3}
           value={answer}
           onChange={(e) => setAnswer(e.target.value)}
-          placeholder="Напиши ответ своими словами…"
-          className="text-sm sm:text-base"
+          placeholder="Type your answer…"
+          className={cn(
+            "text-sm",
+            isAnswered &&
+              "border-background bg-transparent text-background placeholder:text-background/50 focus-visible:ring-background",
+          )}
         />
       </div>
 
       {showCorrect && hasCorrect && (
-        <div className="mt-3 rounded-md border border-emerald-500/30 bg-emerald-500/5 p-3 text-sm leading-relaxed">
-          <div className="mb-1 text-xs font-semibold uppercase tracking-wide text-emerald-400">
-            Правильный ответ
-          </div>
-          <p className="whitespace-pre-wrap">{correctAnswer}</p>
+        <div className="mt-5 border border-current p-4">
+          <div className="yzy-label opacity-60 mb-2">Reference answer</div>
+          <p className="text-sm leading-relaxed whitespace-pre-wrap">{correctAnswer}</p>
         </div>
       )}
 
       {!hasEasy && !hasFull && !hasCorrect && (
-        <p className="mt-3 text-xs text-muted-foreground">
-          Подсказки и эталонный ответ ещё не заполнены.
+        <p className="mt-4 yzy-meta opacity-50">
+          Hints and reference not yet filled in.
         </p>
       )}
     </article>
   );
 }
 
-function Hint({ kind, text }: { kind: "easy" | "full"; text: string }) {
-  const palette =
-    kind === "easy"
-      ? "border-amber-500/30 bg-amber-500/5 text-amber-200"
-      : "border-sky-500/30 bg-sky-500/5 text-sky-200";
-  const label = kind === "easy" ? "Лёгкая подсказка" : "Полная подсказка";
+function ToggleLink({
+  active,
+  disabled,
+  onClick,
+  children,
+}: {
+  active: boolean;
+  disabled: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+}) {
   return (
-    <div className={cn("mt-3 rounded-md border p-3 text-sm leading-relaxed", palette)}>
-      <div className="mb-1 text-xs font-semibold uppercase tracking-wide opacity-80">
-        {label}
-      </div>
-      <p className="whitespace-pre-wrap text-foreground/90">{text}</p>
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      className={cn(
+        "yzy-label transition-opacity",
+        disabled && "opacity-30 cursor-not-allowed",
+        !disabled && active && "underline underline-offset-4 decoration-1",
+        !disabled && !active && "opacity-70 hover:opacity-100",
+      )}
+    >
+      {children}
+    </button>
+  );
+}
+
+function Hint({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div className="mt-4 border border-current p-4">
+      <div className="yzy-label opacity-60 mb-2">{label}</div>
+      <p className="text-sm leading-relaxed whitespace-pre-wrap">{children}</p>
     </div>
   );
 }

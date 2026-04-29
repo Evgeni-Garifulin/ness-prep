@@ -17,9 +17,7 @@ export default async function SectionPage({ params }: { params: Params }) {
 
   const section = await prisma.section.findUnique({
     where: { slug: params.slug },
-    include: {
-      questions: { orderBy: { order: "asc" } },
-    },
+    include: { questions: { orderBy: { order: "asc" } } },
   });
   if (!section) notFound();
 
@@ -31,7 +29,6 @@ export default async function SectionPage({ params }: { params: Params }) {
   });
   const byQuestionId = new Map(answers.map((a) => [a.questionId, a.text]));
 
-  // Group questions by subsection so the page mirrors the source markdown layout.
   const groups: { subsection: string | null; items: typeof section.questions }[] = [];
   for (const q of section.questions) {
     const last = groups[groups.length - 1];
@@ -48,12 +45,8 @@ export default async function SectionPage({ params }: { params: Params }) {
 
   const category = categoryFor(section.slug);
   const trackHref = category === "social" ? "/social" : "/tech";
-  const trackLabel = category === "social" ? "Социалка" : "Техника";
-  const trackAccent = category === "social" ? "text-sky-400" : "text-emerald-400";
-  const progressBarColor = category === "social" ? "bg-sky-500" : "bg-emerald-500";
+  const trackLabel = category === "social" ? "Social" : "Tech";
 
-  // Соседние секции в рамках того же трека (а не глобально), чтобы prev/next
-  // не уносили из техники в социалку и наоборот.
   const all = await prisma.section.findMany({
     select: { slug: true, title: true, order: true },
     orderBy: { order: "asc" },
@@ -66,41 +59,42 @@ export default async function SectionPage({ params }: { params: Params }) {
   const idx = sameTrack.findIndex((s) => s.slug === section.slug);
   const prev = idx > 0 ? sameTrack[idx - 1] : null;
   const next = idx >= 0 && idx < sameTrack.length - 1 ? sameTrack[idx + 1] : null;
+  const positionLabel = `${String(idx + 1).padStart(2, "0")} / ${String(sameTrack.length).padStart(2, "0")}`;
 
   return (
     <>
       <SiteHeader username={username} />
-      <main className="mx-auto max-w-3xl px-3 sm:px-6 py-4 sm:py-8">
+      <main className="mx-auto max-w-3xl px-4 sm:px-8 py-8 sm:py-12">
         <Link
           href={trackHref}
-          className="text-xs text-muted-foreground hover:text-foreground"
+          className="yzy-label text-muted-foreground hover:text-foreground transition-colors"
         >
           ← {trackLabel}
         </Link>
-        <div className="mt-2 flex flex-wrap items-end justify-between gap-3">
+
+        <div className="mt-4 flex flex-wrap items-end justify-between gap-3">
           <div className="min-w-0">
-            <p className={`text-[11px] uppercase tracking-wide ${trackAccent}`}>
-              {trackLabel}
+            <p className="yzy-label text-muted-foreground">
+              {trackLabel} · {positionLabel}
             </p>
-            <h1 className="text-xl sm:text-2xl font-bold tracking-tight">
+            <h1 className="mt-2 text-2xl sm:text-4xl font-medium uppercase leading-[1.05] tracking-tight">
               {section.title}
             </h1>
-            <p className="text-xs sm:text-sm text-muted-foreground mt-1">
-              {answered} / {total} отвечено · {pct}%
+            <p className="mt-3 yzy-meta text-muted-foreground tabular-nums">
+              {answered} / {total} · {pct}%
             </p>
           </div>
-          <ResetButton scope="section" sectionSlug={section.slug} label="Сбросить раздел" />
+          <ResetButton scope="section" sectionSlug={section.slug} label="Reset section" />
         </div>
 
-        <div className="mt-2 h-1.5 w-full rounded bg-muted overflow-hidden">
-          <div className={`h-full ${progressBarColor}`} style={{ width: `${pct}%` }} />
-        </div>
+        <div className="mt-6 h-px w-full bg-foreground" />
+        <div className="mt-px h-px bg-foreground" style={{ width: `${pct}%` }} />
 
-        <div className="mt-6 space-y-8">
+        <div className="mt-10 space-y-12">
           {groups.map((g, gi) => (
-            <section key={gi} className="space-y-3">
+            <section key={gi} className="space-y-4">
               {g.subsection && (
-                <h2 className="text-sm sm:text-base font-semibold uppercase tracking-wide text-muted-foreground">
+                <h2 className="yzy-label text-muted-foreground border-b border-foreground/30 pb-2">
                   {g.subsection}
                 </h2>
               )}
@@ -122,25 +116,33 @@ export default async function SectionPage({ params }: { params: Params }) {
           ))}
         </div>
 
-        <nav className="mt-10 flex items-center justify-between gap-3 text-sm">
+        <nav className="mt-16 grid grid-cols-2 gap-px border border-foreground bg-foreground">
           {prev ? (
             <Link
               href={`/sections/${prev.slug}`}
-              className="rounded-md border border-border px-3 py-2 hover:bg-accent flex-1 max-w-[48%]"
+              className="block bg-background hover:bg-foreground hover:text-background transition-colors px-4 py-4"
             >
-              <div className="text-[11px] text-muted-foreground">← {String(prev.order).padStart(2, "0")}</div>
-              <div className="truncate">{prev.title}</div>
+              <div className="yzy-label opacity-60">← Previous</div>
+              <div className="mt-2 text-sm font-medium uppercase tracking-tight truncate">
+                {prev.title}
+              </div>
             </Link>
-          ) : <span />}
+          ) : (
+            <span className="bg-background" />
+          )}
           {next ? (
             <Link
               href={`/sections/${next.slug}`}
-              className="rounded-md border border-border px-3 py-2 hover:bg-accent text-right flex-1 max-w-[48%]"
+              className="block bg-background hover:bg-foreground hover:text-background transition-colors px-4 py-4 text-right"
             >
-              <div className="text-[11px] text-muted-foreground">{String(next.order).padStart(2, "0")} →</div>
-              <div className="truncate">{next.title}</div>
+              <div className="yzy-label opacity-60">Next →</div>
+              <div className="mt-2 text-sm font-medium uppercase tracking-tight truncate">
+                {next.title}
+              </div>
             </Link>
-          ) : <span />}
+          ) : (
+            <span className="bg-background" />
+          )}
         </nav>
       </main>
     </>

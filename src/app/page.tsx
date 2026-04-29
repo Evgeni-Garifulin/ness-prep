@@ -40,83 +40,91 @@ export default async function HomePage() {
 
   const grandTotal = stats.reduce((a, s) => a + s.total, 0);
   const grandAnswered = stats.reduce((a, s) => a + s.answered, 0);
+  const grandPct = grandTotal ? Math.round((grandAnswered / grandTotal) * 100) : 0;
 
   return (
     <>
       <SiteHeader username={username} />
-      <main className="mx-auto max-w-5xl px-3 sm:px-6 py-4 sm:py-8">
-        <div className="flex flex-wrap items-end justify-between gap-3">
-          <div>
-            <h1 className="text-xl sm:text-2xl font-bold tracking-tight">
-              Подготовка к собесу
+      <main className="mx-auto max-w-6xl px-4 sm:px-8 py-8 sm:py-12">
+        <div className="grid grid-cols-12 gap-4 sm:gap-6 items-end">
+          <div className="col-span-12 md:col-span-8">
+            <p className="yzy-label text-muted-foreground">Season — Q2 / 2026</p>
+            <h1 className="mt-3 text-3xl sm:text-5xl font-medium leading-[1.05] tracking-tight uppercase">
+              Interview
+              <br />
+              Preparation
             </h1>
-            <p className="text-xs sm:text-sm text-muted-foreground mt-1">
-              {grandAnswered} из {grandTotal} вопросов отвечено
-            </p>
           </div>
-          <ResetButton scope="all" />
+          <div className="col-span-12 md:col-span-4 flex items-end justify-between md:justify-end gap-6">
+            <div className="text-right">
+              <p className="yzy-label text-muted-foreground">Progress</p>
+              <p className="mt-1 text-3xl sm:text-4xl font-medium tabular-nums">
+                {grandPct}%
+              </p>
+              <p className="yzy-meta text-muted-foreground mt-0.5">
+                {grandAnswered} / {grandTotal}
+              </p>
+            </div>
+          </div>
         </div>
 
-        <div className="mt-2 h-1.5 w-full rounded bg-muted overflow-hidden">
-          <div
-            className="h-full bg-emerald-500 transition-[width]"
-            style={{
-              width: grandTotal ? `${Math.round((grandAnswered / grandTotal) * 100)}%` : "0%",
-            }}
-          />
-        </div>
+        <div className="mt-8 h-px w-full bg-foreground" />
 
-        <ul className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-          {stats.map((track) => {
+        <ul className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-0 border border-foreground">
+          {stats.map((track, idx) => {
             const pct = track.total
               ? Math.round((track.answered / track.total) * 100)
               : 0;
-            const accentBar =
-              track.accent === "emerald" ? "bg-emerald-500" : "bg-sky-500";
-            const accentRing =
-              track.accent === "emerald"
-                ? "hover:border-emerald-500/40"
-                : "hover:border-sky-500/40";
             return (
-              <li key={track.key}>
+              <li
+                key={track.key}
+                className={
+                  idx === 0
+                    ? "border-b sm:border-b-0 sm:border-r border-foreground"
+                    : ""
+                }
+              >
                 <Link
                   href={track.href}
-                  className={`group block h-full rounded-xl border border-border bg-card p-4 sm:p-6 transition-colors ${accentRing}`}
+                  className="group block h-full p-6 sm:p-8 hover:bg-foreground hover:text-background transition-colors duration-150"
                 >
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="min-w-0">
-                      <p className="text-[11px] uppercase tracking-wide text-muted-foreground">
-                        {track.sections} разделов · {track.total} вопросов
-                      </p>
-                      <h2 className="mt-1 text-base sm:text-lg font-semibold leading-tight">
-                        {track.title}
-                      </h2>
-                      <p className="mt-1 text-xs sm:text-sm text-muted-foreground">
-                        {track.subtitle}
-                      </p>
-                    </div>
-                    <span className="shrink-0 rounded-md border border-border px-2 py-0.5 text-xs text-muted-foreground">
+                  <div className="flex items-start justify-between">
+                    <p className="yzy-label opacity-60 group-hover:opacity-100">
+                      {String(idx + 1).padStart(2, "0")} / {String(stats.length).padStart(2, "0")}
+                    </p>
+                    <p className="yzy-meta tabular-nums opacity-60 group-hover:opacity-100">
                       {track.answered}/{track.total}
-                    </span>
+                    </p>
                   </div>
-                  <div className="mt-4 h-1.5 w-full rounded bg-muted overflow-hidden">
-                    <div
-                      className={`h-full ${accentBar}`}
-                      style={{ width: `${pct}%` }}
-                    />
-                  </div>
-                  <p className="mt-3 text-xs text-muted-foreground">
-                    Открыть {track.title.toLowerCase()} →
+                  <h2 className="mt-8 text-2xl sm:text-3xl font-medium leading-tight uppercase tracking-tight">
+                    {track.title}
+                  </h2>
+                  <p className="mt-3 text-sm opacity-70 group-hover:opacity-100 max-w-md">
+                    {track.subtitle}
                   </p>
+
+                  <div className="mt-10 flex items-center justify-between">
+                    <span className="yzy-label">Enter →</span>
+                    <span className="yzy-meta tabular-nums">{pct}%</span>
+                  </div>
+
+                  <div className="mt-3 h-px w-full bg-current opacity-30" />
+                  <div
+                    className="-mt-px h-px bg-current"
+                    style={{ width: `${pct}%` }}
+                  />
                 </Link>
               </li>
             );
           })}
         </ul>
 
-        <p className="mt-8 text-xs text-muted-foreground">
-          Подсказки, ответы и заметки сохраняются между визитами. Прогресс — у каждого свой.
-        </p>
+        <div className="mt-12 flex items-center justify-between">
+          <p className="yzy-meta text-muted-foreground">
+            User · {username}
+          </p>
+          <ResetButton scope="all" label="Reset progress" />
+        </div>
       </main>
     </>
   );

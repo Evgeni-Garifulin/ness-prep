@@ -33,16 +33,14 @@ export function sortKey(category: SectionCategory, slug: string, fallbackOrder: 
 export const TRACKS = [
   {
     key: "tech" as const,
-    title: "Технические вопросы",
-    subtitle: "JS, TS, React, perf, security, system design — основной рабочий контур",
+    title: "Tech",
+    subtitle: "JS · TS · React · Performance · Architecture · System design",
     href: "/tech",
-    accent: "emerald",
   },
   {
     key: "social" as const,
-    title: "Социальные вопросы",
-    subtitle: "HR / English / Behavioral / что спрашивать самому",
+    title: "Social",
+    subtitle: "HR · English · Behavioral · Reverse Q&A",
     href: "/social",
-    accent: "sky",
   },
 ];

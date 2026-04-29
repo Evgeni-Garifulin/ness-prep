@@ -45,35 +45,43 @@ export default async function SocialPage() {
 
   const total = sections.reduce((acc, s) => acc + s.totalQuestions, 0);
   const answered = sections.reduce((acc, s) => acc + s.answered, 0);
+  const pct = total ? Math.round((answered / total) * 100) : 0;
 
   return (
     <>
       <SiteHeader username={username} />
-      <main className="mx-auto max-w-5xl px-3 sm:px-6 py-4 sm:py-8">
-        <Link href="/" className="text-xs text-muted-foreground hover:text-foreground">
-          ← Обзор
+      <main className="mx-auto max-w-6xl px-4 sm:px-8 py-8 sm:py-12">
+        <Link
+          href="/"
+          className="yzy-label text-muted-foreground hover:text-foreground transition-colors"
+        >
+          ← Index
         </Link>
-        <div className="mt-2 flex flex-wrap items-end justify-between gap-3">
-          <div>
-            <p className="text-[11px] uppercase tracking-wide text-sky-400">
-              Социальные вопросы
-            </p>
-            <h1 className="text-xl sm:text-2xl font-bold tracking-tight">
-              HR / English / Behavioral
+        <div className="mt-4 grid grid-cols-12 gap-4 items-end">
+          <div className="col-span-12 md:col-span-8">
+            <p className="yzy-label text-muted-foreground">Track 02 / 02</p>
+            <h1 className="mt-2 text-3xl sm:text-5xl font-medium uppercase leading-[1.05] tracking-tight">
+              Social
             </h1>
-            <p className="text-xs sm:text-sm text-muted-foreground mt-1">
-              {answered} / {total} отвечено · {sections.length} разделов
+            <p className="mt-3 yzy-meta text-muted-foreground">
+              HR · English · Behavioral · Reverse Q&amp;A
             </p>
           </div>
+          <div className="col-span-12 md:col-span-4 flex items-end justify-between md:justify-end gap-6">
+            <div className="text-right">
+              <p className="yzy-label text-muted-foreground">Progress</p>
+              <p className="mt-1 text-3xl font-medium tabular-nums">{pct}%</p>
+              <p className="yzy-meta text-muted-foreground mt-0.5">
+                {answered} / {total} · {sections.length} sections
+              </p>
+            </div>
+          </div>
         </div>
-        <div className="mt-2 h-1.5 w-full rounded bg-muted overflow-hidden">
-          <div
-            className="h-full bg-sky-500"
-            style={{ width: total ? `${Math.round((answered / total) * 100)}%` : "0%" }}
-          />
-        </div>
-        <div className="mt-6">
-          <TrackGrid sections={sections} accent="sky" />
+        <div className="mt-6 h-px w-full bg-foreground" />
+        <div className="mt-px h-px bg-foreground" style={{ width: `${pct}%` }} />
+
+        <div className="mt-8">
+          <TrackGrid sections={sections} />
         </div>
       </main>
     </>

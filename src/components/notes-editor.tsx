@@ -56,9 +56,7 @@ export function NotesEditor({ initialNotes }: { initialNotes: Note[] }) {
     if (!target) return;
     const next = !target.pinned;
     setNotes((prev) =>
-      [...prev.map((n) => (n.id === id ? { ...n, pinned: next } : n))].sort(
-        sortNotes,
-      ),
+      [...prev.map((n) => (n.id === id ? { ...n, pinned: next } : n))].sort(sortNotes),
     );
     start(async () => {
       await fetch(`/api/notes/${id}`, {
@@ -70,26 +68,27 @@ export function NotesEditor({ initialNotes }: { initialNotes: Note[] }) {
   };
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-[260px_1fr] gap-4">
+    <div className="grid grid-cols-1 md:grid-cols-[280px_1fr] gap-0 border border-foreground">
       <aside
         className={cn(
-          "rounded-lg border border-border bg-card",
-          "md:block",
+          "border-foreground md:border-r",
           showList ? "block" : "hidden md:block",
+          "border-b md:border-b-0",
         )}
       >
-        <div className="flex items-center justify-between gap-2 border-b border-border p-2">
-          <span className="text-xs font-semibold text-muted-foreground">
-            {notes.length} заметок
-          </span>
-          <Button size="sm" onClick={onCreate}>
-            + Новая
-          </Button>
+        <div className="flex items-center justify-between gap-2 border-b border-foreground px-3 py-2">
+          <span className="yzy-label text-muted-foreground">{notes.length} ITEMS</span>
+          <button
+            onClick={onCreate}
+            className="yzy-label hover:opacity-60 transition-opacity"
+          >
+            + New
+          </button>
         </div>
         <ul className="max-h-[60vh] md:max-h-[70vh] overflow-y-auto">
           {notes.length === 0 && (
-            <li className="px-3 py-6 text-center text-xs text-muted-foreground">
-              Пока пусто. Жми «Новая» — создастся первая заметка.
+            <li className="px-3 py-8 text-center yzy-meta text-muted-foreground">
+              Empty — hit "+ New" to start
             </li>
           )}
           {notes.map((n) => (
@@ -100,18 +99,20 @@ export function NotesEditor({ initialNotes }: { initialNotes: Note[] }) {
                   setShowList(false);
                 }}
                 className={cn(
-                  "block w-full px-3 py-2 text-left hover:bg-accent border-b border-border/60",
-                  activeId === n.id && "bg-accent",
+                  "block w-full px-3 py-3 text-left transition-colors border-b border-foreground/20",
+                  activeId === n.id
+                    ? "bg-foreground text-background"
+                    : "hover:bg-foreground hover:text-background",
                 )}
               >
                 <div className="flex items-center gap-1">
-                  {n.pinned && <span className="text-amber-400 text-xs">★</span>}
-                  <span className="truncate text-sm font-medium">
-                    {n.title || "Без названия"}
+                  {n.pinned && <span className="yzy-label">★</span>}
+                  <span className="truncate text-sm font-medium uppercase tracking-tight">
+                    {n.title || "UNTITLED"}
                   </span>
                 </div>
-                <div className="mt-0.5 truncate text-xs text-muted-foreground">
-                  {previewLine(n.content) || "Пусто"}
+                <div className="mt-1 truncate yzy-meta opacity-70">
+                  {previewLine(n.content) || "Empty"}
                 </div>
               </button>
             </li>
@@ -119,25 +120,25 @@ export function NotesEditor({ initialNotes }: { initialNotes: Note[] }) {
         </ul>
       </aside>
 
-      <section className="rounded-lg border border-border bg-card p-3 sm:p-5">
-        <div className="mb-3 flex items-center gap-2 md:hidden">
+      <section className="p-4 sm:p-6">
+        <div className="mb-4 flex items-center gap-2 md:hidden">
           <Button
             size="sm"
             variant="outline"
             onClick={() => setShowList((v) => !v)}
           >
-            {showList ? "Скрыть список" : "Список заметок"}
+            {showList ? "Hide list" : "Notes list"}
           </Button>
           <Button size="sm" onClick={onCreate}>
-            + Новая
+            + New
           </Button>
         </div>
 
         {!active ? (
-          <div className="py-12 text-center text-sm text-muted-foreground">
-            Создай первую заметку, чтобы начать.
-            <div className="mt-3">
-              <Button onClick={onCreate}>+ Новая заметка</Button>
+          <div className="py-16 text-center">
+            <p className="yzy-meta text-muted-foreground">No note selected</p>
+            <div className="mt-4 inline-block">
+              <Button onClick={onCreate}>+ Create note</Button>
             </div>
           </div>
         ) : (
@@ -173,9 +174,7 @@ function ActiveNoteEditor({
 }) {
   const [title, setTitle] = useState(note.title);
   const [content, setContent] = useState(note.content);
-  const [savedState, setSaved] = useState<"idle" | "saving" | "saved" | "error">(
-    "idle",
-  );
+  const [savedState, setSaved] = useState<"idle" | "saving" | "saved" | "error">("idle");
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastSaved = useRef({ title: note.title, content: note.content });
 
@@ -216,43 +215,43 @@ function ActiveNoteEditor({
   }, [title, content]);
 
   return (
-    <div className="flex flex-col gap-3">
-      <div className="flex flex-wrap items-center gap-2">
+    <div className="flex flex-col gap-4">
+      <div className="flex flex-wrap items-center gap-3">
         <Input
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          placeholder="Название"
-          className="text-base sm:text-lg font-semibold flex-1 min-w-0"
+          placeholder="UNTITLED"
+          className="text-base sm:text-lg font-medium uppercase tracking-tight flex-1 min-w-0 border-0 border-b border-foreground px-0 h-10 focus-visible:ring-0"
         />
         <Button
           size="sm"
-          variant={note.pinned ? "secondary" : "outline"}
+          variant={note.pinned ? "default" : "outline"}
           onClick={onTogglePin}
         >
-          {note.pinned ? "★ Закреплено" : "☆ Закрепить"}
+          {note.pinned ? "★ Pinned" : "☆ Pin"}
         </Button>
         <Button size="sm" variant="destructive" onClick={onDelete}>
-          Удалить
+          Delete
         </Button>
       </div>
       <Textarea
         value={content}
         onChange={(e) => setContent(e.target.value)}
-        placeholder="Черновик…"
-        className="min-h-[40vh] sm:min-h-[50vh] text-sm sm:text-base font-mono leading-relaxed"
+        placeholder="Draft…"
+        className="min-h-[40vh] sm:min-h-[55vh] text-sm leading-relaxed"
       />
-      <div className="flex items-center justify-between text-xs text-muted-foreground">
-        <span>Обновлено: {new Date(note.updatedAt).toLocaleString("ru-RU")}</span>
+      <div className="flex items-center justify-between yzy-meta text-muted-foreground">
+        <span>UPD · {new Date(note.updatedAt).toLocaleString("ru-RU")}</span>
         <span
           className={cn(
-            savedState === "saving" && "text-muted-foreground",
-            savedState === "saved" && "text-emerald-400",
-            savedState === "error" && "text-destructive",
+            "yzy-label",
+            savedState === "saving" && "opacity-60",
+            savedState === "idle" && "opacity-0",
           )}
         >
-          {savedState === "saving" && "Сохраняю…"}
-          {savedState === "saved" && "Сохранено"}
-          {savedState === "error" && "Ошибка сохранения"}
+          {savedState === "saving" && "Saving…"}
+          {savedState === "saved" && "Saved"}
+          {savedState === "error" && "Error"}
         </span>
       </div>
     </div>

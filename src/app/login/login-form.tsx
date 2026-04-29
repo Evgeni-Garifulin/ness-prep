@@ -25,13 +25,13 @@ export function LoginForm() {
       });
       if (!res.ok) {
         const body = await res.json().catch(() => ({}));
-        setError(body.error ?? "Не получилось войти");
+        setError(body.error ?? "Sign-in failed");
         return;
       }
       const next = search.get("from") || "/";
       router.replace(next);
     } catch {
-      setError("Сетевая ошибка");
+      setError("Network error");
     } finally {
       setLoading(false);
     }
@@ -40,40 +40,46 @@ export function LoginForm() {
   return (
     <form
       onSubmit={onSubmit}
-      className="w-full max-w-sm rounded-lg border border-border bg-card p-5 sm:p-6 shadow-sm"
+      className="w-full max-w-sm border border-foreground bg-background p-6 sm:p-8"
     >
-      <h1 className="text-lg sm:text-xl font-bold tracking-tight">ness·prep</h1>
-      <p className="mt-1 text-xs sm:text-sm text-muted-foreground">
-        Вход для подготовки к собесу.
+      <p className="yzy-label text-muted-foreground">NESS / PREP</p>
+      <h1 className="mt-3 text-2xl sm:text-3xl font-medium uppercase tracking-tight leading-[1.05]">
+        Sign in
+      </h1>
+      <p className="mt-2 yzy-meta text-muted-foreground">
+        Members only · Interview prep
       </p>
 
-      <label className="mt-5 block text-xs font-medium text-muted-foreground">
-        Логин
-      </label>
-      <Input
-        value={username}
-        onChange={(e) => setU(e.target.value)}
-        autoComplete="username"
-        required
-        className="mt-1"
-      />
+      <div className="mt-8 space-y-5">
+        <div>
+          <label className="yzy-label opacity-60 mb-2 block">Username</label>
+          <Input
+            value={username}
+            onChange={(e) => setU(e.target.value)}
+            autoComplete="username"
+            required
+          />
+        </div>
+        <div>
+          <label className="yzy-label opacity-60 mb-2 block">Password</label>
+          <Input
+            type="password"
+            value={password}
+            onChange={(e) => setP(e.target.value)}
+            autoComplete="current-password"
+            required
+          />
+        </div>
+      </div>
 
-      <label className="mt-3 block text-xs font-medium text-muted-foreground">
-        Пароль
-      </label>
-      <Input
-        type="password"
-        value={password}
-        onChange={(e) => setP(e.target.value)}
-        autoComplete="current-password"
-        required
-        className="mt-1"
-      />
+      {error && (
+        <p className="mt-4 yzy-label text-foreground border border-foreground p-3">
+          {error}
+        </p>
+      )}
 
-      {error && <p className="mt-3 text-xs text-destructive">{error}</p>}
-
-      <Button type="submit" disabled={loading} className="mt-5 w-full">
-        {loading ? "Вхожу…" : "Войти"}
+      <Button type="submit" disabled={loading} className="mt-8 w-full" size="lg">
+        {loading ? "Signing in…" : "Enter →"}
       </Button>
     </form>
   );

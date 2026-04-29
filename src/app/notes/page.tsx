@@ -18,24 +18,27 @@ export default async function NotesPage() {
   return (
     <>
       <SiteHeader username={username} />
-      <main className="mx-auto max-w-5xl px-3 sm:px-6 py-4 sm:py-8">
-        <header className="mb-4">
-          <h1 className="text-xl sm:text-2xl font-bold tracking-tight">
-            Заметки и черновики
-          </h1>
-          <p className="text-xs sm:text-sm text-muted-foreground mt-1">
-            Сюда удобно складывать STAR-истории, шпоры по терминам, заготовки ответов.
-          </p>
-        </header>
-        <NotesEditor
-          initialNotes={notes.map((n) => ({
-            id: n.id,
-            title: n.title,
-            content: n.content,
-            pinned: n.pinned,
-            updatedAt: n.updatedAt.toISOString(),
-          }))}
-        />
+      <main className="mx-auto max-w-6xl px-4 sm:px-8 py-8 sm:py-12">
+        <p className="yzy-label text-muted-foreground">Scratchpad</p>
+        <h1 className="mt-2 text-3xl sm:text-5xl font-medium uppercase leading-[1.05] tracking-tight">
+          Notes
+        </h1>
+        <p className="mt-3 yzy-meta text-muted-foreground">
+          STAR stories · vocab · talking points
+        </p>
+        <div className="mt-6 h-px w-full bg-foreground" />
+
+        <div className="mt-8">
+          <NotesEditor
+            initialNotes={notes.map((n) => ({
+              id: n.id,
+              title: n.title,
+              content: n.content,
+              pinned: n.pinned,
+              updatedAt: n.updatedAt.toISOString(),
+            }))}
+          />
+        </div>
       </main>
     </>
   );

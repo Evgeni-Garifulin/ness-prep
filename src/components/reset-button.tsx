@@ -38,21 +38,21 @@ export function ResetButton({ scope = "all", sectionSlug, label, className }: Pr
         onClick={() => setConfirming(true)}
         className={className}
       >
-        {label ?? (scope === "all" ? "Сбросить все ответы" : "Сбросить раздел")}
+        {label ?? (scope === "all" ? "Reset all" : "Reset section")}
       </Button>
     );
   }
 
   return (
-    <div className="flex flex-wrap items-center gap-2">
-      <span className="text-xs text-muted-foreground">Точно сбросить?</span>
+    <div className="flex flex-wrap items-center gap-3">
+      <span className="yzy-label opacity-60">Are you sure?</span>
       <Button
         size="sm"
-        variant="destructive"
+        variant="default"
         onClick={onReset}
         disabled={pending}
       >
-        {pending ? "Сбрасываю…" : "Да, сбросить"}
+        {pending ? "Wiping…" : "Yes, reset"}
       </Button>
       <Button
         size="sm"
@@ -60,7 +60,7 @@ export function ResetButton({ scope = "all", sectionSlug, label, className }: Pr
         onClick={() => setConfirming(false)}
         disabled={pending}
       >
-        Отмена
+        Cancel
       </Button>
     </div>
   );

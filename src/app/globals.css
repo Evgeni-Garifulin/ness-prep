@@ -2,60 +2,67 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ============================================================================
+   Палитра в духе yeezy.com: чистый монохром (чёрное на белом / белое на чёрном),
+   без акцентов. Все границы 1px, никаких теней и скруглений. Шрифт — Helvetica
+   с системными фолбэками. Toggle меняет .dark класс на <html> — все цвета
+   тут же инвертируются через CSS-переменные ниже.
+   ============================================================================ */
+
 :root {
   --background: 0 0% 100%;
-  --foreground: 222 47% 11%;
+  --foreground: 0 0% 0%;
 
   --card: 0 0% 100%;
-  --card-foreground: 222 47% 11%;
+  --card-foreground: 0 0% 0%;
 
-  --primary: 222 47% 11%;
-  --primary-foreground: 210 40% 98%;
+  --primary: 0 0% 0%;
+  --primary-foreground: 0 0% 100%;
 
-  --secondary: 210 40% 96%;
-  --secondary-foreground: 222 47% 11%;
+  --secondary: 0 0% 96%;
+  --secondary-foreground: 0 0% 0%;
 
-  --muted: 210 40% 96%;
-  --muted-foreground: 215 16% 47%;
+  --muted: 0 0% 96%;
+  --muted-foreground: 0 0% 40%;
 
-  --accent: 210 40% 96%;
-  --accent-foreground: 222 47% 11%;
+  --accent: 0 0% 92%;
+  --accent-foreground: 0 0% 0%;
 
-  --destructive: 0 72% 51%;
-  --destructive-foreground: 210 40% 98%;
+  --destructive: 0 0% 0%;
+  --destructive-foreground: 0 0% 100%;
 
-  --border: 214 32% 91%;
-  --input: 214 32% 91%;
-  --ring: 222 84% 5%;
+  --border: 0 0% 0%;
+  --input: 0 0% 80%;
+  --ring: 0 0% 0%;
 
-  --radius: 0.5rem;
+  --radius: 0px;
 }
 
 .dark {
-  --background: 222 47% 6%;
-  --foreground: 210 40% 98%;
+  --background: 0 0% 0%;
+  --foreground: 0 0% 100%;
 
-  --card: 222 47% 8%;
-  --card-foreground: 210 40% 98%;
+  --card: 0 0% 0%;
+  --card-foreground: 0 0% 100%;
 
-  --primary: 210 40% 98%;
-  --primary-foreground: 222 47% 11%;
+  --primary: 0 0% 100%;
+  --primary-foreground: 0 0% 0%;
 
-  --secondary: 217 33% 17%;
-  --secondary-foreground: 210 40% 98%;
+  --secondary: 0 0% 8%;
+  --secondary-foreground: 0 0% 100%;
 
-  --muted: 217 33% 17%;
-  --muted-foreground: 215 20% 65%;
+  --muted: 0 0% 8%;
+  --muted-foreground: 0 0% 60%;
 
-  --accent: 217 33% 17%;
-  --accent-foreground: 210 40% 98%;
+  --accent: 0 0% 14%;
+  --accent-foreground: 0 0% 100%;
 
-  --destructive: 0 63% 31%;
-  --destructive-foreground: 210 40% 98%;
+  --destructive: 0 0% 100%;
+  --destructive-foreground: 0 0% 0%;
 
-  --border: 217 33% 17%;
-  --input: 217 33% 17%;
-  --ring: 213 27% 84%;
+  --border: 0 0% 100%;
+  --input: 0 0% 30%;
+  --ring: 0 0% 100%;
 }
 
 * {
@@ -69,6 +76,70 @@ body {
   -webkit-text-size-adjust: 100%;
 }
 
+html {
+  /* мгновенная (без plait) инверсия всего полотна при клике по тогглу.
+     transition держим коротким, чтобы не было размазни. */
+  transition:
+    background-color 200ms ease,
+    color 200ms ease;
+}
+
 body {
-  font-feature-settings: "rlig" 1, "calt" 1;
+  /* IBM Plex Mono — основной шрифт. var(--font-plex-mono) приходит из
+     next/font в layout.tsx; fallback покрывает SSR/no-JS. */
+  font-family: var(--font-plex-mono), "IBM Plex Mono",
+    "IBM Plex Mono Fallback", ui-monospace, SFMono-Regular, Menlo, Consolas,
+    monospace;
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 1.45;
+}
+
+/* Все заголовки — uppercase Helvetica с минимальным трекингом, как у yeezy. */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: inherit;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+}
+
+/* yeezy-utility: подпись/служебный лейбл — uppercase + жирный трекинг. */
+.yzy-label {
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-size: 10px;
+  font-weight: 500;
+}
+
+.yzy-meta {
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 11px;
+  font-weight: 400;
+}
+
+/* Селекшн в стиль теме (инвертированный). */
+::selection {
+  background: hsl(var(--foreground));
+  color: hsl(var(--background));
+}
+
+/* Скрыть скроллбар-track фон на webkit, оставить минимальный thumb. */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--foreground) / 0.2);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--foreground) / 0.4);
 }
