@@ -56,12 +56,15 @@ export default async function TechPage() {
     <>
       <SiteHeader username={username} />
       <main className="mx-auto max-w-6xl px-4 sm:px-8 py-8 sm:py-12">
-        <Link
-          href="/"
-          className="yzy-label text-muted-foreground hover:text-foreground transition-colors"
-        >
-          INDEX
-        </Link>
+        <div className="flex items-baseline justify-between gap-4">
+          <Link
+            href="/"
+            className="yzy-label text-muted-foreground hover:text-foreground transition-colors"
+          >
+            INDEX
+          </Link>
+          <ResetButton scope="all" label="RESET PROGRESS" />
+        </div>
         <div className="mt-4 grid grid-cols-12 gap-4 items-end">
           <div className="col-span-12 md:col-span-8">
             <p className="yzy-label text-muted-foreground">TRACK 01 / 02</p>
@@ -87,9 +90,6 @@ export default async function TechPage() {
           <TrackGrid sections={sections} />
         </div>
 
-        <div className="mt-10 flex items-center justify-end">
-          <ResetButton scope="all" label="RESET PROGRESS" />
-        </div>
       </main>
     </>
   );

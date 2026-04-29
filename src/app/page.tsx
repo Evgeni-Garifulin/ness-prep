@@ -52,10 +52,13 @@ export default async function HomePage() {
     <>
       <SiteHeader username={username} />
       <main className="mx-auto max-w-6xl px-4 sm:px-8 py-8 sm:py-12">
-        <div className="grid grid-cols-12 gap-4 sm:gap-6 items-end">
+        <div className="flex items-baseline justify-between gap-4">
+          <p className="yzy-label text-muted-foreground">SEASON — Q2 / 2026</p>
+          <ResetButton scope="all" label="RESET PROGRESS" />
+        </div>
+        <div className="mt-3 grid grid-cols-12 gap-4 sm:gap-6 items-end">
           <div className="col-span-12 md:col-span-8">
-            <p className="yzy-label text-muted-foreground">SEASON — Q2 / 2026</p>
-            <h1 className="mt-3 text-3xl sm:text-5xl font-medium leading-[1.05] tracking-tight uppercase">
+            <h1 className="text-3xl sm:text-5xl font-medium leading-[1.05] tracking-tight uppercase">
               Interview
               <br />
               Preparation
@@ -127,7 +130,6 @@ export default async function HomePage() {
 
         <div className="mt-12 flex items-center justify-between">
           <p className="yzy-meta text-muted-foreground">USER · {username}</p>
-          <ResetButton scope="all" label="RESET PROGRESS" />
         </div>
       </main>
     </>

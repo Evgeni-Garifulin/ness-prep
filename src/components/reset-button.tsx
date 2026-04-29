@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 type Props = {
   scope?: "all" | "section";
@@ -11,57 +11,43 @@ type Props = {
   className?: string;
 };
 
+// Текстовая ссылка-сброс в стиле RESET TEST в тренажёре. Сидит в шапке
+// страницы (по правому краю напротив SEASON-лейбла). Подтверждение — нативный
+// confirm(), чтобы не разводить inline-«Are you sure?» в шапке.
 export function ResetButton({ scope = "all", sectionSlug, label, className }: Props) {
-  const [confirming, setConfirming] = useState(false);
   const [pending, start] = useTransition();
   const router = useRouter();
 
-  const onReset = () => {
+  const onClick = () => {
+    const msg =
+      scope === "section"
+        ? "Сбросить ответы по этой секции?"
+        : "Снести весь прогресс по ответам?";
+    if (!confirm(msg)) return;
     start(async () => {
       const res = await fetch("/api/answers/reset", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ scope, sectionSlug }),
       });
-      if (res.ok) {
-        setConfirming(false);
-        router.refresh();
-      }
+      if (res.ok) router.refresh();
     });
   };
 
-  if (!confirming) {
-    return (
-      <Button
-        size="sm"
-        variant="outline"
-        onClick={() => setConfirming(true)}
-        className={className}
-      >
-        {label ?? (scope === "all" ? "Reset all" : "Reset section")}
-      </Button>
-    );
-  }
-
   return (
-    <div className="flex flex-wrap items-center gap-3">
-      <span className="yzy-label opacity-60">Are you sure?</span>
-      <Button
-        size="sm"
-        variant="default"
-        onClick={onReset}
-        disabled={pending}
-      >
-        {pending ? "Wiping…" : "Yes, reset"}
-      </Button>
-      <Button
-        size="sm"
-        variant="ghost"
-        onClick={() => setConfirming(false)}
-        disabled={pending}
-      >
-        Cancel
-      </Button>
-    </div>
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={pending}
+      className={cn(
+        "yzy-label transition-colors whitespace-nowrap",
+        pending
+          ? "text-muted-foreground/40 cursor-not-allowed"
+          : "text-muted-foreground hover:text-foreground",
+        className,
+      )}
+    >
+      {pending ? "RESETTING…" : (label ?? (scope === "all" ? "RESET ALL" : "RESET SECTION"))}
+    </button>
   );
 }

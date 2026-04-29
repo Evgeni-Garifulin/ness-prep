@@ -90,26 +90,30 @@ export default async function SectionPage({ params }: { params: Params }) {
     <>
       <SiteHeader username={username} />
       <main className="mx-auto max-w-3xl px-4 sm:px-8 py-8 sm:py-12">
-        <Link
-          href={trackHref}
-          className="yzy-label text-muted-foreground hover:text-foreground transition-colors"
-        >
-          {trackLabel}
-        </Link>
+        <div className="flex items-baseline justify-between gap-4">
+          <Link
+            href={trackHref}
+            className="yzy-label text-muted-foreground hover:text-foreground transition-colors"
+          >
+            {trackLabel}
+          </Link>
+          <ResetButton
+            scope="section"
+            sectionSlug={section.slug}
+            label="RESET SECTION"
+          />
+        </div>
 
-        <div className="mt-4 flex flex-wrap items-end justify-between gap-3">
-          <div className="min-w-0">
-            <p className="yzy-label text-muted-foreground">
-              {trackLabel} · {positionLabel}
-            </p>
-            <h1 className="mt-2 text-2xl sm:text-4xl font-medium uppercase leading-[1.05] tracking-tight">
-              {stripSectionPrefix(section.title)}
-            </h1>
-            <p className="mt-3 yzy-meta text-muted-foreground tabular-nums">
-              {answered} / {total} · {pct}%
-            </p>
-          </div>
-          <ResetButton scope="section" sectionSlug={section.slug} label="RESET SECTION" />
+        <div className="mt-4">
+          <p className="yzy-label text-muted-foreground">
+            {trackLabel} · {positionLabel}
+          </p>
+          <h1 className="mt-2 text-2xl sm:text-4xl font-medium uppercase leading-[1.05] tracking-tight">
+            {stripSectionPrefix(section.title)}
+          </h1>
+          <p className="mt-3 yzy-meta text-muted-foreground tabular-nums">
+            {answered} / {total} · {pct}%
+          </p>
         </div>
 
         <div className="mt-6 h-px w-full bg-foreground/20" />
