@@ -4,6 +4,83 @@ import { useEffect, useRef, useState, useTransition } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 
+// Промпт для нейросети: контекст роли + сам вопрос + структура нужного объяснения.
+// Цель — пользователь жмёт COPY PROMPT, идёт в любой LLM (Claude / ChatGPT) и
+// получает развёрнутый разбор темы вместо зазубривания.
+function buildPrompt(question: string) {
+  return `Я готовлюсь к собеседованию на senior frontend. Помоги разобрать тему по вопросу:
+
+«${question}»
+
+Цель — понять, а не зазубрить. Структурируй ответ так:
+1. Что это и зачем нужно — простыми словами
+2. Как работает под капотом (но без занудства)
+3. Минимальный наглядный пример
+4. Реальные кейсы из фронтенд-разработки, где это пригождается
+5. Типичные ошибки и подводные камни
+6. Что часто спрашивают рядом, если копают глубже
+
+Пиши по-русски, без воды и без маркетинга. Если есть несколько подходов — сравни.`;
+}
+
+function CopyPromptButton({
+  question,
+  className,
+}: {
+  question: string;
+  className?: string;
+}) {
+  const [state, setState] = useState<"idle" | "copied" | "error">("idle");
+
+  const onCopy = async () => {
+    const prompt = buildPrompt(question);
+    try {
+      await navigator.clipboard.writeText(prompt);
+      setState("copied");
+      setTimeout(() => setState("idle"), 1500);
+    } catch {
+      // Fallback: создаём textarea, выделяем, document.execCommand. Старый трюк
+      // на случай когда navigator.clipboard недоступен (http-локалка, безопасный
+      // контекст и т.п.).
+      try {
+        const ta = document.createElement("textarea");
+        ta.value = prompt;
+        ta.style.position = "fixed";
+        ta.style.opacity = "0";
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand("copy");
+        document.body.removeChild(ta);
+        setState("copied");
+        setTimeout(() => setState("idle"), 1500);
+      } catch {
+        setState("error");
+        setTimeout(() => setState("idle"), 1500);
+      }
+    }
+  };
+
+  const label =
+    state === "copied" ? "COPIED" : state === "error" ? "ERROR" : "COPY PROMPT";
+
+  return (
+    <button
+      type="button"
+      onClick={onCopy}
+      aria-label="Скопировать промпт для разбора темы с нейросетью"
+      className={cn(
+        "yzy-label transition-colors whitespace-nowrap",
+        state === "copied"
+          ? "text-foreground"
+          : "text-muted-foreground hover:text-foreground",
+        className,
+      )}
+    >
+      {label}
+    </button>
+  );
+}
+
 type Mode = "tech" | "social";
 
 type Props = {
@@ -47,8 +124,8 @@ function SocialCard({ number, text, correctAnswer }: Props) {
         </h3>
       </header>
 
-      {hasAnswer ? (
-        <div className="mt-5">
+      <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-2">
+        {hasAnswer ? (
           <button
             type="button"
             onClick={() => setOpen((v) => !v)}
@@ -62,22 +139,23 @@ function SocialCard({ number, text, correctAnswer }: Props) {
           >
             {open ? "HIDE RECOMMENDED ANSWER WAY" : "REVEAL RECOMMENDED ANSWER WAY"}
           </button>
+        ) : (
+          <span className="yzy-meta text-muted-foreground">
+            RECOMMENDED ANSWER WAY NOT YET FILLED IN.
+          </span>
+        )}
+        <CopyPromptButton question={text} />
+      </div>
 
-          {open && (
-            <div className="mt-3 border border-foreground p-4">
-              <div className="yzy-label text-muted-foreground mb-2">
-                RECOMMENDED ANSWER WAY
-              </div>
-              <p className="text-sm leading-relaxed whitespace-pre-wrap">
-                {correctAnswer}
-              </p>
-            </div>
-          )}
+      {hasAnswer && open && (
+        <div className="mt-3 border border-foreground p-4">
+          <div className="yzy-label text-muted-foreground mb-2">
+            RECOMMENDED ANSWER WAY
+          </div>
+          <p className="text-sm leading-relaxed whitespace-pre-wrap">
+            {correctAnswer}
+          </p>
         </div>
-      ) : (
-        <p className="mt-5 yzy-meta text-muted-foreground">
-          RECOMMENDED ANSWER WAY NOT YET FILLED IN.
-        </p>
       )}
     </article>
   );
@@ -179,6 +257,7 @@ function TechCard({
         >
           {showCorrect ? "HIDE ANSWER" : "REVEAL ANSWER"}
         </ToggleLink>
+        <CopyPromptButton question={text} />
         <span
           className={cn(
             "ml-auto yzy-label tabular-nums text-muted-foreground",
