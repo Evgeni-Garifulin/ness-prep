@@ -1,0 +1,378 @@
+{
+  "_meta": {
+    "note": "Контент подсказок и эталонных ответов. Маппинг questionId -> {hintEasy, hintFull, answer}. Заливается секциями по мере готовности. Сид мержит поверх questions.json — пустые поля не затирают то, что уже есть.",
+    "filled_sections": ["must-have-blitz", "behavioral-star"]
+  },
+
+  "must-have-blitz__1": {
+    "hintEasy": "Цикл, который чередует выполнение JS и обработку очередей задач.",
+    "hintFull": "Single-threaded runtime: пока стек пуст — берёт следующую задачу. После каждой задачи дренирует ВСЮ microtask queue, потом даёт браузеру шанс на render, потом следующая macrotask.",
+    "answer": "Event loop — механизм, который держит JS однопоточным, но неблокирующим. Пока call stack не пуст — выполняет; когда пустеет, дренирует microtasks (Promise, queueMicrotask), потом render-фаза (если пора), потом одна следующая macrotask (setTimeout/IO/postMessage). Ключевое: microtasks выполняются полностью перед каждым следующим шагом, поэтому они могут блокировать render если плодят сами себя."
+  },
+  "must-have-blitz__2": {
+    "hintEasy": "Microtasks дренируются полностью между macrotasks; macrotasks — по одной за итерацию.",
+    "hintFull": "Microtasks: Promise.then, queueMicrotask, MutationObserver. Macrotasks: setTimeout, setInterval, message-events, IO. Все microtasks обработаются ДО следующей macrotask и до render.",
+    "answer": "Microtasks выполняются сразу после текущей задачи и ДО следующей macrotask и render-фазы — Promise.then, queueMicrotask, MutationObserver. Macrotasks отбираются по одной за итерацию loop'а — setTimeout, setInterval, IO, postMessage. Поэтому Promise.then(...) выполнится раньше setTimeout(0), даже если поставлен позже. Бесконечный цикл microtasks может полностью заморозить UI — render не получит шанса."
+  },
+  "must-have-blitz__3": {
+    "hintEasy": "Функция + её lexical environment, которое она помнит после возврата из родителя.",
+    "hintFull": "Когда внутренняя функция ссылается на переменную внешнего scope, после return из родителя эти переменные не уничтожаются — внутренняя держит ссылку через scope chain.",
+    "answer": "Closure — функция, которая помнит переменные из своего lexical scope, даже когда внешняя функция уже завершилась. Используется для encapsulation (приватные поля), partial application, фабрик, и hooks (по сути каждый useState — closure над setState). Цена: closure держит references на захваченные переменные, GC не уберёт их пока функция жива — поэтому забытые closures это типичный источник memory leak'ов."
+  },
+  "must-have-blitz__4": {
+    "hintEasy": "Closure захватил старое значение переменной, продолжает на него ссылаться когда уже нерелевантно.",
+    "hintFull": "В React-hooks возникает когда useEffect/useCallback/event handler захватывают state из старого render'а. После update этот closure продолжает видеть старое значение — отсюда баги типа «handler видит state каким он был секунду назад».",
+    "answer": "Stale closure — функция всё ещё держит ссылку на старое значение переменной из прошлого render'а. В React это типично с useEffect без правильного deps массива, setInterval без cleanup, event listener'ом, навешанным один раз и помнящим первоначальный state. Лечится: правильные dependencies, functional setState (`setX(prev => …)`), useRef для значения которое нужно «всегда свежим», или useEvent/useEffectEvent для стабильного callback."
+  },
+  "must-have-blitz__5": {
+    "hintEasy": "all = ждать всех / allSettled = всех с результатами / race = первого / any = первого успешного.",
+    "hintFull": "all reject'ит на первой ошибке. allSettled всегда resolve'ит массивом {status, value|reason}. race — первый settled (любой). any — первый fulfilled, reject'ит AggregateError только если ВСЕ упали.",
+    "answer": "Promise.all — резолвит массивом результатов когда все исполнились; reject'ит сразу на первой ошибке. allSettled — всегда резолвит массивом {status, value|reason}, без коротких замыканий, удобно для batch-операций где нужно дождаться всех. race — резолвит/реджектит первым изменившимся promise. any — резолвит первым успешным; reject'ит AggregateError только если все упали — полезно для fallback-стратегий (CDN с несколькими endpoints)."
+  },
+  "must-have-blitz__6": {
+    "hintEasy": "Стандартный механизм отмены async-операций: AbortSignal передаётся в fetch и подобные.",
+    "hintFull": "AbortController.signal даёшь в fetch, addEventListener, observer. Вызов controller.abort() кидает AbortError в pending fetch, чистит listener. Можно линковать несколько (AbortSignal.any), таймауты (AbortSignal.timeout).",
+    "answer": "AbortController — стандартный API для отмены async-операций. Создаёшь controller, передаёшь controller.signal в fetch (или другой API, который его поддерживает), на вызове controller.abort() запрос reject'ится с AbortError. Используется для отмены устаревших fetch'ей при смене страницы/параметров поиска (race condition guard), для таймаутов (`AbortSignal.timeout(5000)`), для удаления event-listener'ов одной строкой через `addEventListener(..., { signal })`. Современный фронтендный must-have."
+  },
+  "must-have-blitz__7": {
+    "hintEasy": "Debounce — ждёт паузы после последнего вызова. Throttle — пропускает не чаще раза в N мс.",
+    "hintFull": "Debounce: каждый новый вызов сбрасывает таймер — финальный вызов произойдёт через N мс тишины. Throttle: первый вызов проходит, следующие N мс блокируются. Debounce для search-input, throttle для scroll/resize/mousemove.",
+    "answer": "Debounce откладывает выполнение пока поток вызовов не утихнет на N мс — каждый новый вызов сбрасывает таймер; финальный effect происходит после паузы. Throttle гарантирует что функция выполнится не чаще раза в N мс — первый вызов проходит сразу, последующие в окне игнорируются (или ставятся в очередь — leading/trailing варианты). Правило: debounce когда важен ИТОГ (поиск, autosave), throttle когда важна РЕГУЛЯРНОСТЬ (scroll, mousemove, real-time updates)."
+  },
+  "must-have-blitz__8": {
+    "hintEasy": "interface — расширяемый, может склеиваться (declaration merging). type — может всё (union, mapped, conditional), но не мержится.",
+    "hintFull": "interface — для object shapes, особенно публичные API. Поддерживает declaration merging и extends. type — алиас, может описывать union, intersection, primitives, conditional/mapped types. В большинстве кейсов — взаимозаменяемы.",
+    "answer": "interface — описывает форму объекта, расширяется через extends, поддерживает declaration merging (можно дописать поле в той же или другой декларации того же имени — удобно для расширения сторонних типов). type — alias, может описывать всё что угодно: object, union, intersection, mapped, conditional, primitive. Merge'ить нельзя. Практика: для public API публичных пакетов — interface (расширяемость), для всего остального — type. Performance компиляции у interface чуть лучше на больших иерархиях."
+  },
+  "must-have-blitz__9": {
+    "hintEasy": "unknown — «что-то есть, но я не знаю что». any — «отключи проверки».",
+    "hintFull": "any выключает type-checker полностью — переданное никак не проверяется. unknown заставляет сузить тип (через typeof/instanceof/in/type guard) перед использованием. Это безопасный any.",
+    "answer": "unknown и any оба означают «значение неизвестного типа», но unknown — type-safe, any — нет. С any можно делать что угодно (вызвать как функцию, обратиться к полю), компилятор молчит. С unknown — обязан сузить тип через type guard (`typeof`, `instanceof`, custom predicate) до операции. Поэтому unknown — правильный выбор для входных границ (API-ответ, JSON.parse, postMessage), а any — почти всегда technical debt и code smell."
+  },
+  "must-have-blitz__10": {
+    "hintEasy": "never — тип значения, которое НИКОГДА не существует. Проверка exhaustiveness в switch.",
+    "hintFull": "Возвращается из функций которые никогда не возвращаются (throw, infinite loop). Используется для exhaustive check в discriminated union: ветка default присваивается never, и компилятор ругнётся если добавили новый case.",
+    "answer": "never — тип, у которого нет ни одного значения. Возвращают функции, которые не завершаются нормально (throw error, бесконечный цикл). Главное применение в дизайне типов — exhaustive check: в switch'е по discriminated union в default'е присваивай переменную типа never (`const _: never = x`). Если добавишь новый вариант в union, но забудешь обработать — TS ругнётся, что в default попало неприсваиваемое значение. never поглощает в union (T | never = T)."
+  },
+  "must-have-blitz__11": {
+    "hintEasy": "Union с общим литеральным полем-discriminator, по которому TS сужает тип.",
+    "hintFull": "type Action = { type: 'add', id: string } | { type: 'remove', id: string, soft?: boolean }. Switch по a.type автоматически сужает тип внутри case'ов, без type assertions.",
+    "answer": "Discriminated union — union из объектов, у которых есть общее литеральное поле (обычно `type` или `kind`), различающее варианты. TypeScript использует это поле как discriminator: внутри `if (x.type === 'add')` или `case 'add':` — тип сужен до соответствующего варианта, без всяких `as`. Это идеальная замена перегрузок и проверок через `instanceof` для бизнес-логики (Redux actions, AsyncState, API responses, машины состояний)."
+  },
+  "must-have-blitz__12": {
+    "hintEasy": "Параметризованный тип — позволяет описать переиспользуемое поведение без потери информации о типе.",
+    "hintFull": "function pluck<T, K extends keyof T>(o: T, k: K): T[K]. Generic берёт типы как параметры, что даёт type-safe API без any. Можно ограничивать через extends, ставить дефолты.",
+    "answer": "Generic — параметризованный тип. Функция/класс/интерфейс принимают тип как аргумент, что даёт переиспользуемый type-safe код. Базовая форма: `function id<T>(x: T): T`. Можно ограничить параметр (`<T extends object>`), задать дефолт (`<T = string>`), чейнить (`<T, K extends keyof T>`). Главное правило: generic полезен когда тип результата ЗАВИСИТ от типа входа. Если внутри ты делаешь `as` — generic скорее всего лишний."
+  },
+  "must-have-blitz__13": {
+    "hintEasy": "Сужение более широкого типа до конкретного по runtime-проверке (typeof / in / instanceof / guard).",
+    "hintFull": "Type narrowing — TypeScript следит за runtime-проверкой и сужает тип в этой ветке. Работает с typeof, instanceof, in, equality, discriminated unions, custom user-defined type guards.",
+    "answer": "Type narrowing — сужение типа на основе runtime-проверки. Виды: typeof (`typeof x === 'string'`), instanceof (`x instanceof Error`), in (`'foo' in x`), equality (`x === null`), discriminated union (`x.type === 'add'`), custom guard (`isUser(x)`), assertion function (`asserts x is User`). Работает в обе стороны — в `if`-ветке тип сужен в одну сторону, в else — в другую. Это основной механизм безопасной работы с unknown / unions."
+  },
+  "must-have-blitz__14": {
+    "hintEasy": "Render — расчёт VDOM (pure). Commit — применение к DOM + side-эффекты + lifecycle.",
+    "hintFull": "Render — чистая функция props/state в JSX, может прерываться в Concurrent React. Commit — мутирует DOM, запускает refs, useLayoutEffect, потом useEffect.",
+    "answer": "Render-фаза — React вызывает компоненты и считает новый VDOM. Это должно быть pure: никаких side effects, мутаций пропсов, прямого доступа к DOM. В Concurrent React эта фаза может прерываться и стартовать заново. Commit-фаза — React применяет diff к реальному DOM, обновляет refs, синхронно вызывает useLayoutEffect, потом асинхронно useEffect. Commit нельзя прервать — он атомарен. Понимать разницу важно для отладки: если эффект «не должен» крутиться при каждом render — проблема обычно в render-фазе."
+  },
+  "must-have-blitz__15": {
+    "hintEasy": "Алгоритм diff'а старого и нового VDOM-дерева для минимизации DOM-операций.",
+    "hintFull": "React сравнивает старый и новый tree узел за узлом по типу элемента + key. При совпадении переиспользует DOM/component instance. При разнице — выкидывает поддерево и строит заново.",
+    "answer": "Reconciliation — алгоритм, которым React сравнивает прошлый и новый VDOM, чтобы понять минимальный набор DOM-операций. Эвристики: разные типы элементов в одной позиции = выбросить поддерево; одинаковый тип = переиспользовать DOM-node, обновить пропсы; для списков — match по `key`. Поэтому ключи нужно стабильные и уникальные среди siblings, а не индексы. В Concurrent React reconciliation может прерываться, чтобы дать высокоприоритетным апдейтам пройти первыми."
+  },
+  "must-have-blitz__16": {
+    "hintEasy": "Стабильный идентификатор элемента в списке — помогает reconciliation сохранять state.",
+    "hintFull": "Без key React не знает, какой child есть какой. С index'ом как ключом — при insert/remove перетасовываются compoenent instances и DOM-nodes, теряется local state и focus.",
+    "answer": "key — стабильный идентификатор элемента списка, который React использует для diff'а. С правильным key React понимает, какие элементы переехали, какие добавились, какие удалились — и переиспользует DOM-ноды и component instances. Index в качестве key опасен при операциях вставки/удаления в середине списка: компоненты «съезжают», state, focus и uncontrolled input'ы теряются или перепутываются. Используй ID из данных или композицию полей; index'ом можно когда список статичен и сортировка не меняется."
+  },
+  "must-have-blitz__17": {
+    "hintEasy": "Controlled — значение управляет React (value+onChange). Uncontrolled — DOM сам, читаем через ref.",
+    "hintFull": "Controlled даёт точный контроль, валидацию на лету, derive state. Uncontrolled — производительнее на больших формах, проще для file input'ов и third-party виджетов.",
+    "answer": "Controlled component — value управляется React-state'ом, onChange синкает обратно. Дает мгновенную валидацию, форматирование, derive state. Цена — re-render на каждый ввод. Uncontrolled component — input хранит значение в DOM, читаем через ref/event.target. Выгоден на больших формах, обязателен для file input, удобен для third-party (CodeMirror и подобные). Hybrid: controlled с debounce. Practial advice: для UX-критичных форм — controlled, для огромных — uncontrolled + collected ref'ами на submit."
+  },
+  "must-have-blitz__18": {
+    "hintEasy": "Side-effect, синхронизированный с external system. Запускается ПОСЛЕ commit'а.",
+    "hintFull": "useEffect — для подписок, fetch, timers, DOM-мутаций которые не нужны для layout. Зависит от deps array — пересоздаётся когда хоть одна dep поменялась. Cleanup-функция отрабатывает перед следующим запуском и при unmount.",
+    "answer": "useEffect — хук для side-effect'ов, синхронизирующих компонент с внешним миром (fetch, subscriptions, timers, manual DOM, аналитика). Запускается после commit'а — DOM уже обновился, layout посчитан. Зависит от deps: пустой массив — один раз после mount; список — при изменении любой dep; нет массива — после каждого render'а. Возвращай cleanup, чтобы отписаться/отменить запрос. В React 18 Strict Mode эффекты в dev монтируются дважды — это намеренно, чтобы ловить idempotency-ошибки."
+  },
+  "must-have-blitz__19": {
+    "hintEasy": "Как useEffect, но синхронно ДО paint'а — для вычислений, которые видны пользователю как мерцание.",
+    "hintFull": "useLayoutEffect блокирует paint: запускается после commit, но до того как браузер нарисует. Используется для измерений (getBoundingClientRect) и синхронных DOM-мутаций, чтобы не было flash'а.",
+    "answer": "useLayoutEffect отрабатывает после commit'а, но синхронно ДО paint'а — браузер не нарисует кадр пока не отработает. Это нужно когда ты делаешь измерение DOM и решаешь на его основе тут же скорректировать стили (типичный кейс: tooltip позиционирование, авто-фокус с прокруткой). Эффект блокирует paint, поэтому его cost виден пользователю — используй только когда useEffect даёт визуальный «прыжок». В SSR не запускается, поэтому хорошие либы делают `useIsomorphicLayoutEffect`."
+  },
+  "must-have-blitz__20": {
+    "hintEasy": "Мемоизация результата вычисления между render'ами по deps.",
+    "hintFull": "useMemo не «делает быстрее по умолчанию» — он сохраняет referential equality для derived value. Полезен когда вычисление дорогое или результат идёт в deps другого hook'а / в memo-компонент.",
+    "answer": "useMemo кеширует результат функции по deps между render'ами. Два валидных кейса: (1) вычисление реально дорогое (фильтрация большого массива, сложный selector); (2) referential equality важна — результат идёт пропсом в React.memo-компонент или в deps другого хука, иначе там сорвётся мемоизация. По умолчанию НЕ оборачивай всё подряд — useMemo сам стоит сравнения deps + хранения значения, на дешёвых вычислениях вреден."
+  },
+  "must-have-blitz__21": {
+    "hintEasy": "Мемоизация САМОЙ функции (а не результата) между render'ами.",
+    "hintFull": "Чтобы handler-функция не пересоздавалась — иначе она ломает React.memo у дочки и попадает в deps других hook'ов как «новая» каждый render.",
+    "answer": "useCallback — это `useMemo(() => fn, deps)`, мемоизирует функцию по deps. Полезен в двух случаях: (1) функция передаётся в React.memo-компонент как prop — без useCallback memo бесполезен, prop меняется каждый render; (2) функция стоит в deps другого hook'а (useEffect) — без него эффект перезапускается на каждый render. В остальных случаях — overhead без выгоды. Часто можно вообще обойтись через ref-стабильный handler или паттерн с reducer."
+  },
+  "must-have-blitz__22": {
+    "hintEasy": "HOC, который пропускает re-render если props по shallow equal не поменялись.",
+    "hintFull": "React.memo сравнивает props shallow по умолчанию. Если parent re-render'ится, но props у memo-компонента те же (по ===) — render skipped. Помогает только если props стабильны.",
+    "answer": "React.memo — HOC, который при ре-рендере parent'а пропускает render компонента, если props по shallow comparison не изменились. Работает только если props стабильны: если каждый раз передаёшь свежий объект/массив/функцию, memo ничего не сэкономит. Обычно идёт в паре с useCallback / useMemo на стороне parent. Можно передать кастомный comparator вторым аргументом, но в 99% случаев лучше пересмотреть структуру state. Это инструмент по нужде, не дефолт."
+  },
+  "must-have-blitz__23": {
+    "hintEasy": "useState для сложного state с многими переходами — централизуем апдейты в reducer-функции.",
+    "hintFull": "useReducer лучше когда: (1) next state зависит от нескольких полей предыдущего, (2) много разных типов апдейтов, (3) хочется тестировать переходы отдельно. Pure reducer + dispatch.",
+    "answer": "useReducer — альтернатива useState для сложного state. Принимает (state, action) => newState reducer и initialState; возвращает [state, dispatch]. Лучше useState когда: state — объект с несколькими полями, апдейты разнородны, переходы зависят от текущего state. Reducer pure → легко тестировать. Часто комбинируется с Context для передачи dispatch вниз без prop drilling. Хорошо моделирует машины состояний (loading/success/error/idle)."
+  },
+  "must-have-blitz__24": {
+    "hintEasy": "Mutable container, переживающий render'ы и НЕ триггерящий re-render при изменении.",
+    "hintFull": "ref.current можно менять без последствий для render-цикла. Два юзкейса: (1) DOM-нода через ref={ref}; (2) хранение mutable значения, которое нужно между render'ами без re-render — таймеры, instance-объекты, latest-snapshot.",
+    "answer": "useRef — создаёт mutable объект {current}, который переживает все render'ы и НЕ вызывает re-render при изменении current. Применения: (1) ref на DOM-ноду через JSX `ref={myRef}`; (2) хранение instance-объектов (timer ID, observer, abort controller); (3) latest-value pattern — держать актуальное значение в closure-зависимом callback'е, обновляя в useEffect. Не используй ref для значения, которое должно отображаться в UI — для этого state."
+  },
+  "must-have-blitz__25": {
+    "hintEasy": "Помечает state-update как low-priority, не блокирует урожный input.",
+    "hintFull": "startTransition оборачивает setState — React пометит этот update как transition; высокоприоритетные (например, ввод в input) пройдут первыми. Полезно для тяжёлой фильтрации/навигации.",
+    "answer": "useTransition — хук Concurrent React, помечает state-апдейт как «несрочный transition». Возвращает [isPending, startTransition]. startTransition(() => setState(...)) — этот апдейт не блокирует более приоритетные (например, печатание в input). isPending — флаг, что transition ещё в работе. Типичный кейс: фильтрация большого списка по input'у — input остаётся отзывчивым, тяжёлый список обновляется отложенно. Не серебряная пуля — сначала уменьшай объём работы, transition только сглаживает."
+  },
+  "must-have-blitz__26": {
+    "hintEasy": "Возвращает «отложенную» копию value, которая обновляется как low-priority.",
+    "hintFull": "useDeferredValue(value) — производное значение, которое в момент тяжёлого апдейта может «отставать» от input. Похоже на debounce, но управляется планировщиком React, а не таймером.",
+    "answer": "useDeferredValue(value) возвращает «отстающую» версию value: при срочных апдейтах оно показывает старое значение, потом догоняет в transition. В отличие от debounce — задержка адаптивная, рассчитывается планировщиком; на быстрой машине почти нет задержки, на медленной — есть. Хорош для деривативов которые дорого считать (фильтр, граф). useTransition нужен когда ты сам инициируешь setState; useDeferredValue — когда value приходит сверху (props, context) и оборачивать setState ты не можешь."
+  },
+  "must-have-blitz__27": {
+    "hintEasy": "Подписка на external store с гарантией consistency в Concurrent React.",
+    "hintFull": "useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot?) — официальный API React 18 для интеграции внешних state-источников. Решает tearing — когда разные компоненты читают разные снапшоты во время одного render'а.",
+    "answer": "useSyncExternalStore — API для подключения внешнего store к React в Concurrent режиме без tearing'а. Принимает subscribe(callback) и getSnapshot() (синхронно возвращающий текущее значение), опционально getServerSnapshot для SSR. React гарантирует, что в рамках одного render'а все компоненты увидят один и тот же snapshot. Используют Redux 8+, Zustand, Jotai — иначе при concurrent rendering получишь разные подписки в разных частях дерева, видящих разные версии state."
+  },
+  "must-have-blitz__28": {
+    "hintEasy": "Любое изменение value у Provider re-render'ит ВСЕХ потребителей.",
+    "hintFull": "Context не диспатчит селективно — любой consumer видит весь объект. Решения: разделить Context (state vs dispatch), мемоизировать value, использовать external store + useSyncExternalStore для селекторов.",
+    "answer": "Context при каждом изменении value в Provider'е перерендеривает всех потребителей, независимо от того, какое именно поле value их интересует. На больших деревьях это становится bottleneck'ом. Стратегии: (1) разделить контексты на стабильные (dispatch, API) и часто меняющиеся (current value); (2) мемоизировать value на стороне Provider'а; (3) использовать external store с селекторами (Zustand, Redux) — где компоненты подписываются на slice; (4) use-context-selector от @dai-shi для сужения подписки."
+  },
+  "must-have-blitz__29": {
+    "hintEasy": "Server state приходит из бэка и устаревает; client state — локальный UI.",
+    "hintFull": "Server state имеет lifecycle: fetch, cache, invalidate, refetch, sync. Client state — модалки, фильтры, форма в драфте. Смешивание убивает архитектуру — server state кладите в React Query / SWR, client state в local или Zustand.",
+    "answer": "Client state — локальное UI-состояние: открыта ли модалка, индекс таба, форма-черновик, тема. Полностью под контролем клиента, нет concept'а «устаревания». Server state — данные с бэка: лист пользователей, текущий ордер, прайсы. У него есть lifecycle: fetch, cache, stale, refetch, optimistic update, invalidation, real-time sync. Эти два типа имеют РАЗНЫЕ требования и инструменты. Server state в Redux часто превращается в hand-rolled cache; лучше React Query / TanStack Query / SWR. Client state — useState / useReducer / Zustand / Jotai."
+  },
+  "must-have-blitz__30": {
+    "hintEasy": "Cache+sync-слой для server state: fetch, dedupe, retry, refetch, invalidate, optimistic updates.",
+    "hintFull": "useQuery(['users'], fetcher) — авто-кеш по ключу, refetch on focus/reconnect, stale time, dedupe одинаковых запросов. Mutations + invalidateQueries для синка после write'ов. Решает 80% server state-болей одним пакетом.",
+    "answer": "React Query (TanStack Query) — слой синка server state. Ключевые фичи: кеш по queryKey с автоматическим dedup'ом параллельных запросов; stale time / cache time; refetch on window focus / reconnect / interval; pagination и infinite queries; mutations с onSuccess invalidation; optimistic updates. Заменяет hand-rolled solutions с Redux + thunks для CRUD-приложений. Boilerplate минимальный, DevTools отдельные. Альтернативы: SWR от Vercel (проще), RTK Query (если уже на Redux), Apollo (для GraphQL)."
+  },
+  "must-have-blitz__31": {
+    "hintEasy": "Мощно для сложного client state + middleware, но boilerplate-heavy и часто overkill.",
+    "hintFull": "Плюсы: predictable, devtools, middleware (saga, thunk), time-travel, тестируемость. Минусы: много boilerplate (RTK сильно режет), легко тащить server state куда не надо, performance с большим store требует селекторов и тонкой настройки.",
+    "answer": "Redux: плюсы — централизованный store, predictable updates через pure reducers, devtools с time-travel debugging, отличные middleware (saga для side-effects, thunk), легко тестировать. Минусы — много boilerplate (Redux Toolkit это сильно сократил), легко свалить server state в store вместо React Query, при большом store нужны нормализация и тонкие селекторы (reselect) против лишних re-render'ов. Когда брать: сложный кросс-фичный client state, требования к audit/replay (фин.приложения), большая команда с явной потребностью в дисциплине. В остальном Zustand + React Query закрывают 80% кейсов проще."
+  },
+  "must-have-blitz__32": {
+    "hintEasy": "Метрики UX: LCP (load), INP (interaction), CLS (visual stability).",
+    "hintFull": "LCP — время до отрисовки самого крупного content-элемента (good <2.5s). INP — отзывчивость на любой ввод (заменил FID, good <200ms). CLS — суммарный layout shift без действия пользователя (good <0.1).",
+    "answer": "Core Web Vitals — три метрики UX, которые Google использует в ранжировании и которые отражают реальный пользовательский опыт. LCP (Largest Contentful Paint) — время до отрисовки самого крупного видимого элемента, цель <2.5s; виноваты обычно тяжёлые images, fonts, render-blocking JS. INP (Interaction to Next Paint, заменил FID в марте 2024) — задержка между любым взаимодействием и следующим paint, цель <200ms; виноваты long tasks. CLS (Cumulative Layout Shift) — смещения layout без действий юзера, цель <0.1; виноваты images без размеров, поздно загружающиеся шрифты, динамический content над уже видимым."
+  },
+  "must-have-blitz__33": {
+    "hintEasy": "Рендерить только видимые строки списка/таблицы вместо тысяч DOM-нод.",
+    "hintFull": "react-window / react-virtuoso монтируют только то что в viewport + buffer. DOM-нод единицы вместо тысяч — рендер быстрее, scroll плавный. Сложности: dynamic row height, sticky elements, accessibility, find-on-page.",
+    "answer": "Virtualization (windowing) — техника, при которой в DOM присутствуют только видимые элементы списка плюс небольшой buffer; остальные виртуальные. Библиотеки: react-window (минималистичный), react-virtuoso (динамические высоты, grouping), TanStack Virtual (headless, под любую таблицу). Включаем когда строк >100-500 и каждая нетривиальна. Подводные: dynamic row height требует измерения и предсказания; sticky headers внутри scroll-контейнера; Ctrl+F не находит виртуализированные строки; a11y — нужен правильный aria-rowcount/aria-rowindex."
+  },
+  "must-have-blitz__34": {
+    "hintEasy": "Делить bundle на чанки, грузить по требованию.",
+    "hintFull": "Route-level (lazy() + Suspense per route) и component-level (модальные окна, тяжёлые виджеты). Уменьшает initial JS, ускоряет TTI. Граница — UX: lazy всё подряд = много спиннеров и flash'ей.",
+    "answer": "Bundle splitting — разбиение bundle на отдельные чанки, которые грузятся по требованию. Уровни: route-level (каждый роут отдельным chunk через React.lazy + Suspense), component-level (тяжёлые модалки, charts, редакторы — грузятся при открытии), vendor splitting (отдельный chunk для библиотек с долгим cache lifetime). Бандлеры (Vite/Rollup) делают это через dynamic import(). Цель — уменьшить initial JS до того, что нужно для first paint и first interaction. Ловушки: overzealous splitting приводит к waterfall'у запросов и flash'ам."
+  },
+  "must-have-blitz__35": {
+    "hintEasy": "Бандлер вырезает неиспользуемые экспорты на этапе билда.",
+    "hintFull": "Работает по ESM-модулям (статические import/export). Ломается при side-effects (без `\"sideEffects\": false` в package.json), при CommonJS, при динамическом доступе к экспортам. Без неё библиотеки тянут лишнее.",
+    "answer": "Tree shaking — статический анализ ESM-импортов, удаляющий неиспользованные экспорты из финального bundle. Работает только с ES modules (статические import/export); CommonJS — нет. Ломается если у пакета есть side-effects (импорт сам по себе что-то делает) и в package.json не указано `\"sideEffects\": false` или не перечислены файлы с side-effects. Также ломается при `import * as lib from 'lib'` если bundler не умеет анализировать использования. На практике все современные либы (lodash-es, date-fns) tree-shakeable — при правильном использовании bundle режется в разы."
+  },
+  "must-have-blitz__36": {
+    "hintEasy": "Соединение умирает → переоткрыть с exponential backoff + jitter, не долбить сервер.",
+    "hintFull": "WebSocket close → попытка reconnect через 1s, 2s, 4s, 8s… с jitter (рандомный шум) чтобы фронты не synchronously долбили после общего outage. После N попыток — surface error пользователю.",
+    "answer": "WebSocket disconnect должен корректно обрабатываться: переподключаться с exponential backoff (1s, 2s, 4s, 8s, capped) + jitter (±20%) — иначе все клиенты после общего outage синхронно долбанут сервер. Послушать `online` event window'а для немедленного reconnect. Различать stale connection (heartbeat ping/pong каждые 30с) и реальный close. После reconnect — отправить заново снапшот subscriptions, опционально запросить delta с last-known sequence id. UX: показывать subtle indicator «connection lost», блокировать критичные действия только если данные могут быть устаревшими."
+  },
+  "must-have-blitz__37": {
+    "hintEasy": "Источник шлёт быстрее чем потребитель успевает обработать — нужен механизм притормозить или дропнуть.",
+    "hintFull": "В UI typical: 1000 msg/s WebSocket'а — нельзя setState на каждый. Решения: батч через RAF, дроп устаревших, throttle, держать последний snapshot за key (last-write-wins).",
+    "answer": "Backpressure — ситуация, когда producer выдаёт данные быстрее, чем consumer может обработать. На фронте классика: real-time feed (price ticks, market data) шлёт сотни сообщений в секунду, а render не успевает. Стратегии: (1) batch — копить за окно (16ms через requestAnimationFrame) и применять разом; (2) throttle/sample — обновлять не чаще N Hz; (3) drop — last-write-wins по key, устаревшие выбрасываем; (4) coalescing — собрать diff, применить раз; (5) Web Worker для preprocess'а, в main thread приходят уже агрегированные. Без этого — фриз UI и memory growth."
+  },
+  "must-have-blitz__38": {
+    "hintEasy": "Инъекция вредоносного скрипта через user input, который попадает в DOM как код.",
+    "hintFull": "Reflected (URL-параметр), stored (БД), DOM-based (innerHTML). React по умолчанию escape'ит content, но dangerouslySetInnerHTML/href=javascript:/eval/нештатные API оставляют дыру.",
+    "answer": "XSS (Cross-Site Scripting) — инъекция вредоносного кода в страницу, который выполняется в браузере жертвы с её правами (cookies, session). Виды: reflected — параметр URL отражается в HTML; stored — попадает в БД и потом отображается всем; DOM-based — клиентский JS пишет user input в DOM как код. Защита: (1) React по умолчанию escape'ит JSX-content — основная защита; (2) dangerouslySetInnerHTML только с sanitizer (DOMPurify); (3) валидировать `href`/`src` (запретить `javascript:`); (4) Content Security Policy — script-src self без unsafe-inline; (5) HttpOnly cookies — токены не отдаются JS."
+  },
+  "must-have-blitz__39": {
+    "hintEasy": "Браузерная защита: разные origin'ы по дефолту не могут читать друг друга. Сервер указывает кому можно.",
+    "hintFull": "Origin = scheme + host + port. CORS-headers (Access-Control-Allow-Origin) на ответе разрешают cross-origin request. Preflight (OPTIONS) перед запросами с custom-headers / non-simple methods. CORS — НЕ замена auth.",
+    "answer": "CORS (Cross-Origin Resource Sharing) — механизм, через который сервер сообщает браузеру, что запрос с другого origin'а разрешён. По умолчанию SOP (Same-Origin Policy) запрещает JS читать ответ кросс-origin запроса. Сервер шлёт `Access-Control-Allow-Origin: <origin>` (и возможно Allow-Methods/Headers/Credentials), и браузер разрешает доступ. Для не-simple запросов (custom headers, не-GET/POST/HEAD, JSON content-type иногда) браузер сначала шлёт preflight OPTIONS. CORS — НЕ авторизация и не защита от server-side атак, а защита пользователя от утечки данных другому домену."
+  },
+  "must-have-blitz__40": {
+    "hintEasy": "HttpOnly cookie для refresh-token; access-token в memory. localStorage = уязвим к XSS.",
+    "hintFull": "localStorage читается JS — любой XSS = угон токена. Cookies HttpOnly недоступны JS, но требуют CSRF-защиты (SameSite=Strict/Lax + анти-csrf-token). Лучшая практика: refresh в HttpOnly cookie, короткоживущий access в memory.",
+    "answer": "Token storage — компромисс между удобством и безопасностью. localStorage — простой, но любой XSS читает токен и отправляет attacker'у; не подходит для чувствительных систем. HttpOnly cookies — JS не имеет доступа, защита от XSS-краж. Цена — нужна CSRF-защита: SameSite=Strict/Lax + анти-CSRF token для state-changing запросов. Sessionstorage — то же что localStorage, плюс умирает с табом. Best practice для финтех: refresh-token в HttpOnly Secure SameSite=Strict cookie + короткоживущий access-token в memory (теряется при reload — это ок, в обмен у нас нет XSS-вектора)."
+  },
+  "must-have-blitz__41": {
+    "hintEasy": "Семантический HTML, keyboard-навигация, контраст, alt-text, focus management.",
+    "hintFull": "Базовый чек: native button вместо div, label у input, alt у img, focus visible, контраст 4.5:1 для текста, всё работает по Tab. Это 80% выигрыша.",
+    "answer": "Accessibility basics — то, что делает интерфейс пригодным для людей с инвалидностью (screen readers, keyboard-only, low vision) и попутно улучшает UX для всех. Чеклист: (1) семантический HTML — `<button>` вместо `<div role=button>`; (2) labels на inputs; (3) alt-текст на images, aria-label на icon-buttons; (4) keyboard-навигация — всё доступно через Tab/Enter/Escape; (5) видимый focus-state (не убирай outline без замены); (6) контраст текста ≥4.5:1; (7) heading-иерархия h1>h2>h3 без скачков; (8) reduced-motion preference. Тулинг: axe DevTools, Lighthouse a11y audit, manual screen reader test (VoiceOver/NVDA)."
+  },
+  "must-have-blitz__42": {
+    "hintEasy": "Атрибуты для расширения семантики там, где native HTML не хватает. \"No ARIA лучше плохого ARIA\".",
+    "hintFull": "ARIA: roles (role=tablist, role=alert), states (aria-expanded, aria-selected), properties (aria-label, aria-describedby), live regions (aria-live=polite). Не перекрывает дефолты — кнопка <button> уже имеет role=button.",
+    "answer": "ARIA (Accessible Rich Internet Applications) — атрибуты для расширения семантики HTML, когда нативных тегов недостаточно (custom dropdown, tabs, live updates). Roles описывают что элемент делает (tablist, dialog, alert), states — текущий статус (aria-expanded, aria-selected, aria-checked), properties — связи и описания (aria-label, aria-describedby, aria-controls). Live regions (aria-live=polite/assertive) — для динамических сообщений (toasts). Главное правило WAI: «No ARIA лучше плохого ARIA» — native `<button>` уже знает что он кнопка, не пиши `<div role=button>`. ARIA только дополняет HTML, не заменяет."
+  },
+  "must-have-blitz__43": {
+    "hintEasy": "Тестируй как пользователь — getByRole, не testid'ы, не implementation details.",
+    "hintFull": "Принципы: query'й по тому что видит пользователь (role, label, text), не по class/id. Тест переживает рефакторинг разметки. testid — последний resort. Не тестируй state, тестируй observable behavior.",
+    "answer": "Testing Library построена вокруг принципа «тестируй так, как видит пользователь». Иерархия запросов: getByRole > getByLabelText > getByText > getByTitle > getByTestId. Это заставляет писать a11y-friendly разметку и делает тесты устойчивыми к рефакторингу — не сломаются при смене tag/class. Не тестируй internal state и implementation details — тестируй observable behavior: «после клика по 'Add' появляется новый элемент в списке». При async-апдейтах — findBy/waitFor (auto-retry до таймаута), не setTimeout'ы. testid — крайняя мера для неименованных элементов, не дефолт."
+  },
+  "must-have-blitz__44": {
+    "hintEasy": "Стабильные locator'ы: getByRole, getByLabel, getByText. Избегай CSS selector'ов и xpath'а.",
+    "hintFull": "Playwright auto-wait: locator знает что элемент должен быть visible/enabled/stable перед actionом — explicit sleep'ы не нужны. Цепочки .filter().getByRole() выбирают точно нужный элемент.",
+    "answer": "В Playwright предпочитай user-facing locator'ы: getByRole, getByLabel, getByPlaceholder, getByText, getByTestId. CSS selector'ы и xpath ломаются при рефакторинге верстки. Locators в Playwright lazy — не ищут элемент сразу, а при actionе с auto-waiting (visible, enabled, stable). Поэтому explicit sleeps не нужны, click() сам подождёт. Цепочки: page.getByRole('listitem').filter({ hasText: 'Foo' }).getByRole('button', { name: 'Delete' }) — точечный target в сложной разметке. data-testid — допустимо для динамики (списки), но в первую очередь старайся писать a11y-friendly разметку."
+  },
+  "must-have-blitz__45": {
+    "hintEasy": "Lint → typecheck → unit → integration → build → e2e smoke → deploy.",
+    "hintFull": "Quality gates: каждый PR проходит pipeline; failing pipeline блокирует merge. Build once, deploy many — артефакт собирается раз и продвигается через preview/staging/prod. Параллелизм там где можно.",
+    "answer": "Типичный frontend CI/CD pipeline: (1) install (cache node_modules); (2) lint + typecheck — параллельно; (3) unit/integration tests — с кэшем + shard'ами для скорости; (4) build — один раз, артефакт сохраняется и переезжает между environments; (5) Playwright smoke на preview-environment'е; (6) bundle-size budget check (failing build при regression'е); (7) deploy на preview/staging/prod через manual approve или auto-promote. Quality gates: failing любого шага блокирует merge. Артефакт ОДИН — не пересобираем для prod, чтобы preview ≡ prod."
+  },
+  "must-have-blitz__46": {
+    "hintEasy": "Включить/выключить фичу runtime'ом без redeploy. Gradual rollout, A/B, kill switch.",
+    "hintFull": "Сервис (LaunchDarkly, Unleash, Statsig, ConfigCat) или собственный config-endpoint. Флаг — типизированный, имеет default, имеет owner и срок жизни. Иначе превращаются в постоянное legacy.",
+    "answer": "Feature flags — runtime-переключатели для фич, не зависящие от деплоя. Применения: (1) gradual rollout — сначала 1%, потом 10%, 50%, 100%; (2) kill switch — мгновенное выключение сломанной фичи без rollback'а; (3) A/B testing; (4) trunk-based development без long-lived branches; (5) entitlements — фичи под платный план/роль. Инструменты: LaunchDarkly, Unleash (open-source), Statsig, ConfigCat, или свой config-endpoint. Дисциплина: каждый флаг имеет owner, expiry date, default value, типизирован. Иначе через год — гниль из 200 неудалённых флагов."
+  },
+  "must-have-blitz__47": {
+    "hintEasy": "Откат к прошлому known-good релизу при инциденте. Должен быть быстрее и проще forward-fix.",
+    "hintFull": "Стратегии: blue-green (мгновенный switch на старый), canary (rollback canary subset'а), feature flag (выключить фичу не трогая релиз), redeploy предыдущего артефакта. Главное — отрепетировано и быстро.",
+    "answer": "Rollback — откат к прошлому known-good состоянию, когда новый релиз ломает прод. Виды: (1) instant — flip обратно на старый артефакт через blue-green deployment или CDN switch; (2) feature flag off — релиз остаётся, но фича выключена (часто быстрее всего); (3) redeploy предыдущего тэга — медленнее, но надёжно. Условие чтобы это работало: артефакты иммутабельны и подписаны, БД-миграции backward-compatible (никогда DROP COLUMN на release), state-машина идемпотентна. Rollback должен быть отрепетирован — на инциденте не время разбираться."
+  },
+  "must-have-blitz__48": {
+    "hintEasy": "Logs / metrics / traces. Видеть, что приложение делает в проде без отладчика.",
+    "hintFull": "На фронте: Web Vitals + RUM (real user monitoring) + JS error tracking (Sentry) + custom metrics (slow long tasks, failed API). Связать с release-меткой и backend trace'ами через correlation id.",
+    "answer": "Observability — способность понять, что система делает в production по её output'у, не подключая дебаггер. Три pillars: logs (что произошло), metrics (агрегаты по времени — error rate, p95 latency), traces (распределённый запрос through множество сервисов). На фронте: Web Vitals (LCP, INP, CLS) через web-vitals lib; JS errors через Sentry/Rollbar/Datadog с release-tagging и source maps; custom metrics — long tasks, failed API calls, WebSocket reconnects, slow renders. Trace-correlation: бэкенд возвращает trace-id, фронт логирует его в errors — можно связать UX-баг с backend-инцидентом."
+  },
+  "must-have-blitz__49": {
+    "hintEasy": "Один сайт собирается из независимо разрабатываемых и деплоящихся фронтенд-приложений.",
+    "hintFull": "Каждая команда владеет своим remote'ом, деплоит независимо, работает на своём стеке. Shell объединяет их в единый UX. Цена: shared dependencies, contracts, runtime ошибки, увеличенный bundle.",
+    "answer": "Microfrontends — паттерн, где один продукт собирается из нескольких независимо разрабатываемых и деплоящихся фронтенд-приложений. Каждой команде — свой кусок UI, свой стек, свой релизный цикл. Shell-приложение оркестрирует. Решает проблему scaling'а команд (10+ команд на одном monolith'е давно превращаются в merge-hell). Цена: shared dependencies (React copies), version skew, performance (lazy-loading remotes), цельный UX (требует disciplined design system), сложнее debugging. Включаем когда команд много и независимость > consistency. Иначе — modular monolith с feature-folders проще."
+  },
+  "must-have-blitz__50": {
+    "hintEasy": "Webpack/Vite-плагин: runtime подгрузка чужого bundle'а как обычного импорта, share dependencies.",
+    "hintFull": "Host объявляет remotes, remote объявляет exposed modules. Shared dependencies помечаются singleton (один React на всю систему). Container'ы проверяют version compatibility runtime'ом.",
+    "answer": "Module Federation — фича Webpack 5 (и Vite через плагин), которая позволяет одному приложению (host) загружать модули другого приложения (remote) во время выполнения, как обычный import. Каждое приложение объявляет exposes (что отдаёт) и remotes (что потребляет), плюс shared dependencies (React, design system) с version constraints. На runtime container'ы согласуют версии shared deps — по дефолту singleton, чтобы не было двух React'ов в дереве. Это техническая основа большинства microfrontend-архитектур; альтернативы: import maps, single-spa, iframe-based."
+  },
+
+  "behavioral-star__ownership__1": {
+    "answer": "Используй STAR + сосредоточься на том, что ТЫ принёс, а не команда. Структура: Situation (1-2 предложения о контексте — продукт, команда, scale), Task (что было моей ответственностью, какие constraints), Action (МНОЖЕСТВО конкретных действий: что именно я инициировал, какие решения принял, как координировал), Result (измеримое — метрики, deadline, impact). Ключевая оптика: senior-ownership — это «я заметил → я инициировал → я довёл до production → я измерил → я следил после релиза», без ожидания указаний. Один проект — 3-5 минут максимум. Заранее подготовь 2-3 разных истории (perf, архитектура, кросс-командная)."
+  },
+  "behavioral-star__ownership__2": {
+    "answer": "Это любимый вопрос для проверки senior-уровня — продемонстрируй, как ты работаешь с ambiguity, не ждёшь готового тех-задания. Структура: (1) опиши неясность — что именно было непонятно, кто был стейкхолдером; (2) что ты сделал чтобы прояснить — провёл discovery, поговорил с product/design/users, сделал prototype, написал RFC; (3) какие решения принял и почему именно так (trade-off'ы); (4) как валидировал что движешься правильно (метрики, demo, feedback loop); (5) результат. Антипаттерн: «я ждал пока PM напишет тикет» — это middle-уровень. Плюсы: упомяни как помогал команде с неопределённостью."
+  },
+  "behavioral-star__ownership__3": {
+    "answer": "Покажи проактивность и связь с бизнесом. Идеальная история: ты сам обнаружил проблему (через метрики, user-feedback, code smell, bug-репорт), оценил impact (сколько денег/часов/users теряли), приоритезировал её среди другой работы (как договорился с PM/команде), реализовал решение, измерил результат. Желательно с цифрами: «увидел что 3% пользователей дропали checkout на этапе валидации формы — починил async-validation с race condition'ом — convertion вырос на 1.2pp». Антипаттерн: «починил баг по тикету» — это не ownership, это базовая работа."
+  },
+  "behavioral-star__ownership__4": {
+    "answer": "Senior-сигнал — ты влияешь не только на свой код, но и на ЧТО команда делает. Подумай о случаях когда: предложил перепланировать quarter'е (вместо фичи X сделать Y, потому что метрики показывали…), доказал что технический долг блокирует фичу (и пробил его в roadmap), вызвал сомнение в дизайне фичи и принёс альтернативу с лучшим UX/dev cost. Структура: контекст → твоё наблюдение → как ты доказал ценность изменения (данные, прототип, презентация на planning) → как преодолел сопротивление → результат и измеримый эффект. Подчеркни, что не давил, а строил консенсус."
+  },
+  "behavioral-star__ownership__5": {
+    "answer": "Это вопрос о discretionary effort — что ты делаешь без принуждения. Хорошие нарративы: (1) увидел дыру в observability и поднял её — принёс метрики, alerting; (2) написал internal-tooling, который команда теперь использует daily; (3) на инциденте остался расследовать после того, как симптомы убрали — нашёл root cause; (4) menter'ил junior'а вне формальной программы. Не превращай в «работал 80 часов в неделю» — это red flag для здоровой компании. Лучше: «увидел что X нужно команде, инвестировал N часов своего времени, вот результат». Покажи sustainable ownership, не self-burnout."
+  },
+  "behavioral-star__ownership__6": {
+    "answer": "Распиши конкретный конфликт + способ разрешения. Структура: (1) ситуация и обе стороны; (2) почему ты не согласился (на основе чего — данные, опыт, риски); (3) КАК ты выразил несогласие — приватно ли сначала, в письменном виде с trade-off'ами, на встрече с фактами; (4) что услышал от другой стороны и как пересмотрел свою позицию (если пересмотрел); (5) как пришли к решению — компромисс / disagree-and-commit / эскалация; (6) результат и retrospect. Главное — показать что disagreement был профессиональным, не personal, и что ты готов был ошибиться. Антипаттерн: история где ты был «прав», а они «упёртые»."
+  },
+  "behavioral-star__ownership__7": {
+    "answer": "Покажи где ты остановил релиз/настоял на качестве несмотря на pressure. Хорошие истории: блокировал deploy из-за accessibility regression, настоял на дополнительных тестах перед high-risk fintech-фичей, не дал смерджить PR без security review. Структура: (1) что было под угрозой (UX, безопасность, надёжность); (2) почему другая сторона давила (deadline, стейкхолдер, лень); (3) как ты аргументировал — с фактами, риском, alternative path; (4) что согласовали — отсрочка, минимальный fix, post-release monitor; (5) что показал результат. Тон — не perfectionist'а, а инженера который понимает trade-off'ы и выбирает правильный battlefield."
+  },
+  "behavioral-star__ownership__8": {
+    "answer": "Senior-сигнал — приоритезация simplicity над clever. Найди случай, где у тебя было техническое решение «класса A» (микросервисы, event-sourcing, новый framework), но ты выбрал «класса B» (cron + rest API, плоская архитектура, существующий стек), потому что: (1) не было реальной потребности в advanced approach, (2) команда не имела опыта поддерживать; (3) shorter time-to-value; (4) меньше операционных рисков. Покажи что обдумал оба пути и НЕ romantize'ал. Финал — что вышло проще (что-то перешло на advanced версию через год по реальной потребности — это бонус)."
+  },
+  "behavioral-star__ownership__9": {
+    "answer": "Это вопрос о моральном ownership и conviction'е. Идеальная история: ты предложил отложить релиз / вырезать фичу / переписать неработающий модуль, и многим это не понравилось (продукт хотел релиз, начальство отчитаться). Структура: (1) что было не так и почему именно ты должен был это поднять; (2) как преподнёс — не как «я против» а как «вижу риск, давайте обсудим»; (3) как обосновал — данные, прецеденты, оценка стоимости отказа; (4) как реагировал на сопротивление — не давил, не угрожал, оставлял space для disagree-and-commit; (5) что вышло. Если выяснилось что ты был неправ — тоже хорошая история (показывает growth)."
+  },
+  "behavioral-star__ownership__10": {
+    "answer": "Этот вопрос проверяет stamina и end-to-end-ответственность. Подбери проект 6-12+ месяцев, где было: discovery → design → implementation → rollout → post-release monitoring → optimization. Структура: (1) бизнес-цель и почему ты получил/взял проект; (2) ключевые risk'и и как ты их митигировал early; (3) важные development-этапы и решения; (4) как держал темп когда стало скучно/сложно (рефакторинг, ре-планирование, ре-stakeholdering); (5) launch и что было сложно; (6) post-release: метрики, итерации, что улучшил. Покажи что энергия не упала к концу — long-term execution это senior-уровень."
+  },
+  "behavioral-star__conflict-communication__1": {
+    "answer": "Стандартная проба — конфликт между фронтом и бэком. Идеальный шаблон: (1) контекст: какой контракт API обсуждали; (2) разногласие: backend хотел A (например, REST с overfetching), ты хотел B (GraphQL / BFF / разный shape); (3) почему важно — UX, performance, complexity; (4) как разрешили: предложил написать contract together, сделать прототип обоих подходов, померить cost'ы, привлечь tech lead'а или architect'а к обсуждению; (5) исход: компромисс или disagree-and-commit; (6) что вынес для себя — например, что лучше начать обсуждение раньше, рисовать API-контракты до кода. Никогда не рассказывай конфликт «они тупые» — позиционируй обе стороны разумно."
+  },
+  "behavioral-star__conflict-communication__2": {
+    "answer": "Покажи product-партнёрство, не оппозицию. Хорошая история: PM предлагал shipping фичи без edge-case'а / без accessibility / с bad UX; ты не согласился. Структура: (1) что предлагал PM и какой был твой контр-аргумент (не «не хочу делать», а «вот риск/cost»); (2) как поднял — приватно сначала, потом на planning; (3) что услышал от PM — какие у него constraints (deadline, user research) и пересмотрел ли ты что-то; (4) как договорились — shipped с warning'ом, отложили, сократили scope; (5) measured outcome. Покажи что ты не «выше product'а», а партнёр который видит другую сторону. Disagree-and-commit — нормальный исход."
+  },
+  "behavioral-star__conflict-communication__3": {
+    "answer": "Дизайн-конфликт обычно про trade-off feasibility / UX. Хорошие истории: дизайнер настаивал на анимации, разрушающей performance; design не учитывал accessibility / responsive / loading states. Структура: (1) разногласие; (2) как ты показал техническое ограничение (демо, cost-эстимейт, accessibility audit); (3) как предложил альтернативу, сохраняющую дух дизайна; (4) совместное решение. Сигнал senior'а: ты ходишь в дизайн раньше чем в код, не «вот тебе implementation что не работает». Альтернативно: история, где ты СОГЛАСИЛСЯ с дизайнером против команды (защитил UX) — тоже сильно."
+  },
+  "behavioral-star__conflict-communication__4": {
+    "answer": "Внутри-командный конфликт — деликатно. Не рассказывай drama про коллег. Хорошие истории: разногласия по архитектуре (Redux vs Zustand, REST vs GraphQL), code-style, перформанс-стратегии, how to test. Структура: (1) разногласие на конкретной теме; (2) как обсуждали — синхронно vs письменно (RFC); (3) собрали ли данные / прототип / эксперимент; (4) пришли к договорённости — кто принял final call (tech lead? консенсус? архитектура-комитет?); (5) как живёт решение через N месяцев. Сигнал: ты умеешь disagree-and-commit, не саботируешь решение, даже если оно не твоё."
+  },
+  "behavioral-star__conflict-communication__5": {
+    "answer": "Этот вопрос проверяет accountability и self-awareness. Хорошая история: твоё сообщение/PR-комментарий/decision были истолкованы не так как ты имел в виду — кто-то обиделся, или сделал не то. Структура: (1) что я сказал/написал; (2) как это было воспринято; (3) когда ты заметил недопонимание; (4) что сделал — пошёл к человеку напрямую, переписал, объяснил намерение, извинился если уместно; (5) что вынес — например, в письменной коммуникации больше context'а, в код-ревью добавлять nit/blocker-теги, не использовать сарказм асинхронно. Покажи, что ты ответственный за коммуникацию, а не сваливаешь на «они меня неправильно поняли»."
+  },
+  "behavioral-star__conflict-communication__6": {
+    "answer": "Это самый сильный senior-сигнал — humility. Не выдумывай поверхностные «я ошибся в названии переменной». Хорошие истории: настаивал на технологии которая оказалась неподходящей; недо-оценил complexity → задержал deadline; считал коллегу неправым → данные показали, что прав был он; защищал решение которое в production создало incident. Структура: (1) что я думал и почему; (2) что показало что я неправ — данные, инцидент, коллега; (3) как я отреагировал — публично признал, не защищался; (4) что изменил в подходе на будущее. Конкретика — главное. Без неё звучит как cliché."
+  },
+  "behavioral-star__conflict-communication__7": {
+    "answer": "Похоже на «когда ошибся», но фокус на open-mindedness. Хорошая история: ты пришёл на проект с опытом X и был уверен что нужно делать Y; команда / данные / новый контекст показали что нужно Z; ты пересмотрел. Структура: (1) изначальная позиция и её корни; (2) что заставило задуматься — конкретный аргумент / прототип / метрика; (3) как переоценил (поговорил с коллегами, прочитал спеку, попробовал альтернативу); (4) новая позиция и почему она лучше; (5) что усвоил про strong opinions weakly held. Demonstrate growth mindset не через «я всегда учусь», а через конкретный сдвиг."
+  },
+  "behavioral-star__conflict-communication__8": {
+    "answer": "Зеркало предыдущего — здесь ты предлагал, тебя не приняли. Структура: (1) что я предлагал и зачем; (2) почему команда не согласилась (их аргументы — изложи fairly); (3) как я отреагировал — настаивал? поинтересовался их optic? попросил время на эксперимент? принял? Сигнал: ты не саботируешь и не дуешься. Возможные исходы: (a) согласился с командой и работал по их плану — disagree-and-commit; (b) попросил pilot/POC; (c) спустя время принёс данные и переубедил. Главное показать professional handling несогласия — сильнее всего, если ты потом БЫЛ неправ и они правы. Это редко но честно."
+  },
+  "behavioral-star__conflict-communication__9": {
+    "answer": "Симметричный — здесь ты убедил команду. Не рассказывай как «продавил». Хороший фреймворк: (1) что было дефолтным/общим мнением и почему; (2) что увидел ты, чего не видели другие — данные, перспектива, risk; (3) как преподнёс — RFC / tech talk / 1-1 с key-стейкхолдерами / прототип; (4) reaction — изначальное сопротивление, какие аргументы пришли, что ты признал/учёл; (5) consensus и как он реализовался; (6) outcome. Senior-сигнал: ты пишешь, аргументируешь данными, не давишь, оставляешь space для других ideas, готов скорректироваться по обратной связи."
+  },
+  "behavioral-star__conflict-communication__10": {
+    "answer": "Эскалация — деликатный сигнал maturity. Структура: (1) проблема и почему её нужно было поднять выше; (2) что ты пытался сделать сам first — поговорил с коллегой / командой / руководителем напрямую; (3) почему этого было недостаточно (политическое блокирование, security/compliance issue, performance-проблема влияющая на бизнес); (4) как эскалировал — кому, в каком формате (личный разговор, письмо), с какими данными; (5) что произошло после эскалации; (6) что вынес — стоило ли эскалировать раньше / позже / иначе. Антипаттерн: эскалация как первое действие или как способ обойти коллегу. Идеал: эскалация как результат честного попытки решить вопрос на уровне."
+  },
+  "behavioral-star__deadlines-quality__1": {
+    "answer": "Классический trade-off — покажи структурированное мышление. Структура: (1) deadline и его источник (release window, customer commitment, regulatory); (2) quality risk (performance regression, accessibility, missing edge cases, undertested code); (3) как явно поговорил со стейкхолдерами о trade-off — не «я молча работал больше», а «вот что мы можем зашипить, вот что отложим»; (4) какое решение приняли — резать scope, отодвигать deadline, shipping с known issues + post-release plan; (5) outcome и lessons. Покажи что ты owner trade-off'а, не жертва."
+  },
+  "behavioral-star__deadlines-quality__2": {
+    "answer": "Покажи product-минимализм и приоритизацию. Структура: (1) изначальный scope; (2) reality check (estimate растёт / requirements уезжают / dependency не готова); (3) discussion с PM/lead — какой минимум value-юзеру; (4) что вырезали (явно и почему — каждое решение приоритизировано); (5) что выбросили в follow-up (создан тикет / документировано); (6) outcome — пользователи получили fix/feature, команда не сгорела. Сигнал: ты не «дижу всё или ничего», ты понимаешь что 80% scope'а сегодня лучше 100% через 2 месяца."
+  },
+  "behavioral-star__deadlines-quality__3": {
+    "answer": "MVP-история проверяет дисциплину scoping'а. Структура: (1) бизнес-проблема и hypothesis; (2) MVP-определение — самый узкий путь, валидирующий гипотезу; (3) что ты сознательно НЕ делал в MVP и зачем (no admin UI, no error states, hard-coded data); (4) что валидировало MVP — метрики, user-interviews, beta; (5) развитие — что пошло в next итерацию, а что отбросили. Подчеркни learnings: «без MVP мы бы потратили 3 месяца на то, что юзеры не используют». Антипаттерн: MVP, в котором ты сделал всё «нормально» — это не MVP."
+  },
+  "behavioral-star__deadlines-quality__4": {
+    "answer": "Сильнейшая senior-история. Структура: (1) что не так — критичный bug, security vulnerability, performance regression, data corruption risk; (2) как обнаружил (тестирование, мониторинг, code review); (3) решение остановить — кто принял (ты предложил, lead/PM/SRE согласовали); (4) communication — как сказал команде / стейкхолдерам / пользователям; (5) что fix'или (hot-patch, rollback, postpone); (6) post-mortem — что добавили в process чтобы не повторилось. Покажи, что готов брать heat за остановку — это senior-уровень. Антипаттерн: «продали героизм по релизу» — обратная сторона."
+  },
+  "behavioral-star__deadlines-quality__5": {
+    "answer": "Production incident — отличная stoты. Структура (классический post-mortem): (1) что случилось — symptom, blast radius, кто заметил; (2) когда заметили — alerts, customer-report; (3) как митigировали (rollback, feature flag off, hot-patch); (4) root-cause (не «человек ошибся» а «system allowed this») — race condition, missing test, deployment process gap; (5) что починили в long-term — guardrails, more tests, better alerts; (6) что вынес лично. Тон blameless. Покажи, что incident — не катастрофа, а данные о weak points системы."
+  },
+  "behavioral-star__deadlines-quality__6": {
+    "answer": "Сильно — потому что humility. Не «я никогда не пропускал». Структура: (1) bug, который попал в production по моей вине; (2) blast radius (impact); (3) как обнаружили (юзер пожаловался, monitoring, sales); (4) как fix'или; (5) ROOT cause: что в моём процессе позволило это пропустить — слишком быстро mерж'ил без отлова edge case'а / не дописал test / не подумал про state X; (6) что изменил — process, checklist, code-review-подход. Сигнал: ты learn from mistakes, не сваливаешь на QA / на других. Не делай self-flagellation, держи проф-тон."
+  },
+  "behavioral-star__deadlines-quality__7": {
+    "answer": "Performance-история — хорошая для senior FE. Структура: (1) regression — что замедлилось (LCP вырос, scroll лагает, INP plurality), на сколько; (2) когда обнаружили (RUM-метрика, customer complaint); (3) как локализовали — Performance Profiler, bisect commits, A/B тестирование старого/нового build; (4) root cause: какой коммит / dependency / re-render breakage; (5) fix — конкретное изменение; (6) measurement — метрика после; (7) preventive — добавили performance-budget в CI / Lighthouse-check. Demonstrate methodical approach + tooling-fluency."
+  },
+  "behavioral-star__deadlines-quality__8": {
+    "answer": "Security — sensitive вопрос. Безопасные истории: XSS-vulnerability в user-generated content, token storage flaw, exposed API endpoint, accidental PII logging. Структура: (1) что нашли и как (security-review, pentest, internal-report, code-review); (2) blast radius (потенциальный impact); (3) как fix'или с приоритетом и tactic'ой (hot-patch / rotate tokens / sanitization); (4) communication внутрь — кто знал, как escalated; (5) longer-term — добавили rule в CI (semgrep, trufflehog), updated secure-coding guideline, training. НЕ рассказывай детали уязвимости (responsible disclosure), фокус на process'е. Сигнал: ты понимаешь security как ongoing discipline."
+  },
+  "behavioral-star__deadlines-quality__9": {
+    "answer": "Accessibility-история — недо-расскзаная многими. Покажи что для тебя a11y — не gimmick. Структура: (1) issue — что не работало для каких пользователей (keyboard-navigation сломался, screen reader не озвучивает, contrast низкий); (2) как обнаружили — manual test, audit-tool, customer-feedback (важно: внешний customer-report = большой сигнал, плохо ловили внутри); (3) как fix'или; (4) что добавили в process чтобы не повторилось — axe в CI, Playwright tests с keyboard, design-review checklist; (5) что вынес — a11y это часть quality, не extra. Не делай вид что ты «всегда был prof' a11y» — учись честно."
+  },
+  "behavioral-star__deadlines-quality__10": {
+    "answer": "Положительная история — где тесты спасли. Структура: (1) что собирался изменить — рефакторинг / dep-update / новая фича; (2) изменения сделал; (3) тест упал и почему — конкретный edge-case, regression в behavior; (4) что нашёл бы только в prod иначе (race condition, off-by-one, accessibility); (5) исправил → пройзошёл merge; (6) что вынес — какой именно тест поймал и как ты бы написал ещё больше таких. Подчёркивай value тестов через конкретный caught-bug, а не общие слова. Это сильный сигнал что ты пишешь тесты не для покрытия, а для catching real issues."
+  },
+  "behavioral-star__mentoring-leadership__1": {
+    "answer": "Менторство — стандартный senior-вопрос. Конкретно: 1 человек, период 3-6+ месяцев, конкретная цель. Структура: (1) кого ментор'ил и в чём gap (junior-frontend без TS / middle без архитектурного мышления / новичок не понимающий код-ревью); (2) как договорились о формате (1-1 weekly, pair-programming, code-review-фокус, shadow на встречах); (3) конкретные интервенции — какие задачи давал постепенно усложняя; на каких темах разбирали (примерами из проекта); (4) как измерял прогресс — он начал брать архитектурные решения сам / чужие PR'ы стали проходить его review; (5) outcome — promotion / ownership / growth. Сигнал: ты осознанный mentor, не «отвечаю на вопросы когда спросят»."
+  },
+  "behavioral-star__mentoring-leadership__2": {
+    "answer": "Onboarding — отдельный навык. Структура: (1) кого on-board'или (новичок, переход из бэка, fresh hire); (2) что подготовил — onboarding doc, checklist первой недели, paired pull request, intro-tasks по нарастающей сложности; (3) ритм встреч — daily в первую неделю, weekly после; (4) как измерил прогресс — скорость до первого merge'а, до первой self-driven feature, до code-review-input'а; (5) что улучшил в onboarding-doc по итогам этого цикла. Сигнал: onboarding — system, не ad-hoc «спроси если что-то непонятно»."
+  },
+  "behavioral-star__mentoring-leadership__3": {
+    "answer": "Code review — culture-driver. Структура: (1) что было не так (rubber-stamp, токсичные комменты, очень long PR'ы blocking each other, неравномерная нагрузка); (2) что предложил — guidelines (blocker vs nit-tag), max PR-size, PR-template (что включает, какой тест), pairs review для архитектурных PR'ов; (3) как roll'нул — обсудил на team-meeting, написал в team wiki, pilot на 2 недели; (4) что измерил — review-turnaround time, % rubber-stamp'ов; (5) как поддерживал — обновлял по feedback'у. Сигнал: ты улучшаешь process, не только pишешь код."
+  },
+  "behavioral-star__mentoring-leadership__4": {
+    "answer": "Это «leader» уровень. Хорошие истории: ввёл performance-budget, ввёл architecture review, поднял test-coverage, договорился о tech-debt-budget'е в каждом sprint'е, привёл новые practices (RFCs, post-mortems, observability). Структура: (1) симптомы низкой quality — rigorous baseline; (2) что было причиной (system, не people); (3) что сделал — process changes, tooling, training, examples; (4) ho roll'нул и сопротивление; (5) как измерил effect — hard metrics (incidents↓, lead-time↓) и soft (team satisfaction); (6) как поддерживается без тебя. Сигнал: improvement is sustainable, не зависит от твоей энергии."
+  },
+  "behavioral-star__mentoring-leadership__5": {
+    "answer": "Knowledge sharing. Конкретные форматы: tech talks, internal blog posts, RFCs, lunch-and-learns, recorded screencasts, contribution в shared design-system. Структура: (1) тема и аудитория (сложная вещь, выученная на проекте — performance debugging, конкретный паттерн); (2) формат и зачем именно он (talk, doc, prototype-repo); (3) как готовил и подавал; (4) измерение — кто потом use'ил знание, что внедрилось в дrugих командах; (5) что вынес о sharing'е. Сигнал: scaling impact — ты переводишь свой опыт в системный actif team'а."
+  },
+  "behavioral-star__mentoring-leadership__6": {
+    "answer": "Закрытое менторство — конкретный человек. Структура: (1) человек и его цель (career growth, скилл, переход на senior, перейти в new domain); (2) gap — что не хватало (тех скилл / soft skill / visibility); (3) что ты сделал — давал stretch-задачи, рекомендовал в prom committee, помог prepare для presentation, давал feedback на 1-1; (4) progress checkpoints; (5) outcome — promotion, public recognition, ownership; (6) что вынес лично. Сигнал: ты вкладываешься в людей не транзакционно, а как long-term."
+  },
+  "behavioral-star__mentoring-leadership__7": {
+    "answer": "Difficult feedback — деликатно. Структура: (1) контекст — кому, что не работало (performance, communication, code-quality); (2) почему я был обязан дать feedback (ущерб команде, его росту); (3) подготовка — собрал конкретные примеры (не «in general», а «в PR X на встрече Y»), сформулировал impact (как это влияет на others); (4) разговор — приватно, в нейтральное время, framework SBI (Situation-Behavior-Impact) или подобный; (5) reaction — как принял, что ответил; (6) follow-up — как поддерживал движение, дал ли results; (7) outcome. Сигнал: ты способен иметь uncomfortable conversations, но с эмпатией и конкретикой."
+  },
+  "behavioral-star__mentoring-leadership__8": {
+    "answer": "Hiring — leadership signal. Структура: (1) роль и в какие interview-этапы я ходил (HR/tech/system-design/cultural); (2) как готовил вопросы — calibrated против role rubric, не ad-hoc; (3) что искал — конкретные сигналы senior (ownership, communication, depth); (4) как давал feedback в pipeline — структурировал, конкретные quotes из interview, явный recommendation (strong hire / hire / no hire / no), без bias; (5) калибровка — как сверял свои оценки с другими; (6) что вынес. Сигнал: hiring это серьёзная responsibility, не «поковыряюсь час»."
+  },
+  "behavioral-star__mentoring-leadership__9": {
+    "answer": "Оценивание кандидатов — деталь hiring'а. Структура: (1) уровень роли и rubric — что значит senior FE в этой компании; (2) сигналы которые я искал — depth (system design, debugging real-world); breadth (smell of architectural decisions); ownership (как описывает прошлые проекты); communication (структура мыслей, ответ на ambiguous-questions); (3) как обрабатывал red flags vs growth-areas; (4) как избегал biases — diverse panel, structured questions, rubric-based scoring; (5) examples где я чанг'нул mind по interview. Сигнал: structured thinking + self-awareness про biases."
+  },
+  "behavioral-star__mentoring-leadership__10": {
+    "answer": "Underperformance — самый сложный leadership-вопрос. Структура: (1) что заметил — конкретные паттерны (миссы deadline'ов, low quality PR'ов, communication gaps); (2) проверка прежде чем judge — может личные обстоятельства, неподходящий проект, нечеткие expectations? (3) разговор 1-1 — поделился наблюдениями (SBI), услышал его perspective; (4) plan together — конкретные expectations, milestones, support (mentor, training, redefined scope); (5) regular check-ins; (6) outcome — либо turn-around (часто), либо escalation в HR/manager track (если не сдвиг). Сигнал: эмпатия + standards. Не «терпел» и не «сразу report'ил»."
+  }
+}

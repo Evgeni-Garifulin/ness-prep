@@ -28,9 +28,31 @@ type RawSection = {
   questions: RawQuestion[];
 };
 
+type Content = {
+  hintEasy?: string;
+  hintFull?: string;
+  answer?: string;
+};
+
+function loadAnswers(): Record<string, Content> {
+  const p = path.resolve(process.cwd(), "data/answers.json");
+  if (!fs.existsSync(p)) return {};
+  try {
+    return JSON.parse(fs.readFileSync(p, "utf8")) as Record<string, Content>;
+  } catch (err) {
+    console.warn("[seed] answers.json present but invalid JSON, ignoring:", err);
+    return {};
+  }
+}
+
 async function main() {
   const file = path.resolve(process.cwd(), "data/questions.json");
   const raw = JSON.parse(fs.readFileSync(file, "utf8")) as { sections: RawSection[] };
+  // answers.json — отдельный файл с подсказками и эталонными ответами,
+  // мержится поверх structure из questions.json. Можно дозаливать порциями
+  // (по секциям) и пересеивать — старые поля не затираются.
+  const answers = loadAnswers();
+  let withContent = 0;
 
   let sectionCount = 0;
   let questionCount = 0;
@@ -51,6 +73,12 @@ async function main() {
     sectionCount++;
 
     for (const q of section.questions) {
+      const extra = answers[q.id] ?? {};
+      const hintEasy = extra.hintEasy ?? q.hintEasy ?? "";
+      const hintFull = extra.hintFull ?? q.hintFull ?? "";
+      const answer = extra.answer ?? q.answer ?? "";
+      if (hintEasy || hintFull || answer) withContent++;
+
       await prisma.question.upsert({
         where: { id: q.id },
         create: {
@@ -60,9 +88,9 @@ async function main() {
           number: q.number,
           subsection: q.subsection,
           text: q.text,
-          hintEasy: q.hintEasy ?? "",
-          hintFull: q.hintFull ?? "",
-          answer: q.answer ?? "",
+          hintEasy,
+          hintFull,
+          answer,
         },
         update: {
           sectionSlug: section.slug,
@@ -70,18 +98,19 @@ async function main() {
           number: q.number,
           subsection: q.subsection,
           text: q.text,
-          // Don't blow away hint/answer content if it was hand-edited later;
-          // only overwrite when seed JSON has non-empty values.
-          ...(q.hintEasy ? { hintEasy: q.hintEasy } : {}),
-          ...(q.hintFull ? { hintFull: q.hintFull } : {}),
-          ...(q.answer ? { answer: q.answer } : {}),
+          // Не затираем поля пустотой — обновляем только когда есть контент.
+          ...(hintEasy ? { hintEasy } : {}),
+          ...(hintFull ? { hintFull } : {}),
+          ...(answer ? { answer } : {}),
         },
       });
       questionCount++;
     }
   }
 
-  console.log(`Seeded ${sectionCount} sections / ${questionCount} questions`);
+  console.log(
+    `Seeded ${sectionCount} sections / ${questionCount} questions (${withContent} with hints/answer)`,
+  );
 }
 
 main()
