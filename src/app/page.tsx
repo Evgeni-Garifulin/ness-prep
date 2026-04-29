@@ -55,16 +55,18 @@ export default async function HomePage() {
               Preparation
             </h1>
           </div>
-          <div className="col-span-12 md:col-span-4 flex items-end justify-between md:justify-end gap-6">
-            <div className="text-right">
+          <div className="col-span-12 md:col-span-4 md:text-right">
+            {/* На мобиле: лейбл и % на одной строке (горизонтально), счётчик ниже.
+                На десктопе: вертикальный стек, всё прижато к правому краю. */}
+            <div className="flex items-baseline justify-between gap-4 md:flex-col md:items-end md:gap-0 md:justify-start">
               <p className="yzy-label text-muted-foreground">PROGRESS</p>
-              <p className="mt-1 text-3xl sm:text-4xl font-medium tabular-nums">
+              <p className="text-3xl sm:text-4xl font-medium tabular-nums md:mt-1">
                 {grandPct}%
               </p>
-              <p className="yzy-meta text-muted-foreground mt-0.5">
-                {grandAnswered} / {grandTotal}
-              </p>
             </div>
+            <p className="yzy-meta text-muted-foreground mt-1 md:mt-0.5">
+              {grandAnswered} / {grandTotal}
+            </p>
           </div>
         </div>
 
