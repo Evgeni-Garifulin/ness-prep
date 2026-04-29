@@ -1,9 +1,13 @@
 {
   "_meta": {
     "note": "Контент подсказок и эталонных ответов. Маппинг questionId -> {hintEasy, hintFull, answer}. Заливается секциями по мере готовности. Сид мержит поверх questions.json — пустые поля не затирают то, что уже есть.",
-    "filled_sections": ["must-have-blitz", "behavioral-star", "javascript-fundamentals"]
+    "filled_sections": [
+      "must-have-blitz",
+      "behavioral-star",
+      "javascript-fundamentals",
+      "typescript"
+    ]
   },
-
   "must-have-blitz__1": {
     "hintEasy": "Цикл, который чередует выполнение JS и обработку очередей задач.",
     "hintFull": "Single-threaded runtime: пока стек пуст — берёт следующую задачу. После каждой задачи дренирует ВСЮ microtask queue, потом даёт браузеру шанс на render, потом следующая macrotask.",
@@ -254,7 +258,6 @@
     "hintFull": "Host объявляет remotes, remote объявляет exposed modules. Shared dependencies помечаются singleton (один React на всю систему). Container'ы проверяют version compatibility runtime'ом.",
     "answer": "Module Federation — фича Webpack 5 (и Vite через плагин), которая позволяет одному приложению (host) загружать модули другого приложения (remote) во время выполнения, как обычный import. Каждое приложение объявляет exposes (что отдаёт) и remotes (что потребляет), плюс shared dependencies (React, design system) с version constraints. На runtime container'ы согласуют версии shared deps — по дефолту singleton, чтобы не было двух React'ов в дереве. Это техническая основа большинства microfrontend-архитектур; альтернативы: import maps, single-spa, iframe-based."
   },
-
   "behavioral-star__ownership__1": {
     "answer": "Используй STAR + сосредоточься на том, что ТЫ принёс, а не команда. Структура: Situation (1-2 предложения о контексте — продукт, команда, scale), Task (что было моей ответственностью, какие constraints), Action (МНОЖЕСТВО конкретных действий: что именно я инициировал, какие решения принял, как координировал), Result (измеримое — метрики, deadline, impact). Ключевая оптика: senior-ownership — это «я заметил → я инициировал → я довёл до production → я измерил → я следил после релиза», без ожидания указаний. Один проект — 3-5 минут максимум. Заранее подготовь 2-3 разных истории (perf, архитектура, кросс-командная)."
   },
@@ -375,172 +378,170 @@
   "behavioral-star__mentoring-leadership__10": {
     "answer": "Underperformance — самый сложный leadership-вопрос. Структура: (1) что заметил — конкретные паттерны (миссы deadline'ов, low quality PR'ов, communication gaps); (2) проверка прежде чем judge — может личные обстоятельства, неподходящий проект, нечеткие expectations? (3) разговор 1-1 — поделился наблюдениями (SBI), услышал его perspective; (4) plan together — конкретные expectations, milestones, support (mentor, training, redefined scope); (5) regular check-ins; (6) outcome — либо turn-around (часто), либо escalation в HR/manager track (если не сдвиг). Сигнал: эмпатия + standards. Не «терпел» и не «сразу report'ил»."
   },
-
   "javascript-fundamentals__event-loop-async__1": {
-    "hintEasy": "Цикл, который чередует исполнение JS, microtasks и render-фазу. Делает однопоточный JS неблокирующим.",
-    "hintFull": "После завершения task'и runtime сначала дренирует ВСЮ microtask-очередь, потом отдаёт фрейм браузеру, потом берёт следующую macrotask. Без него Promise/timer/fetch были бы невозможны в одном thread'е.",
-    "answer": "Event loop — механизм, который держит JavaScript однопоточным, но неблокирующим. Пока call stack не пуст — JS исполняет; когда пустеет, runtime дренирует microtasks (Promise.then, queueMicrotask, MutationObserver), затем отдаёт фрейм браузеру (rAF + paint), затем берёт одну macrotask из очереди (setTimeout, IO, DOM events). Каждая итерация называется tick. Из-за этого Promise.then всегда выполняется до setTimeout(0), даже если поставлен позже."
+    "hintEasy": "Механизм, который позволяет JS быть однопоточным и при этом не блокировать UI.",
+    "hintFull": "Когда стек выполнения пустеет, runtime берёт следующую задачу из очереди. Между задачами успевают пройти микротаски и отрисовка кадра.",
+    "answer": "Event loop — это цикл, который держит JS однопоточным, но не блокирует UI. Пока стек выполнения занят — браузер ждёт; как только освободился, runtime сначала разгребает все микротаски (Promise.then), потом отдаёт кадр на отрисовку, потом берёт следующую задачу из очереди (setTimeout, IO). Это позволяет одной нитке обрабатывать таймеры, сетевые ответы и ввод одновременно."
   },
   "javascript-fundamentals__event-loop-async__2": {
-    "hintEasy": "Microtasks — Promise.then, queueMicrotask. Tasks — setTimeout, IO, DOM events.",
-    "hintFull": "После каждой macrotask runtime дренирует ВЕСЬ microtask queue до пустоты. Macrotasks отбираются по одной за итерацию. Это даёт Promise приоритет над таймерами.",
-    "answer": "Macrotask (или просто task) — единица из основной очереди: setTimeout, setInterval, MessageChannel, IO, DOM events, postMessage. Microtask — высокоприоритетная: Promise.then/catch/finally, queueMicrotask, MutationObserver. Ключевое различие: microtasks дренируются полностью между двумя macrotasks и до render-фазы. То есть Promise.then всегда выполнится до следующего setTimeout-callback. Бесконечный promise.then(...).then(...) может заморозить страницу — браузер просто не дойдёт до paint."
+    "hintEasy": "Микротаски — это Promise. Таски — setTimeout, IO, события.",
+    "hintFull": "Микротаски — приоритетная очередь. После каждой обычной задачи runtime разгребает её полностью, и только потом берёт следующую таску.",
+    "answer": "Таска — обычная единица из основной очереди: setTimeout, обработчики событий, IO. Микротаска — приоритетная: всё что от Promise, queueMicrotask и MutationObserver. Между двумя тасками runtime обязательно разгребает ВСЕ микротаски до пустоты, и только потом даёт браузеру отрисовать кадр и берёт следующую таску. Поэтому Promise.then всегда срабатывает раньше setTimeout с нулём."
   },
   "javascript-fundamentals__event-loop-async__3": {
-    "hintEasy": "Microtasks → rAF → paint → macrotasks. Promise.then и queueMicrotask идут сразу; setTimeout — на следующий tick.",
-    "hintFull": "После текущей задачи runtime дренирует все microtasks (queueMicrotask + Promise.then в порядке регистрации). Потом, если нужен paint, выполняется rAF и render. setTimeout(fn, 0) — отдельная macrotask, ждёт следующего tick'а.",
-    "answer": "В одном тике сначала выполнятся queueMicrotask и Promise.then (microtask queue, в порядке регистрации). Затем, если браузер собирается рисовать, rAF-callbacks ПЕРЕД paint. Затем сам paint. На следующей итерации loop'а возьмётся одна macrotask — setTimeout-callback. Пример: log('a'); setTimeout(()=>log('b')); Promise.resolve().then(()=>log('c')); queueMicrotask(()=>log('d')); requestAnimationFrame(()=>log('e')) — порядок a, c, d, e, b."
+    "hintEasy": "Сначала микротаски, потом rAF, потом обычные таски.",
+    "hintFull": "Promise.then и queueMicrotask — микротаски, идут сразу после текущего кода. requestAnimationFrame — отдельная фаза перед отрисовкой. setTimeout — обычная таска, на следующем тике.",
+    "answer": "Сначала отработают микротаски — Promise.then и queueMicrotask, в порядке регистрации. Потом, перед отрисовкой кадра, выполнится requestAnimationFrame. И только в следующем тике event loop возьмётся setTimeout — это обычная таска. То есть setTimeout с нулём — это не «сразу», это «не раньше следующего тика», а до него много чего успеет."
   },
   "javascript-fundamentals__event-loop-async__4": {
-    "hintEasy": "Между macrotasks, после дренажа microtasks, обычно ~60 раз в секунду.",
-    "hintFull": "Браузер старается дать кадр каждые 16ms (или 8ms для 120Hz). Перед paint выполняются rAF-callbacks. Если microtasks или текущая macrotask не отдают control дольше 16ms — кадр пропускается, UI лагает.",
-    "answer": "Браузер вставляет фазу render (style → layout → paint → composite) в event loop примерно каждые 16ms (60fps), но только когда у него есть chance — текущая macrotask и весь microtask queue завершены. Прямо перед paint выполняется requestAnimationFrame-очередь. Если main thread держит работу дольше 16ms (long task), кадр пропускается. Promise-chains, синхронный JSON.parse большого ответа, тяжёлые reducers — типичные виновники jank'а."
+    "hintEasy": "Между задачами, когда стек пустой и микротаски разгреблись.",
+    "hintFull": "Браузер хочет рисовать примерно 60 раз в секунду, но кадр пропустит, если ваш JS блокирует поток дольше 16 миллисекунд.",
+    "answer": "Браузер вставляет фазу отрисовки между задачами event loop'а — примерно 60 раз в секунду. Но только если стек пустой и все микротаски разгреблись. Если ваша синхронная работа держит поток дольше 16 миллисекунд — кадр пропускается, UI начинает лагать. Поэтому тяжёлые вычисления нужно либо разбивать на чанки, либо выносить в воркеры."
   },
   "javascript-fundamentals__event-loop-async__5": {
-    "hintEasy": "Microtasks дренируются ДО render и macrotasks; пока новые добавляются — никто другой не получит control.",
-    "hintFull": "Если каждая microtask добавляет новую (Promise.resolve().then(loop)), очередь не пустеет → браузер не дойдёт до paint, setTimeout не запустится. Page будет полностью frozen.",
-    "answer": "Между двумя macrotasks runtime дренирует ВЕСЬ microtask queue до пустоты. Если microtask добавляет новую microtask, и так далее — конца не будет. Render, setTimeout-callbacks, user input не получат шанс. UI замирает. Отличается от while(true) — тот блокирует одну task, а бесконечный microtask loop ещё и блокирует переход к следующей task. Защита: setTimeout(fn, 0) внутри тяжёлого цикла или scheduler.yield()."
+    "hintEasy": "Микротаски разгребаются ДО отрисовки и до следующей таски.",
+    "hintFull": "Если каждая микротаска планирует новую — очередь не пустеет. А пока она не пустая, браузер не нарисует кадр и не даст обработать клик.",
+    "answer": "Между задачами runtime разгребает всю очередь микротасок до конца. Если каждая микротаска планирует новую — очередь не пустеет, и браузер просто не доходит до отрисовки и обработки ввода. Страница замерзает. Это отличается от обычного бесконечного цикла: тот блокирует одну задачу, а тут проблема в том, что не получается выйти в «следующую» задачу вообще."
   },
   "javascript-fundamentals__event-loop-async__6": {
-    "hintEasy": "all reject'ит при первой ошибке. allSettled даёт результаты всех. race — первого. any — первого fulfilled.",
-    "hintFull": "all — результаты массивом, fail-fast. allSettled — массив {status, value|reason}, никогда не reject'ит. race — первый settled (resolve OR reject). any — первый fulfilled, AggregateError только если все упали.",
-    "answer": "Promise.all — резолвит массивом результатов в порядке оригинальных промисов; reject'ит сразу при первой ошибке (fail-fast). Promise.allSettled — всегда резолвит массивом {status: 'fulfilled', value} или {status: 'rejected', reason}, не делает коротких замыканий. Promise.race — резолвит/реджектит первым изменившимся (любой статус). Promise.any — резолвит первым fulfilled; реджектит AggregateError только если все упали — fallback на несколько endpoint'ов."
+    "hintEasy": "all — все или ничего. allSettled — итог по всем. race — первый. any — первый успешный.",
+    "hintFull": "Главная развилка: ждать всех или хватит первого. И — что считать «ошибкой»: одну падающую промис или только когда все упали.",
+    "answer": "all возвращает массив результатов когда все успели, но падает на первой же ошибке. allSettled никогда не падает — даёт массив с результатами и ошибками каждого, удобно когда нужно знать кто как отработал. race выдаёт первый завершённый, неважно успех или ошибка. any — почти как race, но игнорирует ошибки и ждёт первый успешный; падает только если все упали — типичный кейс fallback на несколько эндпоинтов."
   },
   "javascript-fundamentals__event-loop-async__7": {
-    "hintEasy": "Цикл с try/catch: при error ждём delay и удваиваем. После N попыток — пробрасываем.",
-    "hintFull": "Базово: for-loop, в catch — await sleep(delay); delay *= 2. Прибавь jitter (random шум) чтобы избежать thundering herd. Не retry'й 4xx — только сеть и 5xx.",
-    "answer": "async function retry(fn, { attempts = 5, baseDelay = 200, maxDelay = 5000 } = {}) { for (let i = 0; i < attempts; i++) { try { return await fn() } catch (e) { if (i === attempts-1 || !isRetriable(e)) throw e; const exp = Math.min(baseDelay * 2**i, maxDelay); const jitter = Math.random() * exp * 0.3; await new Promise(r => setTimeout(r, exp + jitter)) } } }. Exponential backoff (200, 400, 800), cap чтобы не ждать минутами, jitter чтобы клиенты не долбили синхронно после outage. Retry'ить только сеть/5xx — на 4xx бесполезно и удвоит side-effects."
+    "hintEasy": "Цикл с try/catch и экспоненциальной задержкой между попытками.",
+    "hintFull": "Каждая следующая попытка ждёт в два раза дольше. Плюс jitter — случайный шум — чтобы клиенты не долбили сервер синхронно после общего сбоя.",
+    "answer": "Базово — цикл с try/catch: при ошибке ждём delay, удваиваем его и пробуем снова, до N попыток. Важные детали: добавь случайный jitter, иначе после общего outage все клиенты ломанутся одновременно. И не повторяй на 4xx — там повтор бесполезен и может задвоить операцию. Повторяй только сетевые ошибки и 5xx."
   },
   "javascript-fundamentals__event-loop-async__8": {
-    "hintEasy": "AbortController + signal в options.",
-    "hintFull": "const c = new AbortController(); fetch(url, { signal: c.signal }); ... c.abort(). Запрос reject'ится с DOMException 'AbortError'. Обрабатывай отдельно от других ошибок.",
-    "answer": "Стандартный API — AbortController. Создаёшь controller, передаёшь controller.signal в fetch options, при необходимости вызываешь controller.abort(). fetch reject'ится с AbortError. Используется для отмены устаревших запросов при смене параметров поиска (race-condition guard), для таймаутов (AbortSignal.timeout(5000)), для удаления event-listener'ов одной строкой через addEventListener(..., { signal }). В React useEffect создаёт controller, в cleanup вызывает abort. AbortError ловить отдельно — это нормальная отмена, не ошибка."
+    "hintEasy": "AbortController.",
+    "hintFull": "Создаёшь controller, его signal передаёшь в fetch. Когда нужно отменить — вызываешь controller.abort(), запрос падает с AbortError.",
+    "answer": "Через AbortController. Создаёшь controller, передаёшь его signal в опции fetch. Когда нужно отменить — вызываешь controller.abort(), и запрос падает с AbortError. Чаще всего применяется в React: при размонтировании компонента или смене параметров поиска отменяем устаревший запрос, чтобы он не перетёр свежие данные. AbortError ловят отдельно — это нормальная отмена, а не настоящая ошибка."
   },
   "javascript-fundamentals__event-loop-async__9": {
-    "hintEasy": "Несколько одновременных async-операций возвращаются в непредсказуемом порядке и затирают результаты друг друга.",
-    "hintFull": "Типичный кейс: пользователь печатает в search, каждое нажатие шлёт запрос. Запрос #5 вернулся раньше #6 — но #6 был стартован позже и его результат должен победить. Без guard'а UI покажет stale data.",
-    "answer": "Race condition — несколько одновременных async-операций приходят в непредсказуемом порядке и могут затирать друг друга. Классика: search-input — пользователь печатает 'foo', потом 'foobar'. Первый запрос медленнее второго, возвращается позже и перезаписывает результат. UI показывает 'foo'-результаты для 'foobar'. Защита: AbortController (отменяем устаревший), generation-counter (id запроса, применяем только если соответствует последнему), debounce. В React Query / SWR этим занимается библиотека."
+    "hintEasy": "Несколько асинхронных операций пришли в неправильном порядке.",
+    "hintFull": "Запустили запрос #1, потом #2; но #1 ответил позже и затёр результат от #2. UI показывает неправильное.",
+    "answer": "Это когда несколько асинхронных операций возвращаются в неправильном порядке и затирают результаты друг друга. Классика — поиск по input: пользователь набирает, на каждый символ летит запрос, более старый запрос ответил позже более нового и UI показывает stale-результат. Защищаются обычно тремя способами: AbortController отменяет старые запросы, debounce ждёт паузы перед запросом, или счётчик «номер запроса» — применяем результат только если он соответствует последнему отправленному."
   },
   "javascript-fundamentals__event-loop-async__10": {
-    "hintEasy": "AbortController + cleanup в useEffect, или флаг ignored в closure.",
-    "hintFull": "Паттерн: useEffect с cleanup. Внутри fetch с signal или флагом cancelled. На cleanup signal.abort() или cancelled = true. Перед setState — проверка.",
-    "answer": "Стандартный паттерн: useEffect(() => { const c = new AbortController(); fetch(url, { signal: c.signal }).then(setData).catch(e => { if (e.name !== 'AbortError') setError(e) }); return () => c.abort(); }, [url]). Старый запрос отменяется при смене url или unmount. Альтернатива: let cancelled = false; cleanup => cancelled = true. Реальная отмена через AbortController лучше — закрывает сетевое соединение. В реальных приложениях React Query / SWR закрывают этот класс багов из коробки."
+    "hintEasy": "AbortController в useEffect с cleanup.",
+    "hintFull": "В useEffect создаёшь controller, fetch с его signal. В cleanup вызываешь abort. При смене зависимостей старый запрос отменится сам.",
+    "answer": "Стандартный паттерн — useEffect с cleanup. Внутри создаёшь AbortController, делаешь fetch с его signal, в cleanup вызываешь controller.abort(). Когда зависимости меняются или компонент размонтируется — старый запрос отменяется автоматически. В реальных приложениях этот класс багов обычно закрывают React Query или SWR — они умеют это из коробки, плюс кеш и refetch."
   },
   "javascript-fundamentals__event-loop-async__11": {
-    "hintEasy": "Каждая итерация ждёт предыдущей — последовательное выполнение. Параллельность теряется.",
-    "hintFull": "for (const x of arr) { await f(x) } — итерации синхронны. Если функции независимы и хочется параллели — arr.map(f) и await Promise.all(...).",
-    "answer": "for...of с await выполняет итерации последовательно: каждая ждёт предыдущей. Правильно если есть зависимости или важен порядок side-effects. Если функции независимы — в N раз медленнее: const results = await Promise.all(arr.map(f)) запускает все параллельно. forEach с async НЕ работает как ожидается — promise'ы не await'ятся, цикл завершается синхронно. На больших массивах нужен concurrency-limit (5-10 одновременно), иначе откроешь сотни сокетов."
+    "hintEasy": "Каждая итерация ждёт предыдущей.",
+    "hintFull": "for-of с await исполняется последовательно. Если функции независимы — теряешь параллельность; чинится через Promise.all с map.",
+    "answer": "Каждая итерация ждёт завершения предыдущей — выполнение становится последовательным. Это правильно если итерации зависят друг от друга. Но если функции независимы — например, fetch для каждого id — это в N раз медленнее чем нужно. Тогда правильно делать Promise.all с map: запросы стартуют параллельно. И ещё — forEach с async не работает как ожидаешь, цикл не дождётся промисов."
   },
   "javascript-fundamentals__event-loop-async__12": {
-    "hintEasy": "Parallel — независимые операции. Sequential — есть зависимости/нужен порядок/ограничения по нагрузке.",
-    "hintFull": "Parallel: загрузка нескольких независимых ресурсов, batch DB-чтений. Sequential: миграции, операции с зависимостями, со side-effects где порядок критичен.",
-    "answer": "Parallel (Promise.all) — операции независимы и порядок не важен: загрузить параллельно user, posts, comments. Sequential (await в for-of) — есть зависимости (B нуждается в результате A), важен порядок side-effects, нужно ограничить нагрузку (один lock). Гибрид — limited concurrency: по 5 одновременно — для batch'а с rate-limit'ом. Анти-паттерн: parallel для тысячи запросов одной DB — убьёт connection pool."
+    "hintEasy": "Parallel — независимые. Sequential — есть зависимости или нужен порядок.",
+    "hintFull": "Параллельно когда операции не мешают друг другу. Последовательно — когда B нужен результат A, или важен порядок побочных эффектов, или нужно щадить ресурс.",
+    "answer": "Параллельно — когда операции независимы и порядок не важен: загрузить пользователя, его посты и комментарии разом. Последовательно — когда есть зависимости (B нужен результат A), важен порядок побочных эффектов, или нужно щадить какой-то ресурс. Гибрид — параллельно, но по пять одновременно — для batch-операций с rate-limit. Антипаттерн — запустить параллельно тысячу запросов в одну БД, убьёшь connection pool."
   },
   "javascript-fundamentals__event-loop-async__13": {
-    "hintEasy": "Worker pool: N воркеров берут из общей очереди задачи.",
-    "hintFull": "Простая реализация: массив воркеров, каждый async loop'ом достаёт задачу из shared queue. Готовые либы: p-limit, bottleneck. Использование: pLimit(5), tasks.map(t => limit(() => f(t))).",
-    "answer": "Worker pool: const limit = (n) => { const queue = []; let active = 0; const next = () => { if (active >= n || !queue.length) return; active++; const { fn, resolve, reject } = queue.shift(); fn().then(resolve, reject).finally(() => { active--; next() }); }; return (fn) => new Promise((res, rej) => { queue.push({ fn, resolve: res, reject: rej }); next() }); }. Использование: const run = limit(5); await Promise.all(urls.map(u => run(() => fetch(u)))). Готовые: p-limit, bottleneck (с rate-limit'ом)."
+    "hintEasy": "Worker pool: фиксированное число «слотов», задачи берутся из очереди.",
+    "hintFull": "Идея — ограничитель: разрешаем не больше N параллельных задач, остальные ждут в очереди. Готовые либы — p-limit, bottleneck.",
+    "answer": "Идея — пул воркеров: разрешаем выполняться не больше N задач одновременно, остальные ждут в общей очереди. Каждый «слот» освобождается — берёт следующую задачу. Своя реализация недлинная, но обычно проще взять p-limit или bottleneck. Применения — batch-загрузка, обработка файлов, работа с rate-limited API."
   },
   "javascript-fundamentals__event-loop-async__14": {
-    "hintEasy": "debounce — ждём паузу N ms после последнего вызова. throttle — выполняем не чаще раза в N ms.",
-    "hintFull": "debounce: каждый вызов сбрасывает таймер; финальный effect — после паузы. Search-input. throttle: первый проходит, остальные в окне игнорируются. Scroll, mousemove.",
-    "answer": "debounce(fn, ms) откладывает fn пока поток вызовов не утихнет на ms; каждый новый вызов сбрасывает таймер. Реализация: let t; return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), ms) }. throttle(fn, ms) гарантирует не чаще раза в ms — первый вызов проходит сразу, последующие в окне блокируются (или в trailing). Реализация через last-timestamp + setTimeout для trailing."
+    "hintEasy": "debounce — подождать паузы. throttle — выполнять не чаще раза в N мс.",
+    "hintFull": "debounce: каждый вызов сбрасывает таймер; срабатывает после паузы. throttle: первый проходит сразу, остальные в окне игнорируются.",
+    "answer": "Это две техники против лишних срабатываний. debounce ждёт пока поток вызовов утихнет — каждый новый сбрасывает таймер, итоговый вызов происходит после паузы. throttle гарантирует что функция выполнится не чаще раза в N миллисекунд — первый проходит сразу, остальные в окне игнорируются. debounce — для search-input или autosave; throttle — для scroll, mousemove, real-time апдейтов."
   },
   "javascript-fundamentals__event-loop-async__15": {
-    "hintEasy": "debounce — после паузы. throttle — регулярно с ограничением частоты.",
-    "hintFull": "debounce пропускает все промежуточные; нас интересует ИТОГ. throttle пропускает большинство, но регулярно даёт срабатывать; нас интересует ПРОГРЕСС.",
-    "answer": "debounce реагирует только на финал — все промежуточные вызовы отбрасываются, выполнение после паузы. Применения: search-input (отправляем когда юзер закончил), autosave, валидация формы. throttle реагирует регулярно: первый проходит, потом не чаще раза в ms. Применения: scroll-handler, mousemove (drag), price ticker (flush раз в 100ms). Правило: «нужен ИТОГ — debounce; нужна РЕГУЛЯРНОСТЬ — throttle»."
+    "hintEasy": "debounce — после паузы. throttle — регулярно.",
+    "hintFull": "debounce пропускает все промежуточные вызовы и реагирует только на финал. throttle регулярно даёт срабатывать в течение потока.",
+    "answer": "debounce реагирует только на финал — все промежуточные вызовы отбрасываются. throttle реагирует регулярно — даёт срабатывать раз в N миллисекунд в течение всего потока. Простое правило: нужен ИТОГ — debounce; нужна обратная связь по ПРОГРЕССУ — throttle. Поиск, валидация, autosave — debounce. Скролл, drag, ticker — throttle."
   },
   "javascript-fundamentals__event-loop-async__16": {
-    "hintEasy": "Любая работа, которую нужно сделать прямо перед paint — animations, smooth-scroll, DOM-измерения.",
-    "hintFull": "rAF-callback запускается прямо перед композицией кадра — текущий layout уже свежий. 60fps по дефолту. Хорош для анимаций (Canvas, transforms), для batching real-time updates.",
-    "answer": "requestAnimationFrame(cb) подписывает cb на запуск прямо перед следующим paint браузера (~16ms). Применения: (1) анимации — изменение transform/opacity внутри cb, плавно и синхронно с refresh rate; (2) DOM-измерения — getBoundingClientRect актуален; (3) batching real-time updates — копим WebSocket-сообщения, флашим раз в кадр. Главное преимущество — браузер сам знает когда tab background или зажат CPU и пропускает rAF. setInterval так не умеет."
+    "hintEasy": "Прямо перед отрисовкой кадра. Анимации и измерения DOM.",
+    "hintFull": "rAF выполняется ровно перед paint, синхронно с частотой кадров. Идеально для анимаций через transform или opacity и для батчинга real-time апдейтов.",
+    "answer": "requestAnimationFrame срабатывает ровно перед следующей отрисовкой кадра. Используется в трёх случаях: анимации — изменение transform или opacity внутри callback; измерения DOM — getBoundingClientRect к этому моменту актуален; и батчинг real-time апдейтов — копим WebSocket-сообщения и применяем разом раз в кадр, чтобы не делать setState на каждое. Главное преимущество перед setInterval — браузер сам пропускает кадры когда вкладка в фоне или нагрузка велика."
   },
   "javascript-fundamentals__event-loop-async__17": {
-    "hintEasy": "Низкоприоритетная работа, которую можно отложить пока браузер не занят.",
-    "hintFull": "Запускается в idle-моменты event loop'а с deadline'ом. Полезно для аналитики, prefetching, indexing на background. Не для критичного UX.",
-    "answer": "requestIdleCallback(cb, { timeout }) выполняет cb в моменты когда браузер свободен; callback получает IdleDeadline.timeRemaining(). Применения: фоновая аналитика, prefetching данных следующей страницы, computing cache, low-priority logging. НЕ подходит для critical UX — браузер может вообще не вызвать cb если страница загружена. Safari исторически не поддерживал — нужен polyfill через setTimeout. В новых API заменено на scheduler.postTask с приоритетами."
+    "hintEasy": "Низкоприоритетная работа, которую можно отложить.",
+    "hintFull": "Срабатывает когда браузер свободен. Полезно для аналитики, prefetching, фоновых вычислений. Не для критичного UX.",
+    "answer": "requestIdleCallback запускает функцию в моменты простоя браузера. Применяется для всего что не критично прямо сейчас: отправить накопленные analytics-события, prefetch'нуть данные следующей страницы, посчитать кеш в фоне. Не для UX-критичной работы — браузер может вообще не вызвать callback если страница нагружена. В Safari исторически не поддерживался, нужен polyfill. В новых API заменяется на scheduler.postTask с приоритетами."
   },
   "javascript-fundamentals__event-loop-async__18": {
-    "hintEasy": "Высокоприоритетные задачи крутятся бесконечно, не давая дойти до низкоприоритетных.",
-    "hintFull": "Бесконечный microtask loop блокирует render и macrotasks — это starvation render-фазы. Иначе: тяжёлый цикл задач не оставляет места для setTimeout/IO.",
-    "answer": "Starvation — высокоприоритетная работа не даёт низкоприоритетной выполниться. В JS типично: бесконечный promise.then-цикл дренирует microtask queue без остановки → render и macrotasks никогда не запустятся → UI замерзает. Менее очевидно: тяжёлый sync-код в одной macrotask блокирует следующие 100 (включая user input). Решения: yield через scheduler.yield() / setTimeout(0), разбиение работы на чанки, перенос в Web Worker. В React 18 useTransition помечает state-updates как low-priority."
+    "hintEasy": "Высокоприоритетная работа не даёт низкоприоритетной выполниться.",
+    "hintFull": "Бесконечный microtask-loop блокирует отрисовку и обычные таски. Тяжёлая sync-работа блокирует все остальные таски.",
+    "answer": "Starvation — когда высокоприоритетная работа крутится непрерывно и не даёт другим выполниться. В JS типично — бесконечный promise-then-цикл: микротаски разгребаются без остановки, отрисовка и обычные таски никогда не получают шанса. И просто тяжёлый синхронный код в одной таске блокирует следующие. Решения — yield через scheduler или setTimeout(0), разбиение работы на чанки, перенос в Web Worker. В React 18 useTransition помечает state-апдейты как низкоприоритетные."
   },
   "javascript-fundamentals__event-loop-async__19": {
-    "hintEasy": "0 — это минимум; runtime поставит в очередь macrotask, она выполнится не раньше следующего тика после current task + microtasks.",
-    "hintFull": "Спека требует минимум 4ms во вложенных setTimeout (clamping). Кроме этого, перед setTimeout-callback'ом всегда выполнятся microtasks и rAF (если пора).",
-    "answer": "setTimeout(fn, 0) гарантирует только МИНИМАЛЬНУЮ задержку — runtime ставит fn в macrotask queue, обработается не раньше следующей итерации loop. Сначала закончится текущая task, потом дренируются microtasks (Promise.then), потом могут пройти rAF + paint, и только потом — setTimeout. На практике задержка ≈4-15ms (clamping для nested setTimeout — 4ms). Если нужно «ASAP, но не сейчас» — лучше queueMicrotask или Promise.resolve().then() (выполнится до paint), для «после paint» — setTimeout 0 или MessageChannel."
+    "hintEasy": "0 — это минимум, не «сейчас же».",
+    "hintFull": "setTimeout ставит callback в обычную очередь задач. Перед его исполнением успеют отработать все микротаски и rAF.",
+    "answer": "Ноль — это минимум, не «сейчас же». setTimeout всегда ставит callback в очередь обычных задач, а та обработается не раньше следующего тика event loop'а. До неё успеют отработать все микротаски (Promise.then), а возможно ещё и render-фаза. На практике задержка в 4-15 миллисекунд. Если нужно «как можно скорее, но не сейчас в стеке» — лучше использовать queueMicrotask или Promise.resolve().then."
   },
   "javascript-fundamentals__event-loop-async__20": {
-    "hintEasy": "Promise reject'ится. Если никто не .catch'ит — unhandled promise rejection.",
-    "hintFull": "async-функция всегда возвращает Promise. throw внутри = reject. Без catch'ера — попадает в window.unhandledrejection event, в Node.js может крашить процесс (--unhandled-rejections=strict).",
-    "answer": "Любая async-функция возвращает Promise; throw внутри (или await reject'нувшегося Promise) reject'ит этот Promise. Без catch — unhandled rejection: в браузере событие window.addEventListener('unhandledrejection') с promise и reason; в Node — process.on('unhandledRejection'), а с --unhandled-rejections=strict краш процесса. Sentry / другие error trackers ловят автоматически. Защита: всегда либо await с try/catch, либо .catch на корне chain. В React 19 unhandled-rejection можно поймать через onUncaughtError option в createRoot."
+    "hintEasy": "Промис отреджектится. Если никто не ловит — unhandled rejection.",
+    "hintFull": "async-функция всегда возвращает промис; throw внутри = reject. Без catch ошибка попадает в глобальный обработчик unhandledrejection.",
+    "answer": "Любая async-функция возвращает промис; throw или await на упавший промис реджектят его. Если никто не сделал catch — это unhandled rejection: в браузере событие window.unhandledrejection, в Node — process.on('unhandledRejection'), в strict-режиме краш процесса. Sentry и другие error-trackers это ловят автоматически. Защита простая — либо try/catch вокруг await, либо .catch на корне промис-цепочки."
   },
-
   "javascript-fundamentals__closures-scope-memory__1": {
-    "hintEasy": "Функция, которая помнит переменные из своего lexical scope, даже когда внешняя функция уже вернулась.",
-    "hintFull": "В JS scope — лексический. Внутренняя функция держит ссылку на environment record внешней. После возврата эти переменные не GC'ятся, пока closure жив.",
-    "answer": "Closure — функция, у которой есть доступ к переменным из её lexical environment, даже после того как внешняя функция завершилась. Например: function counter() { let n = 0; return () => ++n }; — возвращённая функция помнит n. Каждое создание функции захватывает ссылки на enclosing scopes; пока closure жив, эти переменные не GC'ятся. Применения: encapsulation (приватные переменные), partial application, фабрики функций, hooks (useState — closure над setState). Цена: closure держит свои переменные → memory leak'и если ссылку забыли убрать."
+    "hintEasy": "Функция помнит переменные из своего окружения, даже когда вернулась из родителя.",
+    "hintFull": "Внутренняя функция держит ссылки на переменные внешней. Эти переменные не уничтожаются после возврата, пока closure жив.",
+    "answer": "Closure — это функция, которая помнит переменные из своего лексического окружения, даже после того как внешняя функция уже завершилась. Например, фабрика возвращает функцию-счётчик: счётчик помнит локальную переменную фабрики и инкрементит её при каждом вызове. Применений много: приватные данные, фабрики функций, hooks в React, partial application. Цена — закрытые переменные не собираются GC пока closure жив, отсюда могут быть memory leaks."
   },
   "javascript-fundamentals__closures-scope-memory__2": {
-    "hintEasy": "Stale closure (старое значение переменной), unintended captures, memory leaks.",
-    "hintFull": "Типично: handler в setInterval помнит старый state; loop с let vs var capturing index; addEventListener один раз создан, видит initial values; large objects в closure'е удерживаются в памяти.",
-    "answer": "Главные баги: (1) stale closure — handler видит state из render'а, в котором был создан, не текущий; в React-hooks типично с useEffect/setInterval без правильных deps; (2) unintended capture большого объекта — closure держит весь outer scope в памяти; (3) loop с var — все callback'ы видят последний i (классика); решается let'ом или IIFE; (4) addEventListener один раз — closure захватил initial state, обновлений не видит. Решения: правильные deps, useRef для latest-value, removeEventListener'ы, Weak* структуры."
+    "hintEasy": "Stale closure, утечки памяти, незаметный захват больших объектов.",
+    "hintFull": "Типичные кейсы: handler в setInterval помнит старый state; addEventListener один раз создан и видит initial values; цикл с var ловит последнее значение i.",
+    "answer": "Главные ловушки три. Первая — stale closure: функция помнит state из render'а где была создана, не текущий. Вторая — захват больших объектов: closure держит весь outer-scope, даже если использует одно поле. Третья — утечки: забытый listener или setInterval держит closure, тот держит DOM-ноду, нода не собирается. Лечится правильными зависимостями в hooks, удалением listener'ов и осознанным выкладыванием нужных полей в локальные переменные."
   },
   "javascript-fundamentals__closures-scope-memory__3": {
-    "hintEasy": "Closure захватил старое значение переменной и продолжает на него ссылаться, когда оно уже устарело.",
-    "hintFull": "Типично в React: useEffect/setInterval с пустым deps array захватывает state из mount-render'а. После update этот closure видит старый state. Лечится правильными deps или функциональным setState.",
-    "answer": "Stale closure — функция всё ещё держит ссылку на старое значение из прошлого scope/render'а, потому что closure был создан тогда. Самый частый кейс — React: useEffect(() => { const id = setInterval(() => setCount(count + 1), 1000); return () => clearInterval(id) }, []) — count в callback'е навсегда останется 0. Лечение: (1) правильные deps массив (но это перезапустит interval); (2) функциональный setState: setCount(c => c + 1); (3) useRef для latest-value; (4) useEffectEvent / useEvent (proposal) для callback'ов которые всегда видят свежие значения."
+    "hintEasy": "Closure захватил старое значение и продолжает видеть его, когда state уже обновился.",
+    "hintFull": "В React обычно из-за пустых deps в useEffect/useCallback — closure не пересоздаётся, видит state из mount-render'а.",
+    "answer": "Это когда функция продолжает видеть старое значение переменной, потому что closure был создан тогда. Самый частый кейс — useEffect с пустым массивом зависимостей: callback внутри помнит count из mount-render'а, и через десять обновлений всё ещё видит ноль. Лечится тремя способами: правильные deps, функциональный setState (где получаешь актуальное значение от React), или ref с latest-value паттерном."
   },
   "javascript-fundamentals__closures-scope-memory__4": {
-    "hintEasy": "Каждый render — свой closure над своим state. Hook без правильных deps замораживается на одном render'е.",
-    "hintFull": "useState даёт новое значение state на каждом render'е, но callback'и внутри useEffect/useCallback захватывают то значение, которое было в момент создания closure. Без правильных deps closure не пересоздаётся.",
-    "answer": "В React каждый render компонента создаёт новые closures над текущими props/state. Если ты не указал переменную в deps массиве hook'а, hook не пересоздаст callback — и тот будет помнить значения из render'а где был создан. Типичный сценарий: useEffect с пустым deps + setInterval, useCallback с пропущенной dep, event listener созданный в useEffect и редко переподписанный. Это «фича» React-модели — снапшот закрепляется на каждый render — и одновременно её главная граната на ноге. eslint-plugin-react-hooks/exhaustive-deps ловит большинство случаев. Современная альтернатива: useEffectEvent (React 19+) для функций, которые должны видеть всегда последний state, не перезапуская effect."
+    "hintEasy": "Каждый render — свой closure над своим state.",
+    "hintFull": "Hook без правильных зависимостей не пересоздаётся между render'ами, остаётся «замороженным» на одном.",
+    "answer": "Потому что в React каждый render компонента создаёт свежие closures над текущими props и state. Если ты не указал нужную переменную в массиве зависимостей хука, хук не пересоздаст callback — и тот будет вечно помнить значения из render'а где был создан. Это плата за модель снапшотов. Защищает eslint-plugin-react-hooks с правилом exhaustive-deps — он почти всегда указывает на проблему."
   },
   "javascript-fundamentals__closures-scope-memory__5": {
-    "hintEasy": "Либо правильные deps + переподписка, либо useRef с latest-value, либо функциональный setState.",
-    "hintFull": "В React: useEffect с правильными deps пересоздаст handler. Но если переподписка дорогая — useRef с latest-value: ref.current = state на каждом render'е, handler читает ref.current. setState с функциональной формой не зависит от closure'а.",
-    "answer": "Три рабочих паттерна: (1) указать все используемые значения в deps массиве hook'а — handler пересоздаётся при их изменении, всегда свежий, но переподписывается каждый раз; (2) useRef-паттерн — useEffect(() => { ref.current = state }) обновляет ref на каждом render'е без переподписки; внутри handler'а читаем ref.current; (3) функциональный setState (setX(prev => ...)) — не зависит от closure'а, получает текущее значение от React. Новый proposal useEffectEvent (React 19) делает (2) встроенным. Eslint-plugin-react-hooks/exhaustive-deps практически всегда указывает на проблему."
+    "hintEasy": "Правильные deps, функциональный setState или useRef с latest-value.",
+    "hintFull": "Если можно переподписать handler — указывай зависимости. Если переподписка дорогая — клади актуальное значение в ref и читай ref.current внутри handler'а.",
+    "answer": "Три рабочих варианта. Первый — указать все используемые значения в зависимостях; handler пересоздаётся когда что-то меняется. Второй — функциональный setState: setX(prev => ...) не зависит от closure'а вообще, потому что значение даёт сам React. Третий — паттерн с ref: useEffect обновляет ref.current на каждом render'е, handler внутри читает ref.current и всегда видит свежее. eslint-plugin-react-hooks обычно подсветит проблему."
   },
   "javascript-fundamentals__closures-scope-memory__6": {
-    "hintEasy": "Scope определяется по месту объявления в коде, не по месту вызова. Scope chain — цепочка вложенных scope'ов от внутреннего к глобальному.",
-    "hintFull": "При обращении к переменной runtime ищет её в текущем scope, потом в enclosing, потом globally. Лексически — значит на этапе парсинга, не runtime'ом. Это даёт closures.",
-    "answer": "Lexical scope — JS определяет видимость переменных по месту ОБЪЯВЛЕНИЯ в коде, а не по месту вызова. Когда внутри функции обращаешься к переменной, runtime сначала смотрит в локальный scope, потом во внешний (enclosing), потом дальше по цепочке вверх до глобального. Эта цепочка называется scope chain. Лексически — потому что определяется при парсинге, фиксируется навсегда. Альтернатива — dynamic scope (как в bash), где видимость зависит от runtime call stack — в JS этого нет. Closures работают именно благодаря lexical scope: функция помнит ссылки на свой enclosing scope, даже когда вышла за пределы вызова."
+    "hintEasy": "Scope определяется по месту объявления, а не вызова. Цепочка идёт от внутреннего к глобальному.",
+    "hintFull": "При обращении к переменной runtime ищет её сначала в локальном scope, потом в окружающем, и так до глобального. Это всё определяется на этапе парсинга.",
+    "answer": "JavaScript определяет видимость переменных по месту объявления в коде, не по месту вызова. При обращении к переменной runtime смотрит сначала в локальный scope, потом в окружающий, потом дальше вверх до глобального — это и называется scope chain. И вся эта структура определяется при парсинге, фиксируется навсегда. Именно благодаря этому работают closures: функция помнит ссылки на свой outer scope, куда бы её потом ни передали."
   },
   "javascript-fundamentals__closures-scope-memory__7": {
-    "hintEasy": "var — function-scope, hoisted с undefined. let/const — block-scope, в TDZ до объявления.",
-    "hintFull": "var: видна во всей функции, var x в for-loop — одна переменная для всех итераций. let/const: scope = ближайший {}, redeclare запрещён. const — нельзя реассайнить (но мутировать объект можно).",
-    "answer": "var имеет function-level scope: var x внутри if/for виден всей функции; hoist'ится с initial value undefined. let и const имеют block-level scope (любые {}); до строки объявления находятся в Temporal Dead Zone — обращение кидает ReferenceError. const запрещает реассайнмент переменной, но не мутацию её содержимого (const obj = {}; obj.x = 1 — ок). Практический эффект: цикл for(var i=0; i<3; i++) setTimeout(() => log(i)) выведет 3,3,3 (одна i на всю функцию); с let — 0,1,2 (новая i на каждой итерации). В современном коде var не используется."
+    "hintEasy": "var — function-scope. let/const — block-scope.",
+    "hintFull": "var видна во всей функции, всплывает в начало с undefined. let/const — внутри ближайших фигурных скобок, до объявления — TDZ.",
+    "answer": "var имеет function-scope: видна во всей функции, всплывает в начало с undefined. let и const — block-scope, ограничены ближайшими фигурными скобками; до строки объявления находятся в TDZ — обращение кидает ошибку. const запрещает реассайнмент, но не запрещает мутировать содержимое объекта. На практике — var в новом коде не нужна; let/const поведение более предсказуемое и ловит баги вроде «переменная использована до объявления»."
   },
   "javascript-fundamentals__closures-scope-memory__8": {
-    "hintEasy": "Период от начала scope до объявления let/const, где обращение к переменной = ReferenceError.",
-    "hintFull": "let x — переменная существует, но не initialized. До строки объявления любое чтение/запись кидает ReferenceError 'Cannot access x before initialization'. Это форсит порядок: сначала declare, потом use.",
-    "answer": "TDZ — период с начала scope до строки `let x` или `const x`, в течение которого переменная уже зарезервирована scope'ом, но ещё не инициализирована. Любое обращение к ней (чтение или запись) кидает ReferenceError 'Cannot access x before initialization'. typeof тоже не спасает, в отличие от не-объявленных переменных. TDZ — сознательная дизайн-фича ES6: в отличие от var (которая hoist'ится с undefined и тихо работает), let/const заставляют писать «сначала declare, потом use», ловит баги где переменная использована до объявления. У function declarations — особый кейс: они hoist'ятся полностью, поэтому function f() {} вызвать до объявления — ок."
+    "hintEasy": "Период от начала scope до объявления let/const, где обращение к переменной кидает ошибку.",
+    "hintFull": "let x объявит переменную на весь блок, но до строки объявления любое обращение — ReferenceError.",
+    "answer": "TDZ — это период с начала блока до строки объявления let или const, в течение которого переменная уже зарезервирована, но ещё не инициализирована. Любое обращение к ней — ReferenceError «Cannot access before initialization». Это сделано специально, чтобы ловить баги где переменная использована до объявления — в отличие от var, которая тихо всплывает с undefined."
   },
   "javascript-fundamentals__closures-scope-memory__9": {
-    "hintEasy": "Closure держит ссылки на ВЕСЬ enclosing scope; если closure долгоживущий — переменные не GC'ятся.",
-    "hintFull": "Event listener с handler-closure'ом держит outer-scope в памяти пока listener жив. Если handler ссылается на DOM-node — нода тоже не убирается. Очисти listener'ы при unmount.",
-    "answer": "Closure хранит ссылки на свой enclosing scope — включая все переменные, не только те что использованы (в spec'е, на практике движки оптимизируют). Если closure долгоживущий (event listener, setInterval-callback, hold в global state), enclosing scope не GC'ится. Опасные кейсы: (1) addEventListener забыл removeEventListener при unmount; (2) setInterval создал closure который держит DOM-node, после navigation node остаётся; (3) в closure захвачен большой объект (всё state), хотя нужно одно поле — выньте поле в локальную переменную перед закрытием. Поиск: Chrome DevTools → Memory → Heap snapshot → Detached HTMLDivElement, retainers."
+    "hintEasy": "Closure держит весь outer scope в памяти, пока сам жив.",
+    "hintFull": "Долгоживущий callback (event listener, setInterval) держит closure, тот держит outer scope, тот держит DOM-ноды или большие объекты. Не убрал listener — утечка.",
+    "answer": "Closure держит ссылки на свой outer scope — пока closure жив, этот scope не собирается GC. Опасно когда closure долгоживущий: забыл removeEventListener при размонтировании, не остановил setInterval, повесил handler с big-object в замыкании. Ноды и большие объекты остаются в памяти. Найти можно через Chrome DevTools → Memory → Heap snapshot, искать Detached HTMLElement и retainers."
   },
   "javascript-fundamentals__closures-scope-memory__10": {
-    "hintEasy": "Chrome DevTools → Memory → Heap snapshots, сравниваем до/после действия.",
-    "hintFull": "(1) Performance → Memory checkbox — следим за heap-graph во времени; (2) Three Snapshot technique — снапшот, действие, снапшот, повторить, найти new objects; (3) Detached DOM nodes — DOM-ноды без parent но с references.",
-    "answer": "Базовый workflow: Chrome DevTools Memory tab. (1) Performance recording с галкой Memory — heap-graph показывает динамику, постоянный рост = leak. (2) Heap snapshots: сделай snapshot, выполни действие N раз, ещё snapshot — сравни в Comparison view, найди объекты которые накапливаются. (3) Three Snapshot Technique: snapshot → действие → snapshot → действие → snapshot; в третьем найди объекты созданные между 1 и 2 и не удалённые в 3 — они утекают. (4) Detached DOM nodes — фильтр в snapshot, эти ноды должны были быть GC. Retainers покажут цепочку. Виновники: forgotten event listeners, setInterval'ы, global cache without TTL, замкнутые closures."
+    "hintEasy": "Chrome DevTools → Memory → Heap snapshots до и после действия.",
+    "hintFull": "Снять snapshot, выполнить подозрительное действие N раз, снять ещё. Сравнить — если объекты накапливаются, утечка.",
+    "answer": "Базовый workflow в Chrome DevTools — Memory tab. Сделать heap snapshot, выполнить действие несколько раз, снять ещё snapshot, сравнить — что накапливается. Полезный фильтр — Detached DOM nodes: эти ноды должны были быть собраны, но кто-то держит ссылку. Колонка Retainers покажет цепочку до GC root. Типичные виновники — забытые event listeners, setInterval без cleanup, глобальный кеш без TTL, замкнутые closures на старый context."
   },
   "javascript-fundamentals__closures-scope-memory__11": {
-    "hintEasy": "Любая reachable-ссылка на объект из root (global, активный stack, closures, listeners).",
-    "hintFull": "GC mark-and-sweep: всё что reachable от root не собирается. Помехи: глобальные переменные, замкнутые closures, event listeners, set/map с регулярными ключами, setTimeout/setInterval, observers.",
-    "answer": "GC в современных JS-движках — generational mark-and-sweep: всё что reachable от GC roots (global object, активный call stack, registered handlers) не собирается. Типичные удержания: (1) global variables / window properties; (2) listeners на live target'ах; (3) Map/Set которые хранят references — даже если объект больше нигде не нужен; используй WeakMap/WeakSet; (4) setInterval/setTimeout — не отменили id; (5) closures, захватившие большой context; (6) retained DOM-nodes (detached, но кто-то держит ссылку); (7) circular references — современные GC справляются, но в old-engine cross-context (DOM ↔ JS) бывало проблемой."
+    "hintEasy": "Любая reachable-ссылка из root.",
+    "hintFull": "Глобальные переменные, забытые listeners и таймеры, Map/Set которые держат объекты, замкнутые closures.",
+    "answer": "GC собирает только то, до чего нельзя дотянуться от root'ов — глобального объекта, активного стека, зарегистрированных handler'ов. Помехи: глобальные переменные, забытые event listeners, не остановленные setInterval'ы, Map или Set хранящие references (используй WeakMap когда можешь), замкнутые closures на большой context. Также detached DOM-ноды — удалённые из дерева, но кто-то всё ещё держит ссылку из JS."
   },
   "javascript-fundamentals__closures-scope-memory__12": {
-    "hintEasy": "Shallow копирует только верхний уровень. Deep — рекурсивно все вложенные объекты.",
-    "hintFull": "Shallow: { ...obj }, Object.assign, [...arr] — вложенные объекты остаются по ссылке. Deep: structuredClone, JSON.parse(JSON.stringify(...)), lodash.cloneDeep — рекурсивная копия.",
-    "answer": "Shallow copy создаёт новый объект, но вложенные объекты внутри остаются по ссылке. Spread { ...obj }, Object.assign({}, obj), [...arr] — это shallow. Изменение nested поля затронет оба объекта. Deep copy рекурсивно копирует все уровни — независимая структура. Современный native API: structuredClone (поддерживает Date, Map, Set, RegExp, Blob, циклы; не функции и DOM-ноды). Старая практика: JSON.parse(JSON.stringify(obj)) — fast, но теряет undefined, Date становится string'ом, не работает с function/Map/Set/Symbol/циклами. Lodash.cloneDeep — медленнее, но универсальнее."
+    "hintEasy": "Shallow — только верхний уровень. Deep — рекурсивно все уровни.",
+    "hintFull": "{...obj} копирует верх, вложенные объекты остаются по ссылке. structuredClone или lodash.cloneDeep делают независимую копию.",
+    "answer": "Shallow copy создаёт новый объект, но вложенные объекты внутри остаются по ссылке — мутация nested-поля затронет оба. Это {...obj}, Object.assign, [...arr]. Deep copy рекурсивно копирует все уровни. Современный native-вариант — structuredClone: поддерживает Date, Map, Set, циклы. Старый JSON.parse(JSON.stringify) теряет undefined, ломает Date и не работает с Map/Set/функциями. Lodash.cloneDeep — медленнее, но универсальнее."
   },
   "javascript-fundamentals__closures-scope-memory__13": {
-    "hintEasy": "Native алгоритм глубокого копирования, поддерживающий примитивы, Date, Map, Set, RegExp, циклы.",
-    "hintFull": "structuredClone(obj) — глобальная функция (Node 17+, все совр. браузеры). Поддерживает: примитивы, объекты, массивы, Map, Set, Date, RegExp, ArrayBuffer, Blob, циклические ссылки. НЕ поддерживает: функции, DOM-ноды, Symbol-keyed properties, prototypes.",
-    "answer": "Structured Clone — алгоритм глубокого копирования, встроенный в браузеры и Node 17+, доступный через global structuredClone(). Используется также внутри postMessage, IndexedDB, Worker.postMessage. Поддерживает: примитивы, plain objects, arrays, Map, Set, Date, RegExp, ArrayBuffer, TypedArrays, Blob, File, ImageData, циклические ссылки. НЕ поддерживает: function (бросит DataCloneError), DOM-ноды, Error (частично), prototypes (восстанавливает в Object.prototype), Symbol-keyed properties. Сильно лучше JSON.parse(JSON.stringify) — корректно работает с Date, Map, циклами; но медленнее."
+    "hintEasy": "Native-функция глубокого копирования с поддержкой Date, Map, Set, циклов.",
+    "hintFull": "structuredClone — встроена в браузеры и Node 17+. Не работает с функциями, DOM-нодами и prototypes.",
+    "answer": "structuredClone — встроенный алгоритм глубокого копирования, доступен в браузерах и Node 17+. Тот же алгоритм работает внутри postMessage и IndexedDB. Поддерживает примитивы, объекты, массивы, Map, Set, Date, RegExp, ArrayBuffer, циклические ссылки. Не поддерживает функции, DOM-ноды и prototypes. Существенно лучше JSON-трюка — корректно работает с Date, Map и циклами; но чуть медленнее."
   },
   "javascript-fundamentals__closures-scope-memory__14": {
     "hintEasy": "Теряет undefined, Date → string, не работает с Map/Set/функциями, не пропускает циклические ссылки.",
@@ -577,7 +578,6 @@
     "hintFull": "Map: keys любого типа (включая объекты), .size O(1), порядок вставки гарантирован, не имеет prototype-полей, лучше при frequent add/remove. Object: для записей с известными именами полей, JSON-serializable, статическая schema.",
     "answer": "Map когда: (1) keys — не строки (объекты, числа); (2) ключи неизвестны заранее, добавляются/удаляются динамически; (3) важен порядок вставки; (4) нужен .size O(1); (5) не хочется конфликтов с prototype-полями (proto, hasOwnProperty); (6) heavy-load add/delete (Map оптимизирован, у object'а — slower на большом числе ключей). Object когда: (1) известная schema полей (DTO, config); (2) JSON serialization; (3) destructuring и shorthand syntax удобнее; (4) маленькие объёмы / static keys. Practical: типы / DTO — object; runtime cache, registries, Entity → Metadata — Map. Performance в современных движках близок, но Map чуть надёжнее на сложных кейсах."
   },
-
   "javascript-fundamentals__prototypes-objects-classes__1": {
     "hintEasy": "Цепочка объектов, через которые JS ищет property: сначала own, потом proto, дальше до Object.prototype или null.",
     "hintFull": "У каждого объекта есть [[Prototype]]. При чтении свойства — проверка own properties, затем proto, далее по цепочке. Класс A extends B — A.prototype.__proto__ === B.prototype.",
@@ -677,5 +677,305 @@
     "hintEasy": "Поля с префиксом # доступны только внутри класса, технически приватные.",
     "hintFull": "class A { #x = 0; getX() { return this.#x; } } — #x не доступно снаружи (TypeError при попытке a.#x), не enumerable, не наследуется в плохом смысле. Real privacy в отличие от _underscore-convention.",
     "answer": "ES2022 private fields через # — настоящая приватность на runtime-уровне, не conventional underscore. Объявление: class Counter { #count = 0; inc() { this.#count++ } get value() { return this.#count } }. Доступ снаружи — SyntaxError на этапе parse: const c = new Counter(); c.#count — invalid. Поля приватны на per-class basis: даже в субклассе нельзя обращаться к #-полю родителя. Не enumerable, не появляются в Object.keys/Reflect. До появления # были workaround'ы: WeakMap-as-private, Symbol-as-key, _ underscore. Современный код для real-encapsulation использует #, для structural-typing — TS-only `private` (compile-time)."
+  },
+  "typescript__basics-types__1": {
+    "hintEasy": "Оба описывают форму, но `type` — alias на что угодно, а `interface` — расширяемый контракт.",
+    "hintFull": "`interface` поддерживает declaration merging и extends; `type` — нет, зато умеет union, mapped, conditional.",
+    "answer": "На уровне формы объекта они почти взаимозаменяемы. Разница в том, что `interface` можно дорасширить — в том числе сторонними декларациями того же имени, — а `type` нет, зато он умеет union, intersection, mapped и conditional. Я по умолчанию беру type, а interface — для публичного API библиотеки или когда осознанно нужен merging."
+  },
+  "typescript__basics-types__2": {
+    "hintEasy": "Зависит от того, надо ли расширять извне.",
+    "hintFull": "Расширяемая публичная форма — interface; всё остальное — type.",
+    "answer": "Беру interface для форм, которые потенциально кто-то будет расширять — публичный API, типы либ, props компонентов дизайн-системы. Всё остальное — type: union, mapped, локальные алиасы. Главное — держать в команде одно правило, чтобы в одном файле не оказалось interface и type без причины."
+  },
+  "typescript__basics-types__3": {
+    "hintEasy": "«Или то, или то» на уровне типов.",
+    "hintFull": "`A | B` — значение может быть любым из перечисленных, до сужения доступно только общее.",
+    "answer": "Union — это «значение одного из нескольких типов», записывается через вертикальную черту. Пока ты его не сузил через typeof, in или discriminator, обращаться можно только к тому, что есть у всех вариантов одновременно. На нём держится моделирование вариативности — статусы, ответы API, экшены."
+  },
+  "typescript__basics-types__4": {
+    "hintEasy": "«И то, и то» — все поля из всех типов сразу.",
+    "hintFull": "`A & B` — значение должно соответствовать и A, и B одновременно.",
+    "answer": "Intersection — это «всё сразу»: значение должно подходить под оба типа в пересечении. Удобно склеивать миксины — например, базовая модель плюс audit-поля. Подвох в том, что если поля конфликтуют по типу, итог станет never, и заметить это бывает не сразу."
+  },
+  "typescript__basics-types__5": {
+    "hintEasy": "Тип, у которого ровно одно конкретное значение — `'add'` или `42`.",
+    "hintFull": "Сам по себе редко полезен, в union из нескольких литералов получается компактный enum-подобный тип.",
+    "answer": "Literal type разрешает ровно одно значение — например, строку 'add' или число 42. В одиночку он почти не нужен, но в union даёт удобную замену enum'у — статусы заказа, тип action'а, размер кнопки. TS отлично сужает literal union в switch и сравнениях."
+  },
+  "typescript__basics-types__6": {
+    "hintEasy": "Union объектов с общим литеральным полем-discriminator'ом.",
+    "hintFull": "По полю-маркеру (`type`/`kind`) TS автоматически сужает тип в каждой ветке.",
+    "answer": "Discriminated union — это набор вариантов с общим литеральным полем, по которому TS понимает, в какой ветке мы находимся. Внутри `if (x.kind === 'success')` он уже знает, что у x есть value, а в ветке error — message. Это базовый инструмент для async-state, redux-action'ов, ответов API без всяких `as`."
+  },
+  "typescript__basics-types__7": {
+    "hintEasy": "Описать состояние так, чтобы невалидные комбинации просто не компилировались.",
+    "hintFull": "Не один объект с кучей optional полей, а discriminated union с собственными полями на каждом state.",
+    "answer": "Идея в том, что тип физически не должен позволять собрать невалидное состояние. Вместо `{loading, data, error}` с кучей optional — discriminated union: idle, loading, success(data), error(message). Тогда ситуация «success без data» или «error и data одновременно» не выразима, и рантайм-проверки на это не нужны."
+  },
+  "typescript__basics-types__8": {
+    "hintEasy": "Сужение более широкого типа до конкретного по runtime-проверке.",
+    "hintFull": "После if/typeof/in/instanceof TS внутри ветки знает более точный тип.",
+    "answer": "Narrowing — это когда TS на основе runtime-проверки сужает тип в текущей ветке. После typeof x === 'string' внутри if x — строка, в else — всё остальное. Это основа безопасной работы с union'ами и unknown: сначала проверяешь, потом TS даёт обращаться к специфичным полям."
+  },
+  "typescript__basics-types__9": {
+    "hintEasy": "Три способа сужать тип по runtime-проверке.",
+    "hintFull": "typeof — для примитивов, instanceof — для классов, in — по наличию поля.",
+    "answer": "typeof сужает по примитиву — string, number, boolean, function. instanceof — по классу через prototype-цепочку, удобно для ошибок и доменных классов. in проверяет наличие поля и сужает union, когда discriminator — не литерал, а сам факт наличия свойства. На практике 80% случаев закрываются typeof и discriminated union."
+  },
+  "typescript__basics-types__10": {
+    "hintEasy": "Своя функция-предикат `(x): x is T`, которая говорит TS «это T».",
+    "hintFull": "Возвращает boolean, но в подписи указано `x is User` — TS использует это для narrowing.",
+    "answer": "Type guard — это функция, у которой в подписи возврат не boolean, а `x is User`. Внутри пишешь любую runtime-проверку — наличие поля, формат — и в `if (isUser(x))` TS сужает тип до User. Это правильный способ обернуть проверку формата ответа от API или валидацию unknown'а — гораздо лучше, чем `as`."
+  },
+  "typescript__basics-types__11": {
+    "hintEasy": "Функция, которая бросает, если значение не того типа, и сужает тип после вызова.",
+    "hintFull": "Сигнатура `asserts x is T` или `asserts cond` — после вызова TS считает условие выполненным.",
+    "answer": "Assertion-функция — это как type guard, только она не возвращает true/false, а бросает исключение, если условие не выполнено. После её вызова TS на остатке функции считает тип сужённым. Удобно для invariant'ов: assertNotNull(user), и дальше user уже не nullable без лишнего if."
+  },
+  "typescript__basics-types__12": {
+    "hintEasy": "Оба — «неизвестно что», но unknown заставляет проверить, any — нет.",
+    "hintFull": "С any TS молчит на любые операции; с unknown сначала надо сузить через guard.",
+    "answer": "any отключает type-checker полностью — компилятор молча пропускает любую операцию. unknown тоже про «что-то неизвестное», но безопасный: пока не сузил типом-гардом, ничего сделать нельзя. Поэтому unknown — правильный тип на границе системы, а any почти всегда красный флаг."
+  },
+  "typescript__basics-types__13": {
+    "hintEasy": "Как временный костыль на границе с нетипизированной либой или в migration.",
+    "hintFull": "Локально, помечено TODO, не утечь в публичный API.",
+    "answer": "По-хорошему — нигде, но реальность другая. any оправдан как временное решение на границе с нетипизированной либой или в процессе миграции с JS, чтобы не блокироваться. Главное — не пускать его в публичные сигнатуры и не оставлять без TODO. Если выбираю между any и unknown, почти всегда unknown."
+  },
+  "typescript__basics-types__14": {
+    "hintEasy": "void — функция «ничего не возвращает»; never — функция «никогда не возвращает».",
+    "hintFull": "void — нормально завершилась, но без значения; never — бросила или зациклилась.",
+    "answer": "void — функция отработала и не вернула ничего полезного, типичный возврат логгера или handler'а. never — функция вообще не вернёт управления: бросит, зациклится, остановит процесс. Ещё never означает «такого значения быть не может» и используется в exhaustive-проверке discriminated union'ов."
+  },
+  "typescript__basics-types__15": {
+    "hintEasy": "Возврат функций-throw'ов и пустые ветки в exhaustive-проверке.",
+    "hintFull": "В default-ветке switch присваивают значение типа never — TS ругнётся при добавлении нового варианта.",
+    "answer": "Never появляется в трёх местах: возврат функции, которая всегда бросает или зациклена; пересечение несовместимых типов; и главное — exhaustive-check в switch по discriminated union, где default присваивает значение типа never. Если потом кто-то добавит новый вариант в union и забудет обработать — TS подсветит, что в default попало неприсваиваемое значение."
+  },
+  "typescript__basics-types__16": {
+    "hintEasy": "Проверка, что все варианты union'а обработаны.",
+    "hintFull": "В default ставишь `const _: never = x` — добавится новый case, TS заругается.",
+    "answer": "Это паттерн, который заставляет компилятор проверять, что все варианты union'а обработаны. В switch по discriminated union в default-ветке присваиваешь переменную типа never — пока все case'ы покрыты, всё ок. Стоит появиться новому варианту, default подсветится как ошибка, и ты не забудешь добавить обработку."
+  },
+  "typescript__basics-types__17": {
+    "hintEasy": "Поле, которое может отсутствовать — пишется через `?`.",
+    "hintFull": "По типу — объединение с undefined, плюс самого ключа может не быть в объекте.",
+    "answer": "Optional property — поле, которое может отсутствовать, пишется через знак вопроса. По типу это объединение с undefined, плюс самого ключа в объекте может не быть. Тонкость: с флагом exactOptionalPropertyTypes явно присвоить undefined уже не то же самое, что отсутствующее поле, и в API-моделях это иногда важно."
+  },
+  "typescript__basics-types__18": {
+    "hintEasy": "Достать тип конкретного поля через `T['field']`.",
+    "hintFull": "Аналог `obj.field`, но на уровне типов; работает и с union'ами ключей.",
+    "answer": "Indexed access — синтаксис, чтобы достать тип поля по ключу: User['email'] даст тип email. Удобно, чтобы не дублировать типы и держать их связанными с источником: типы пропсов формы выводятся из API-модели, и при изменении модели всё подтянется автоматически."
+  },
+  "typescript__basics-types__19": {
+    "hintEasy": "Пробежаться по ключам типа и собрать новый тип.",
+    "hintFull": "`{ [K in keyof T]: ... }` — основа Partial, Readonly, Pick и кастомных трансформаций.",
+    "answer": "Mapped type — конструкция, которая берёт ключи одного типа и для каждого создаёт поле в новом по правилу. На нём построены все стандартные утилиты — Partial, Readonly, Pick. Сам пишу маппеды, когда из доменной модели надо вывести тип формы или, скажем, сделать все поля nullable для DTO."
+  },
+  "typescript__basics-types__20": {
+    "hintEasy": "Тип-тернарник: `T extends U ? X : Y`.",
+    "hintFull": "Позволяет ветвить тип по условию; вместе с infer извлекает части типов.",
+    "answer": "Conditional type — это тип, который разный в зависимости от условия. Чаще всего нужен с infer — вытащить тип возвращаемого значения, аргументов функции, элементов массива. На нём построены ReturnType, Awaited и кастомные утилиты. Без необходимости лучше не лезть — читаемость падает быстро."
+  },
+  "typescript__generics-advanced-ts__1": {
+    "hintEasy": "Параметризованный тип — тип как параметр функции или класса.",
+    "hintFull": "`<T>` позволяет описать переиспользуемое поведение, сохранив связь типа входа и выхода.",
+    "answer": "Generic — это параметризованный тип; функция или класс берут тип «извне» и пользуются им внутри. Главный кейс — когда тип результата зависит от типа входа: id<T>(x: T): T, pluck<T, K extends keyof T>. Если внутри ты делаешь `as`, чтобы заработало, — generic скорее всего лишний, и можно проще."
+  },
+  "typescript__generics-advanced-ts__2": {
+    "hintEasy": "`<T extends X>` — T должен быть совместим с X.",
+    "hintFull": "Это «верхняя граница»: даёт доступ к полям X внутри функции и не пускает несовместимые аргументы.",
+    "answer": "extends в generic — это ограничение сверху: T должен быть подтипом чего-то конкретного. Это даёт две вещи: внутри функции можно пользоваться полями этого типа, и компилятор ловит вызовы с неподходящим аргументом. Типичный пример — <K extends keyof T> для безопасного доступа к полю по ключу."
+  },
+  "typescript__generics-advanced-ts__3": {
+    "hintEasy": "Связать input и output через одну и ту же type-переменную.",
+    "hintFull": "Не возвращать any/unknown и не делать as внутри — пусть TS выводит тип через generic.",
+    "answer": "Type-safe generic — это когда тип входа и выхода завязаны на одну и ту же переменную, и компилятор сам выводит конкретный тип на каждом вызове. Признак, что что-то пошло не так, — внутри понадобился `as` или any. Тогда либо нужно добавить ограничение через extends, либо переписать сигнатуру через перегрузки."
+  },
+  "typescript__generics-advanced-ts__4": {
+    "hintEasy": "Дефолтное значение для type-параметра, как у обычного аргумента.",
+    "hintFull": "`<T = string>` — если на вызове тип не указан и не выводится, берётся дефолт.",
+    "answer": "Generic default — это дефолтный тип, который подставляется, если на вызове его не указали и нельзя вывести из аргументов. Удобно для API, где «обычный» случай хочется писать без угловых скобок. Например, реактовский useState<T = undefined> — без указания получаешь undefined и сужаешь дальше."
+  },
+  "typescript__generics-advanced-ts__5": {
+    "hintEasy": "Union из всех ключей типа.",
+    "hintFull": "`keyof User` — `'id' | 'name' | 'email'`; используется в mapped и indexed-access.",
+    "answer": "keyof T возвращает union всех публичных ключей типа. На нём держатся mapped types, безопасный доступ по ключу через <K extends keyof T> и куча утилит. Тонкость: для Record<string, X> keyof даёт string | number — иногда это удивляет, и стоит держать в голове."
+  },
+  "typescript__generics-advanced-ts__6": {
+    "hintEasy": "Взять тип по имени значения.",
+    "hintFull": "В типе `typeof user` означает «тип переменной user», а не runtime typeof.",
+    "answer": "В типовом контексте typeof — это способ взять тип уже существующего значения, переменной или модуля. Полезно, чтобы не дублировать тип конфига или константы — пишешь объект, выводишь из него тип. Особенно круто с `as const` — получаешь точный тип литералов вместо общего string/number."
+  },
+  "typescript__generics-advanced-ts__7": {
+    "hintEasy": "Извлекает тип внутри conditional через placeholder.",
+    "hintFull": "`T extends Promise<infer U> ? U : T` — infer ловит тип, развёрнутый из Promise.",
+    "answer": "infer работает только внутри conditional type и нужен, чтобы вытащить кусок типа в переменную. Им построены ReturnType, Parameters, Awaited — везде, где надо «развернуть» обёртку. Сам infer пишу редко: обычно есть готовая утилита, а собственные конструкции на infer быстро становятся нечитаемыми."
+  },
+  "typescript__generics-advanced-ts__8": {
+    "hintEasy": "Conditional раздаётся по членам union'а.",
+    "hintFull": "Если T — голый union, conditional применяется к каждому варианту отдельно.",
+    "answer": "Если в conditional T — это голый union, проверка не применяется к union целиком, а раздаётся по каждому его варианту. Из-за этого, например, NonNullable<string | null> корректно превращается в string. Когда надо отключить дистрибуцию, оборачивают T в кортеж: [T] extends [X]."
+  },
+  "typescript__generics-advanced-ts__9": {
+    "hintEasy": "Встроенные дженерики для частых трансформаций типов.",
+    "hintFull": "Partial, Pick, Omit, Required, Record, Readonly, ReturnType — стандартная библиотека типов.",
+    "answer": "Utility types — это набор стандартных дженериков для типичных трансформаций: сделать поля optional, выбрать или отбросить ключи, описать словарь, достать возвращаемый тип функции. Они закрывают 90% повседневных задач, и лишние самописные алиасы поверх них чаще вредят, чем помогают."
+  },
+  "typescript__generics-advanced-ts__10": {
+    "hintEasy": "Trim/расширение полей, описание словарей и извлечение типов из функций.",
+    "hintFull": "Pick/Omit — выбор/отбрасывание ключей; Partial/Required — toggle optional; Record — словарь; ReturnType/Parameters — извлечение из сигнатуры функции.",
+    "answer": "Pick и Omit — выбираешь или отбрасываешь поля по ключу. Partial делает все поля необязательными, Required наоборот. Readonly — иммутабельность на уровне типа. Record описывает словарь с фиксированными типами ключей и значений. ReturnType и Parameters достают тип возврата и аргументов функции — это критично, чтобы хук или wrapper не переопределяли тип, а наследовали его."
+  },
+  "typescript__generics-advanced-ts__11": {
+    "hintEasy": "Discriminated union по статусу запроса плюс runtime-валидация ответа.",
+    "hintFull": "Тип запроса/ответа в одном месте, fetch отдаёт unknown, дальше парсится Zod'ом.",
+    "answer": "Я держу типы запроса и ответа рядом с эндпоинтом и возвращаю наружу discriminated union — success или error. На стороне fetch'а ответ изначально unknown и проходит валидацию схемой, потому что TS на runtime ничего не гарантирует. И обязательная часть — типизированная ошибка, чтобы не путать «сервер вернул 4xx» и «упала сетка»."
+  },
+  "typescript__generics-advanced-ts__12": {
+    "hintEasy": "Не наследник Error, а тип ошибки домена с кодом и сообщением.",
+    "hintFull": "Discriminated union по коду — TS заставит обработать каждый известный кейс.",
+    "answer": "Ошибки я типизирую как discriminated union по коду — например, kind: 'auth' | 'rate_limit' | 'validation' | 'unknown'. У каждой ветки свои поля: validation несёт fieldErrors, rate_limit — retryAfter. Это лучше, чем наследник Error, потому что union форсит exhaustive-обработку и не теряется при сериализации через границу."
+  },
+  "typescript__generics-advanced-ts__13": {
+    "hintEasy": "Не три bool'а, а discriminated union: idle/loading/success/error.",
+    "hintFull": "В каждом варианте лежат только релевантные данные — невалидные комбинации не выразимы.",
+    "answer": "Async-state — классический пример impossible-states. Вместо {loading, data, error} с кучей optional делаю discriminated union: idle, loading, success(data), error(message). После этого UI просто переключается по полю kind, и не бывает ситуации «loading и error одновременно». Хорошо ложится на useReducer и любые state-машины."
+  },
+  "typescript__generics-advanced-ts__14": {
+    "hintEasy": "Тип значений + тип ошибок + тип touched/dirty — параллельные структуры от одной модели.",
+    "hintFull": "Базовая модель формы выводится из API-DTO, errors/touched получаются через mapped types.",
+    "answer": "Я держу форму как одну базовую модель, а из неё вывожу errors и touched через mapped — `{ [K in keyof Values]?: string }` и так далее. Это гарантирует синхронность: добавил поле в values — обязан добавить обработку в errors. Поверх обычно стоит react-hook-form или Formik, но идея с маппедами не меняется."
+  },
+  "typescript__generics-advanced-ts__15": {
+    "hintEasy": "Компонент с пропсом `as`, который меняет, какой тег рендерится.",
+    "hintFull": "Generic по тегу/компоненту плюс ComponentPropsWithoutRef<T> для остальных пропсов.",
+    "answer": "Polymorphic — это компонент, у которого есть проп as, и он меняет, какой тег или другой компонент рендерится. Типизируется generic'ом по этому as плюс ComponentPropsWithoutRef<T>, чтобы IDE подсказывала валидные атрибуты. Штука с подвохами — ref, displayName, defaults — поэтому в проекте обычно живёт одна утилита, которой пользуются все компоненты дизайн-системы."
+  },
+  "typescript__generics-advanced-ts__16": {
+    "hintEasy": "Generic по типу строки; колонки знают про конкретное поле.",
+    "hintFull": "Column<T> с key: keyof T и render, типизированным под T[K].",
+    "answer": "Таблицу делаю generic по типу строки — Table<TRow>. Каждая колонка ссылается на ключ строки через keyof TRow, и render знает тип конкретного поля. В итоге Table<User> на странице — IDE подсказывает реальные ключи и не даст промахнуться. Это один из самых полезных кейсов под generic'и в UI."
+  },
+  "typescript__generics-advanced-ts__17": {
+    "hintEasy": "Готовые типы из React: ChangeEvent, MouseEvent, FormEvent и т.д.",
+    "hintFull": "Они параметризованы тегом — от него зависит, что внутри `event.target`.",
+    "answer": "В React есть готовые типы событий — ChangeEvent, MouseEvent, KeyboardEvent, FormEvent — параметризованные тегом элемента. Это важно, потому что от тега зависит, что у event.target. Стандартный паттерн — `onChange: (e: ChangeEvent<HTMLInputElement>) => void`, и e.target.value уже строго типизирован."
+  },
+  "typescript__generics-advanced-ts__18": {
+    "hintEasy": "Возвращай tuple через `as const` или объект с явным типом — не оставляй inference на 5 строк.",
+    "hintFull": "Если хук generic — возврат завязан на T, чтобы потребитель сразу получил типизированный результат.",
+    "answer": "Свой хук типизирую возвратом — либо именованный объект `{ value, set }`, либо tuple `[value, setValue] as const`, чтобы TS не сводил его к массиву из union'а. Если хук generic, возврат завязан на T — например, useFetch<T> отдаёт AsyncState<T>. Главное — явно описать возвращаемый тип, не оставлять inference'у догадываться на пять строк."
+  },
+  "typescript__generics-advanced-ts__19": {
+    "hintEasy": "Тип состояния плюс сигнатуры subscribe и getSnapshot.",
+    "hintFull": "useSyncExternalStore требует subscribe, getSnapshot, getServerSnapshot — каждый строго типизирован.",
+    "answer": "External store, который ты подаёшь в useSyncExternalStore, — это subscribe(listener) с возвратом unsubscribe, getSnapshot и для SSR getServerSnapshot. Тип состояния — то, что возвращает getSnapshot; именно он становится типом значения в компоненте. Главное — чтобы getSnapshot отдавал стабильную ссылку для одинаковых состояний, иначе React будет считать, что state поменялся."
+  },
+  "typescript__generics-advanced-ts__20": {
+    "hintEasy": "Discriminated union сообщений по полю `type`.",
+    "hintFull": "Отдельно для исходящих и входящих — общий union мешает narrowing.",
+    "answer": "WebSocket-протокол моделирую как discriminated union по полю type — отдельно для исходящих сообщений, отдельно для входящих. На приёме сообщение парсится Zod'ом и попадает в reducer/handler, где switch по type сужает payload. Один общий union на оба направления делать не пытаюсь — narrowing работает чище, когда направления разделены."
+  },
+  "typescript__generics-advanced-ts__21": {
+    "hintEasy": "Запекать список флагов как union строковых литералов.",
+    "hintFull": "Тогда тайпо в имени флага не пройдёт компиляцию.",
+    "answer": "Feature flags типизирую как union строковых литералов — это единый список валидных флагов. Дальше функция isEnabled(flag: Flag) не даёт обратиться к несуществующему флагу. Сам список можно генерировать из конфига или provider'а, но интерфейс наружу — союз литералов; так IDE подсказывает, и удалённый флаг сразу подсвечивает места использования."
+  },
+  "typescript__generics-advanced-ts__22": {
+    "hintEasy": "Permissions — union строк формата `domain:action`; роли — словарь по permission'ам.",
+    "hintFull": "Хелпер `can(user, permission)` принимает только валидный permission.",
+    "answer": "Permissions держу как union строковых литералов в формате domain:action, а роли — как словарь Record<Role, Set<Permission>>. Хелпер can(user, permission) принимает только валидный permission. Когда меняется список — компилятор сразу подсвечивает старые проверки. Для условных правил — own resource, conditional — нужен отдельный policy-слой, не пихать всё в один тип."
+  },
+  "typescript__generics-advanced-ts__23": {
+    "hintEasy": "Извлекать параметры из шаблона роута через template-literal types.",
+    "hintFull": "Через infer вытаскиваешь имена сегментов после двоеточия.",
+    "answer": "Параметры роута достаю из строки пути через template-literal types и conditional с infer: Params<'/users/:id'> равен {id: string}. На практике обычно беру то, что предоставляет роутер — Next.js, TanStack Router, — но идея одна: связать строку пути и тип параметров, чтобы при изменении сигнатуры все вызовы подсветились."
+  },
+  "typescript__generics-advanced-ts__24": {
+    "hintEasy": "States — discriminated union, transitions — функция от state и event.",
+    "hintFull": "Невалидные комбинации просто не описаны в reducer'е и попадают в exhaustive-default.",
+    "answer": "State machine — это discriminated union состояний, плюс union событий, плюс reducer-функция, которая по паре state/event возвращает новый state. Каждое сочетание, которое не имеет смысла, не описано в reducer'е и попадает в exhaustive-default. На сложных кейсах беру XState — там та же модель, плюс встроенные guard'ы и effects."
+  },
+  "typescript__generics-advanced-ts__25": {
+    "hintEasy": "Если читая тип десять секунд не понимаешь, что он делает — переписать.",
+    "hintFull": "Conditional, infer, распределённые union'ы — последнее средство, не первое.",
+    "answer": "Главный признак переусложнения — типы читаются дольше, чем функция, которую они описывают. Сначала пробую решить через discriminated union и базовые утилиты, а conditional, infer и рекурсивные типы — последнее средство, и обязательно с примерами в виде type-only assert'ов. Если без `as` всё равно не работает — типы не справляются с задачей, и проще переделать API."
+  },
+  "typescript__ts-architecture__1": {
+    "hintEasy": "В отдельном пакете или папке, чтобы и фронт, и бэк могли импортировать.",
+    "hintFull": "В монорепо — packages/shared; на разных репо — codegen из единого контракта.",
+    "answer": "Shared types живут в одном источнике правды. В монорепо это обычно packages/shared или packages/api-types, который импортируют и фронт, и бэк. На разделённых репо — контракт сверху: OpenAPI, GraphQL, proto, из которого генерятся типы. Главное — не копипастить руками, иначе расхождение это вопрос времени."
+  },
+  "typescript__ts-architecture__2": {
+    "hintEasy": "Кодген из единого контракта — OpenAPI/GraphQL/Proto или общий пакет.",
+    "hintFull": "На каждый деплой бэка — генерация типов; CI ловит дрейф.",
+    "answer": "Лучшая стратегия — единый контракт, из которого генерятся типы для обеих сторон: OpenAPI, GraphQL-codegen, gRPC. Если такой контракт невозможен, делаю shared-package в монорепо. Главное — встроить генерацию в CI и сборку, чтобы расхождение не накапливалось тихо. Любой ручной copy-paste типов — мина замедленного действия."
+  },
+  "typescript__ts-architecture__3": {
+    "hintEasy": "Один источник, остальное выводить через утилиты.",
+    "hintFull": "Доменная модель — основа; DTO, форма, list-row выводятся через Pick/Omit/Partial.",
+    "answer": "Стартую от одной канонической доменной модели и из неё вывожу всё остальное — DTO для API, поля формы, тип строки таблицы — через Pick, Omit, Partial и mapped types. Тогда добавление поля делается в одном месте, и всё связанное компилятор подсвечивает сам. Параллельные руками описанные типы для одного и того же — почти всегда баг во времени."
+  },
+  "typescript__ts-architecture__4": {
+    "hintEasy": "Гонять unknown через runtime-валидатор — Zod, Valibot, io-ts.",
+    "hintFull": "На границе системы — fetch, postMessage, localStorage — обязательная схема.",
+    "answer": "TS исчезает в рантайме, поэтому всё, что приходит снаружи, для меня unknown, пока не пройдёт валидацию схемой. Использую Zod или Valibot — описываешь схему, она и валидирует, и выводит TS-тип. Это закрывает API-ответы, локалсторадж, postMessage, params роутов. Внутри системы дальше уже доверяю типам."
+  },
+  "typescript__ts-architecture__5": {
+    "hintEasy": "Когда runtime-форма данных не контролируется компилятором.",
+    "hintFull": "Внешние данные, форма, локалсторадж, конфиги, env.",
+    "answer": "Они нужны на любой границе, где данные не под контролем компилятора: API-ответы, формы, localStorage, postMessage, env-переменные. Дают сразу две вещи — гарантию формата в рантайме и автоматический вывод TS-типа из схемы. Между ними разница в размере бандла и эргономике; для нового проекта чаще беру Zod, на performance-чувствительные кейсы — Valibot."
+  },
+  "typescript__ts-architecture__6": {
+    "hintEasy": "Domain — то, чем оперирует приложение; API — то, что прилетает с сервера.",
+    "hintFull": "Между ними mapper, чтобы изменения формата API не текли в логику.",
+    "answer": "Domain model — то, чем удобно оперировать приложению: даты как Date, enum'ы вместо строк, агрегаты с методами. API model — то, что пришло с сервера: обычно date-as-string и плоская структура. Между ними должен быть mapper. Тогда ребрендинг полей или новая версия API — работа в одном слое, а доменная логика остаётся неподвижной."
+  },
+  "typescript__ts-architecture__7": {
+    "hintEasy": "Постепенно — файл за файлом, без блокирующего рефакторинга.",
+    "hintFull": "TS поверх Flow в allowJs-режиме; на каждом merge'е переводим n файлов и поднимаем strictness.",
+    "answer": "Big-bang миграция — почти гарантированно нерабочий main на месяц. Я бы шёл инкрементально: ставлю TS, allowJs, файл за файлом переписываю, начиная с листьев — утилиты, типы, потом компоненты, потом критичная логика. CI должен оставаться зелёным на каждом этапе. Когда переехал основной костяк — поднимаю strict-флаги один за другим."
+  },
+  "typescript__ts-architecture__8": {
+    "hintEasy": "Не одним PR, а флаг за флагом, после стабилизации каждого.",
+    "hintFull": "noImplicitAny → strictNullChecks → strictFunctionTypes — отдельными итерациями.",
+    "answer": "Strict — это не один булев флаг, а пачка независимых. Включаю их по одному, начиная с noImplicitAny, потом strictNullChecks — самый болезненный, но самый ценный. Между шагами стабилизирую кодовую базу, иначе ревью PR на тысячи строк никто не вытянет. Полезно сначала включить флаги в shared/utils, потом распространить дальше."
+  },
+  "typescript__ts-architecture__9": {
+    "hintEasy": "Линтер запрещает голый as, ревью требует объяснения, заменять type-guard'ом.",
+    "hintFull": "ts-eslint правила, лимит исключений и обязательный комментарий у каждого as.",
+    "answer": "Обычно `as` появляется там, где не справились с типом или поленились. Включаю eslint-правила вроде consistent-type-assertions и no-unnecessary-type-assertion, ставлю review-чеклист — каждый `as` либо заменяется type-guard'ом или Zod'ом, либо обязан иметь комментарий «почему». На горячие точки — границу с нетипизированной либой — отдельный wrapper, и `as` живёт только внутри него."
+  },
+  "typescript__ts-architecture__10": {
+    "hintEasy": "Проверять не «компилится ли», а «нельзя ли упростить и убрать unsafe-куски».",
+    "hintFull": "Смотреть на as/any, optional поля, дублирование типов, читаемость.",
+    "answer": "Я смотрю на три вещи. Первое — где появился any, as, нетипизированный fetch: это потенциальные баги. Второе — нет ли дублирования: тот же тип под разным именем или вручную описанная DTO, которую можно вывести из модели. Третье — читаемость: длинные conditional'ы и mapped'ы, которые никто кроме автора не поймёт. Хороший TS-код — тот, который читается без захода в реализацию."
+  },
+  "typescript__ts-architecture__11": {
+    "hintEasy": "Тот, который врёт компилятору и читателю.",
+    "hintFull": "Много any/as, дубли DTO, нечитаемые conditional, optional-поля везде «на всякий случай».",
+    "answer": "Плохой TS-код — это код, в котором типы либо врут (`as` поверх неподходящих типов, any в публичной сигнатуре), либо мешают (конструкции, читающиеся медленнее, чем сама функция). Ещё знак — десять optional-полей в одном объекте; почти всегда это значит, что не разделили состояния и не сделали discriminated union. И отдельный сорт — три почти одинаковых типа одной сущности в разных файлах."
+  },
+  "typescript__ts-architecture__12": {
+    "hintEasy": "Новые поля только optional или с дефолтами; удаление — через deprecation.",
+    "hintFull": "Существующие поля сужать нельзя; крупные изменения — новая версия эндпоинта.",
+    "answer": "На уровне типов backwards-compat значит: новые поля приходят optional или с дефолтом на сервере, существующие никогда не сужаются и не переименовываются без миграции. Если меняется семантика — это новый эндпоинт или новая версия. Старое — deprecated в типе через JSDoc и удаляется в следующем major'е. Хорошо сочетается с OpenAPI и контракт-тестами."
+  },
+  "typescript__ts-architecture__13": {
+    "hintEasy": "Сначала границы — публичные функции и модули; внутрь идём по мере касания.",
+    "hintFull": "Снаружи внутрь: типизируем сигнатуры экспорта, потом точки боли, потом всё.",
+    "answer": "Сначала типизирую границы — то, что выставляется наружу из модуля. Внутренности оставляю как есть, пометив any'ями с TODO. Дальше иду по точкам боли: места, где регулярно ломаются баги, где идёт интеграция с новым кодом. Полная типизация легаси — годовой марафон; попытка сделать всё за неделю обычно ломает прод."
+  },
+  "typescript__ts-architecture__14": {
+    "hintEasy": "strict: true — не обсуждается; плюс noUncheckedIndexedAccess для серьёзного проекта.",
+    "hintFull": "strictNullChecks обязательно; noUncheckedIndexedAccess желательно; exactOptionalPropertyTypes — по вкусу.",
+    "answer": "Минимальный набор — strict: true, прежде всего strictNullChecks; без него типы превращаются в фантик. Дальше очень советую noUncheckedIndexedAccess — он заставляет учитывать, что arr[i] может быть undefined, и ловит реальные баги. exactOptionalPropertyTypes уже опционально: даёт точность, но шумит на формах. Без strict TS теряет половину смысла."
+  },
+  "typescript__ts-architecture__15": {
+    "hintEasy": "Переименование, поиск использований, отлов сломанных мест компилятором.",
+    "hintFull": "Меняем модель в одном месте — TS подсвечивает все вызовы, которые перестали работать.",
+    "answer": "Это, пожалуй, главная ценность TS на длинной дистанции. Меняешь модель или сигнатуру — компилятор показывает все места, которые перестали ей соответствовать, IDE даёт безопасный rename. Discriminated union'ы превращают «не забыл ли я обработать новый case» в compile-error, а не баг в проде. Без TS большие рефакторинги в крупном фронте — это азартная игра."
   }
 }
