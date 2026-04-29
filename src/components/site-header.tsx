@@ -8,6 +8,7 @@ const NAV = [
   { href: "/", label: "INDEX", exact: true as const },
   { href: "/tech", label: "TECH" },
   { href: "/social", label: "SOCIAL" },
+  { href: "/trainer", label: "TRAINER" },
   { href: "/notes", label: "NOTES" },
 ];
 

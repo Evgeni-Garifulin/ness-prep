@@ -34,6 +34,7 @@ model Question {
   section       Section        @relation(fields: [sectionSlug], references: [slug], onDelete: Cascade)
   answers       Answer[]
   questionNotes QuestionNote[]
+  trainerStats  TrainerStat[]
 
   @@index([sectionSlug, order])
 }
@@ -73,6 +74,24 @@ model QuestionNote {
   content    String   @db.Text
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
+
+  question Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@unique([username, questionId])
+  @@index([username])
+}
+
+// Статистика тренажёра: сколько раз пользователь нажал «знаю» и «не знаю» на
+// конкретном вопросе. Одна строка на (username, questionId), счётчики просто
+// инкрементятся при каждом ответе.
+model TrainerStat {
+  id           String   @id @default(cuid())
+  username     String
+  questionId   String
+  knownCount   Int      @default(0)
+  unknownCount Int      @default(0)
+  updatedAt    DateTime @updatedAt
+  createdAt    DateTime @default(now())
 
   question Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
 
