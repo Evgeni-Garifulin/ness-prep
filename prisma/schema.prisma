@@ -1,0 +1,61 @@
+// Postgres on Vercel free tier. Direct connection — Vercel pools at the edge.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("POSTGRES_PRISMA_URL")
+  directUrl = env("POSTGRES_URL_NON_POOLING")
+}
+
+model Section {
+  slug      String     @id
+  order     Int
+  title     String
+  questions Question[]
+}
+
+model Question {
+  id          String   @id
+  sectionSlug String
+  order       Int
+  number      Int
+  subsection  String?
+  text        String   @db.Text
+  hintEasy    String   @default("") @db.Text
+  hintFull    String   @default("") @db.Text
+  answer      String   @default("") @db.Text
+
+  section Section  @relation(fields: [sectionSlug], references: [slug], onDelete: Cascade)
+  answers Answer[]
+
+  @@index([sectionSlug, order])
+}
+
+model Answer {
+  id         String   @id @default(cuid())
+  username   String
+  questionId String
+  text       String   @db.Text
+  updatedAt  DateTime @updatedAt
+  createdAt  DateTime @default(now())
+
+  question Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@unique([username, questionId])
+  @@index([username])
+}
+
+model Note {
+  id        String   @id @default(cuid())
+  username  String
+  title     String   @default("Без названия")
+  content   String   @default("") @db.Text
+  pinned    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([username, updatedAt])
+}
