@@ -99,10 +99,8 @@ export function NotesEditor({ initialNotes }: { initialNotes: Note[] }) {
                   setShowList(false);
                 }}
                 className={cn(
-                  "block w-full px-3 py-3 text-left transition-colors border-b border-foreground/20",
-                  activeId === n.id
-                    ? "bg-foreground text-background"
-                    : "hover:bg-foreground hover:text-background",
+                  "block w-full px-3 py-3 text-left transition-colors border-b border-foreground/20 hover:bg-muted",
+                  activeId === n.id ? "text-foreground" : "text-muted-foreground",
                 )}
               >
                 <div className="flex items-center gap-1">
@@ -111,8 +109,8 @@ export function NotesEditor({ initialNotes }: { initialNotes: Note[] }) {
                     {n.title || "UNTITLED"}
                   </span>
                 </div>
-                <div className="mt-1 truncate yzy-meta opacity-70">
-                  {previewLine(n.content) || "Empty"}
+                <div className="mt-1 truncate yzy-meta">
+                  {previewLine(n.content) || "EMPTY"}
                 </div>
               </button>
             </li>

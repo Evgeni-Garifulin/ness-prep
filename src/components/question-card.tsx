@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState, useTransition } from "react";
-import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 
@@ -71,90 +70,95 @@ export function QuestionCard({
   const hasCorrect = correctAnswer.trim().length > 0;
 
   return (
-    <article
-      className={cn(
-        "border border-foreground bg-card p-4 sm:p-6",
-        isAnswered && "bg-foreground text-background",
-      )}
-    >
-      <header className="flex items-start gap-4">
-        <div
-          className={cn(
-            "yzy-label tabular-nums shrink-0 mt-1 min-w-7",
-            isAnswered ? "opacity-100" : "opacity-60",
-          )}
-        >
+    <article className="border border-foreground bg-card p-4 sm:p-6">
+      <header className="flex items-baseline gap-4">
+        <div className="text-sm sm:text-base leading-snug font-medium tabular-nums shrink-0 min-w-[2ch] text-muted-foreground">
           {String(number).padStart(2, "0")}
         </div>
-        <h3 className="text-sm sm:text-base leading-snug font-medium tracking-tight">
+        <h3
+          className={cn(
+            "flex-1 min-w-0 text-sm sm:text-base leading-snug font-medium tracking-tight",
+            isAnswered && "line-through text-muted-foreground",
+          )}
+        >
           {text}
         </h3>
+        {isAnswered && (
+          <span className="yzy-label shrink-0 text-foreground whitespace-nowrap self-center">
+            ANSWERED
+          </span>
+        )}
       </header>
 
-      <div className="mt-5 flex flex-wrap items-center gap-3 text-xs">
-        <ToggleLink active={showEasy} disabled={!hasEasy} onClick={() => setShowEasy((v) => !v)}>
-          {showEasy ? "Hide hint A" : "Hint A"}
+      <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-2 text-xs">
+        <ToggleLink
+          active={showEasy}
+          disabled={!hasEasy}
+          onClick={() => setShowEasy((v) => !v)}
+        >
+          {showEasy ? "HIDE HINT A" : "HINT A"}
         </ToggleLink>
-        <ToggleLink active={showFull} disabled={!hasFull} onClick={() => setShowFull((v) => !v)}>
-          {showFull ? "Hide hint B" : "Hint B"}
+        <ToggleLink
+          active={showFull}
+          disabled={!hasFull}
+          onClick={() => setShowFull((v) => !v)}
+        >
+          {showFull ? "HIDE HINT B" : "HINT B"}
         </ToggleLink>
         <ToggleLink
           active={showCorrect}
           disabled={!hasCorrect}
           onClick={() => setShowCorrect((v) => !v)}
         >
-          {showCorrect ? "Hide answer" : "Reveal answer"}
+          {showCorrect ? "HIDE ANSWER" : "REVEAL ANSWER"}
         </ToggleLink>
         <span
           className={cn(
-            "ml-auto yzy-label tabular-nums",
-            savedState === "saving" && "opacity-60",
-            savedState === "saved" && "opacity-100",
-            savedState === "error" && "opacity-100",
+            "ml-auto yzy-label tabular-nums text-muted-foreground",
             savedState === "idle" && "opacity-0",
           )}
           aria-live="polite"
         >
-          {savedState === "saving" && "Saving…"}
-          {savedState === "saved" && "Saved"}
-          {savedState === "error" && "Error"}
+          {savedState === "saving" && "SAVING…"}
+          {savedState === "saved" && "SAVED"}
+          {savedState === "error" && "ERROR"}
         </span>
       </div>
 
-      {showEasy && hasEasy && <Hint label="Hint A — light">{hintEasy}</Hint>}
-      {showFull && hasFull && <Hint label="Hint B — full">{hintFull}</Hint>}
+      {showEasy && hasEasy && <Hint label="HINT A — LIGHT">{hintEasy}</Hint>}
+      {showFull && hasFull && <Hint label="HINT B — FULL">{hintFull}</Hint>}
 
       <div className="mt-5">
-        <label className="yzy-label opacity-60 block mb-2">Your answer</label>
+        <label className="yzy-label text-muted-foreground block mb-2">
+          YOUR ANSWER
+        </label>
         <Textarea
           rows={3}
           value={answer}
           onChange={(e) => setAnswer(e.target.value)}
           placeholder="Type your answer…"
-          className={cn(
-            "text-sm",
-            isAnswered &&
-              "border-background bg-transparent text-background placeholder:text-background/50 focus-visible:ring-background",
-          )}
+          className="text-sm"
         />
       </div>
 
       {showCorrect && hasCorrect && (
-        <div className="mt-5 border border-current p-4">
-          <div className="yzy-label opacity-60 mb-2">Reference answer</div>
+        <div className="mt-5 border border-foreground p-4">
+          <div className="yzy-label text-muted-foreground mb-2">REFERENCE ANSWER</div>
           <p className="text-sm leading-relaxed whitespace-pre-wrap">{correctAnswer}</p>
         </div>
       )}
 
       {!hasEasy && !hasFull && !hasCorrect && (
-        <p className="mt-4 yzy-meta opacity-50">
-          Hints and reference not yet filled in.
+        <p className="mt-4 yzy-meta text-muted-foreground">
+          HINTS AND REFERENCE NOT YET FILLED IN.
         </p>
       )}
     </article>
   );
 }
 
+// Активный таб = чёрный, неактивный = светло-серый. Никаких подчёркиваний и
+// инверсий — поведение как в макете.
 function ToggleLink({
   active,
   disabled,
@@ -172,10 +176,12 @@ function ToggleLink({
       onClick={onClick}
       disabled={disabled}
       className={cn(
-        "yzy-label transition-opacity",
+        "yzy-label transition-colors",
         disabled && "opacity-30 cursor-not-allowed",
-        !disabled && active && "underline underline-offset-4 decoration-1",
-        !disabled && !active && "opacity-70 hover:opacity-100",
+        !disabled &&
+          (active
+            ? "text-foreground"
+            : "text-muted-foreground hover:text-foreground"),
       )}
     >
       {children}
@@ -185,8 +191,8 @@ function ToggleLink({
 
 function Hint({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div className="mt-4 border border-current p-4">
-      <div className="yzy-label opacity-60 mb-2">{label}</div>
+    <div className="mt-4 border border-foreground p-4">
+      <div className="yzy-label text-muted-foreground mb-2">{label}</div>
       <p className="text-sm leading-relaxed whitespace-pre-wrap">{children}</p>
     </div>
   );

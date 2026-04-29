@@ -54,11 +54,11 @@ export default async function TechPage() {
           href="/"
           className="yzy-label text-muted-foreground hover:text-foreground transition-colors"
         >
-          ← Index
+          INDEX
         </Link>
         <div className="mt-4 grid grid-cols-12 gap-4 items-end">
           <div className="col-span-12 md:col-span-8">
-            <p className="yzy-label text-muted-foreground">Track 01 / 02</p>
+            <p className="yzy-label text-muted-foreground">TRACK 01 / 02</p>
             <h1 className="mt-2 text-3xl sm:text-5xl font-medium uppercase leading-[1.05] tracking-tight">
               Tech
             </h1>
@@ -68,23 +68,23 @@ export default async function TechPage() {
           </div>
           <div className="col-span-12 md:col-span-4 flex items-end justify-between md:justify-end gap-6">
             <div className="text-right">
-              <p className="yzy-label text-muted-foreground">Progress</p>
+              <p className="yzy-label text-muted-foreground">PROGRESS</p>
               <p className="mt-1 text-3xl font-medium tabular-nums">{pct}%</p>
               <p className="yzy-meta text-muted-foreground mt-0.5">
-                {answered} / {total} · {sections.length} sections
+                {answered} / {total} · {sections.length} SECTIONS
               </p>
             </div>
           </div>
         </div>
-        <div className="mt-6 h-px w-full bg-foreground" />
-        <div className="mt-px h-px bg-foreground" style={{ width: `${pct}%` }} />
+        <div className="mt-6 h-px w-full bg-foreground/20" />
+        <div className="-mt-px h-px bg-foreground" style={{ width: `${pct}%` }} />
 
         <div className="mt-8">
           <TrackGrid sections={sections} />
         </div>
 
         <div className="mt-10 flex items-center justify-end">
-          <ResetButton scope="all" label="Reset progress" />
+          <ResetButton scope="all" label="RESET PROGRESS" />
         </div>
       </main>
     </>

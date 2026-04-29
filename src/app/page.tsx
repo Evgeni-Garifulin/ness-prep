@@ -48,7 +48,7 @@ export default async function HomePage() {
       <main className="mx-auto max-w-6xl px-4 sm:px-8 py-8 sm:py-12">
         <div className="grid grid-cols-12 gap-4 sm:gap-6 items-end">
           <div className="col-span-12 md:col-span-8">
-            <p className="yzy-label text-muted-foreground">Season — Q2 / 2026</p>
+            <p className="yzy-label text-muted-foreground">SEASON — Q2 / 2026</p>
             <h1 className="mt-3 text-3xl sm:text-5xl font-medium leading-[1.05] tracking-tight uppercase">
               Interview
               <br />
@@ -57,7 +57,7 @@ export default async function HomePage() {
           </div>
           <div className="col-span-12 md:col-span-4 flex items-end justify-between md:justify-end gap-6">
             <div className="text-right">
-              <p className="yzy-label text-muted-foreground">Progress</p>
+              <p className="yzy-label text-muted-foreground">PROGRESS</p>
               <p className="mt-1 text-3xl sm:text-4xl font-medium tabular-nums">
                 {grandPct}%
               </p>
@@ -86,31 +86,33 @@ export default async function HomePage() {
               >
                 <Link
                   href={track.href}
-                  className="group block h-full p-6 sm:p-8 hover:bg-foreground hover:text-background transition-colors duration-150"
+                  className="block h-full p-6 sm:p-8 hover:bg-muted transition-colors"
                 >
                   <div className="flex items-start justify-between">
-                    <p className="yzy-label opacity-60 group-hover:opacity-100">
+                    <p className="yzy-label text-muted-foreground">
                       {String(idx + 1).padStart(2, "0")} / {String(stats.length).padStart(2, "0")}
                     </p>
-                    <p className="yzy-meta tabular-nums opacity-60 group-hover:opacity-100">
+                    <p className="yzy-meta tabular-nums text-muted-foreground">
                       {track.answered}/{track.total}
                     </p>
                   </div>
                   <h2 className="mt-8 text-2xl sm:text-3xl font-medium leading-tight uppercase tracking-tight">
                     {track.title}
                   </h2>
-                  <p className="mt-3 text-sm opacity-70 group-hover:opacity-100 max-w-md">
+                  <p className="mt-3 text-sm text-muted-foreground max-w-md">
                     {track.subtitle}
                   </p>
 
                   <div className="mt-10 flex items-center justify-between">
-                    <span className="yzy-label">Enter →</span>
-                    <span className="yzy-meta tabular-nums">{pct}%</span>
+                    <span className="yzy-label">ENTER</span>
+                    <span className="yzy-meta tabular-nums text-muted-foreground">
+                      {pct}%
+                    </span>
                   </div>
 
-                  <div className="mt-3 h-px w-full bg-current opacity-30" />
+                  <div className="mt-3 h-px w-full bg-foreground/20" />
                   <div
-                    className="-mt-px h-px bg-current"
+                    className="-mt-px h-px bg-foreground"
                     style={{ width: `${pct}%` }}
                   />
                 </Link>
@@ -120,10 +122,8 @@ export default async function HomePage() {
         </ul>
 
         <div className="mt-12 flex items-center justify-between">
-          <p className="yzy-meta text-muted-foreground">
-            User · {username}
-          </p>
-          <ResetButton scope="all" label="Reset progress" />
+          <p className="yzy-meta text-muted-foreground">USER · {username}</p>
+          <ResetButton scope="all" label="RESET PROGRESS" />
         </div>
       </main>
     </>

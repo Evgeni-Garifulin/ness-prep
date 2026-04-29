@@ -3,30 +3,36 @@
 import * as React from "react";
 import { cn } from "@/lib/utils";
 
+// В дизайне всего два визуальных стиля кнопок:
+//   accent  — сплошная чёрная, белый текст; hover не меняет цвета (только cursor)
+//   regular — белая с тонкой 1px рамкой, чёрный текст; hover = светло-серый фон
+// Все доступные variant-имена мапятся в один из этих двух стилей, чтобы
+// существующий код не пришлось переписывать.
+
 type Variant = "default" | "secondary" | "ghost" | "destructive" | "outline";
 type Size = "default" | "sm" | "lg" | "icon";
 
-// Yeezy-кнопка: квадратные углы, тонкая 1px граница, uppercase tracking,
-// hover = инверсия (фон и текст меняются местами), без теней.
+const accent =
+  "bg-foreground text-background border border-foreground cursor-pointer";
 
-const base =
-  "inline-flex items-center justify-center gap-2 border font-medium uppercase " +
-  "tracking-[0.18em] transition-colors duration-150 " +
-  "disabled:opacity-40 disabled:pointer-events-none " +
-  "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring focus-visible:ring-offset-0";
+const regular =
+  "bg-background text-foreground border border-foreground cursor-pointer hover:bg-muted";
 
 const variants: Record<Variant, string> = {
-  default:
-    "bg-foreground text-background border-foreground hover:bg-background hover:text-foreground",
-  secondary:
-    "bg-transparent text-foreground border-foreground hover:bg-foreground hover:text-background",
-  outline:
-    "bg-transparent text-foreground border-foreground hover:bg-foreground hover:text-background",
+  default: accent,
+  destructive: accent,
+  outline: regular,
+  secondary: regular,
+  // ghost — без рамки, для мест где вид «как ссылка»
   ghost:
-    "border-transparent bg-transparent text-foreground hover:bg-foreground hover:text-background",
-  destructive:
-    "bg-foreground text-background border-foreground hover:bg-background hover:text-foreground",
+    "bg-transparent text-foreground border border-transparent cursor-pointer hover:bg-muted",
 };
+
+const base =
+  "inline-flex items-center justify-center gap-2 font-medium uppercase " +
+  "tracking-[0.18em] transition-colors duration-150 " +
+  "disabled:opacity-40 disabled:cursor-not-allowed disabled:pointer-events-none " +
+  "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring focus-visible:ring-offset-0";
 
 const sizes: Record<Size, string> = {
   default: "h-10 px-5 text-[10px]",

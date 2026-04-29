@@ -6,6 +6,7 @@ import { SiteHeader } from "@/components/site-header";
 import { QuestionCard } from "@/components/question-card";
 import { ResetButton } from "@/components/reset-button";
 import { categoryFor, sortKey } from "@/lib/categories";
+import { stripSectionPrefix } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
@@ -45,7 +46,7 @@ export default async function SectionPage({ params }: { params: Params }) {
 
   const category = categoryFor(section.slug);
   const trackHref = category === "social" ? "/social" : "/tech";
-  const trackLabel = category === "social" ? "Social" : "Tech";
+  const trackLabel = category === "social" ? "SOCIAL" : "TECH";
 
   const all = await prisma.section.findMany({
     select: { slug: true, title: true, order: true },
@@ -69,7 +70,7 @@ export default async function SectionPage({ params }: { params: Params }) {
           href={trackHref}
           className="yzy-label text-muted-foreground hover:text-foreground transition-colors"
         >
-          ← {trackLabel}
+          {trackLabel}
         </Link>
 
         <div className="mt-4 flex flex-wrap items-end justify-between gap-3">
@@ -78,17 +79,17 @@ export default async function SectionPage({ params }: { params: Params }) {
               {trackLabel} · {positionLabel}
             </p>
             <h1 className="mt-2 text-2xl sm:text-4xl font-medium uppercase leading-[1.05] tracking-tight">
-              {section.title}
+              {stripSectionPrefix(section.title)}
             </h1>
             <p className="mt-3 yzy-meta text-muted-foreground tabular-nums">
               {answered} / {total} · {pct}%
             </p>
           </div>
-          <ResetButton scope="section" sectionSlug={section.slug} label="Reset section" />
+          <ResetButton scope="section" sectionSlug={section.slug} label="RESET SECTION" />
         </div>
 
-        <div className="mt-6 h-px w-full bg-foreground" />
-        <div className="mt-px h-px bg-foreground" style={{ width: `${pct}%` }} />
+        <div className="mt-6 h-px w-full bg-foreground/20" />
+        <div className="-mt-px h-px bg-foreground" style={{ width: `${pct}%` }} />
 
         <div className="mt-10 space-y-12">
           {groups.map((g, gi) => (
@@ -120,11 +121,11 @@ export default async function SectionPage({ params }: { params: Params }) {
           {prev ? (
             <Link
               href={`/sections/${prev.slug}`}
-              className="block bg-background hover:bg-foreground hover:text-background transition-colors px-4 py-4"
+              className="block bg-background hover:bg-muted transition-colors px-4 py-4"
             >
-              <div className="yzy-label opacity-60">← Previous</div>
+              <div className="yzy-label text-muted-foreground">PREVIOUS</div>
               <div className="mt-2 text-sm font-medium uppercase tracking-tight truncate">
-                {prev.title}
+                {stripSectionPrefix(prev.title)}
               </div>
             </Link>
           ) : (
@@ -133,11 +134,11 @@ export default async function SectionPage({ params }: { params: Params }) {
           {next ? (
             <Link
               href={`/sections/${next.slug}`}
-              className="block bg-background hover:bg-foreground hover:text-background transition-colors px-4 py-4 text-right"
+              className="block bg-background hover:bg-muted transition-colors px-4 py-4 text-right"
             >
-              <div className="yzy-label opacity-60">Next →</div>
+              <div className="yzy-label text-muted-foreground">NEXT</div>
               <div className="mt-2 text-sm font-medium uppercase tracking-tight truncate">
-                {next.title}
+                {stripSectionPrefix(next.title)}
               </div>
             </Link>
           ) : (
