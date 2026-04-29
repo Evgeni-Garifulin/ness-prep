@@ -1,7 +1,7 @@
 {
   "_meta": {
     "note": "Контент подсказок и эталонных ответов. Маппинг questionId -> {hintEasy, hintFull, answer}. Заливается секциями по мере готовности. Сид мержит поверх questions.json — пустые поля не затирают то, что уже есть.",
-    "filled_sections": ["must-have-blitz", "behavioral-star"]
+    "filled_sections": ["must-have-blitz", "behavioral-star", "javascript-fundamentals"]
   },
 
   "must-have-blitz__1": {
@@ -374,5 +374,308 @@
   },
   "behavioral-star__mentoring-leadership__10": {
     "answer": "Underperformance — самый сложный leadership-вопрос. Структура: (1) что заметил — конкретные паттерны (миссы deadline'ов, low quality PR'ов, communication gaps); (2) проверка прежде чем judge — может личные обстоятельства, неподходящий проект, нечеткие expectations? (3) разговор 1-1 — поделился наблюдениями (SBI), услышал его perspective; (4) plan together — конкретные expectations, milestones, support (mentor, training, redefined scope); (5) regular check-ins; (6) outcome — либо turn-around (часто), либо escalation в HR/manager track (если не сдвиг). Сигнал: эмпатия + standards. Не «терпел» и не «сразу report'ил»."
+  },
+
+  "javascript-fundamentals__event-loop-async__1": {
+    "hintEasy": "Цикл, который чередует исполнение JS, microtasks и render-фазу. Делает однопоточный JS неблокирующим.",
+    "hintFull": "После завершения task'и runtime сначала дренирует ВСЮ microtask-очередь, потом отдаёт фрейм браузеру, потом берёт следующую macrotask. Без него Promise/timer/fetch были бы невозможны в одном thread'е.",
+    "answer": "Event loop — механизм, который держит JavaScript однопоточным, но неблокирующим. Пока call stack не пуст — JS исполняет; когда пустеет, runtime дренирует microtasks (Promise.then, queueMicrotask, MutationObserver), затем отдаёт фрейм браузеру (rAF + paint), затем берёт одну macrotask из очереди (setTimeout, IO, DOM events). Каждая итерация называется tick. Из-за этого Promise.then всегда выполняется до setTimeout(0), даже если поставлен позже."
+  },
+  "javascript-fundamentals__event-loop-async__2": {
+    "hintEasy": "Microtasks — Promise.then, queueMicrotask. Tasks — setTimeout, IO, DOM events.",
+    "hintFull": "После каждой macrotask runtime дренирует ВЕСЬ microtask queue до пустоты. Macrotasks отбираются по одной за итерацию. Это даёт Promise приоритет над таймерами.",
+    "answer": "Macrotask (или просто task) — единица из основной очереди: setTimeout, setInterval, MessageChannel, IO, DOM events, postMessage. Microtask — высокоприоритетная: Promise.then/catch/finally, queueMicrotask, MutationObserver. Ключевое различие: microtasks дренируются полностью между двумя macrotasks и до render-фазы. То есть Promise.then всегда выполнится до следующего setTimeout-callback. Бесконечный promise.then(...).then(...) может заморозить страницу — браузер просто не дойдёт до paint."
+  },
+  "javascript-fundamentals__event-loop-async__3": {
+    "hintEasy": "Microtasks → rAF → paint → macrotasks. Promise.then и queueMicrotask идут сразу; setTimeout — на следующий tick.",
+    "hintFull": "После текущей задачи runtime дренирует все microtasks (queueMicrotask + Promise.then в порядке регистрации). Потом, если нужен paint, выполняется rAF и render. setTimeout(fn, 0) — отдельная macrotask, ждёт следующего tick'а.",
+    "answer": "В одном тике сначала выполнятся queueMicrotask и Promise.then (microtask queue, в порядке регистрации). Затем, если браузер собирается рисовать, rAF-callbacks ПЕРЕД paint. Затем сам paint. На следующей итерации loop'а возьмётся одна macrotask — setTimeout-callback. Пример: log('a'); setTimeout(()=>log('b')); Promise.resolve().then(()=>log('c')); queueMicrotask(()=>log('d')); requestAnimationFrame(()=>log('e')) — порядок a, c, d, e, b."
+  },
+  "javascript-fundamentals__event-loop-async__4": {
+    "hintEasy": "Между macrotasks, после дренажа microtasks, обычно ~60 раз в секунду.",
+    "hintFull": "Браузер старается дать кадр каждые 16ms (или 8ms для 120Hz). Перед paint выполняются rAF-callbacks. Если microtasks или текущая macrotask не отдают control дольше 16ms — кадр пропускается, UI лагает.",
+    "answer": "Браузер вставляет фазу render (style → layout → paint → composite) в event loop примерно каждые 16ms (60fps), но только когда у него есть chance — текущая macrotask и весь microtask queue завершены. Прямо перед paint выполняется requestAnimationFrame-очередь. Если main thread держит работу дольше 16ms (long task), кадр пропускается. Promise-chains, синхронный JSON.parse большого ответа, тяжёлые reducers — типичные виновники jank'а."
+  },
+  "javascript-fundamentals__event-loop-async__5": {
+    "hintEasy": "Microtasks дренируются ДО render и macrotasks; пока новые добавляются — никто другой не получит control.",
+    "hintFull": "Если каждая microtask добавляет новую (Promise.resolve().then(loop)), очередь не пустеет → браузер не дойдёт до paint, setTimeout не запустится. Page будет полностью frozen.",
+    "answer": "Между двумя macrotasks runtime дренирует ВЕСЬ microtask queue до пустоты. Если microtask добавляет новую microtask, и так далее — конца не будет. Render, setTimeout-callbacks, user input не получат шанс. UI замирает. Отличается от while(true) — тот блокирует одну task, а бесконечный microtask loop ещё и блокирует переход к следующей task. Защита: setTimeout(fn, 0) внутри тяжёлого цикла или scheduler.yield()."
+  },
+  "javascript-fundamentals__event-loop-async__6": {
+    "hintEasy": "all reject'ит при первой ошибке. allSettled даёт результаты всех. race — первого. any — первого fulfilled.",
+    "hintFull": "all — результаты массивом, fail-fast. allSettled — массив {status, value|reason}, никогда не reject'ит. race — первый settled (resolve OR reject). any — первый fulfilled, AggregateError только если все упали.",
+    "answer": "Promise.all — резолвит массивом результатов в порядке оригинальных промисов; reject'ит сразу при первой ошибке (fail-fast). Promise.allSettled — всегда резолвит массивом {status: 'fulfilled', value} или {status: 'rejected', reason}, не делает коротких замыканий. Promise.race — резолвит/реджектит первым изменившимся (любой статус). Promise.any — резолвит первым fulfilled; реджектит AggregateError только если все упали — fallback на несколько endpoint'ов."
+  },
+  "javascript-fundamentals__event-loop-async__7": {
+    "hintEasy": "Цикл с try/catch: при error ждём delay и удваиваем. После N попыток — пробрасываем.",
+    "hintFull": "Базово: for-loop, в catch — await sleep(delay); delay *= 2. Прибавь jitter (random шум) чтобы избежать thundering herd. Не retry'й 4xx — только сеть и 5xx.",
+    "answer": "async function retry(fn, { attempts = 5, baseDelay = 200, maxDelay = 5000 } = {}) { for (let i = 0; i < attempts; i++) { try { return await fn() } catch (e) { if (i === attempts-1 || !isRetriable(e)) throw e; const exp = Math.min(baseDelay * 2**i, maxDelay); const jitter = Math.random() * exp * 0.3; await new Promise(r => setTimeout(r, exp + jitter)) } } }. Exponential backoff (200, 400, 800), cap чтобы не ждать минутами, jitter чтобы клиенты не долбили синхронно после outage. Retry'ить только сеть/5xx — на 4xx бесполезно и удвоит side-effects."
+  },
+  "javascript-fundamentals__event-loop-async__8": {
+    "hintEasy": "AbortController + signal в options.",
+    "hintFull": "const c = new AbortController(); fetch(url, { signal: c.signal }); ... c.abort(). Запрос reject'ится с DOMException 'AbortError'. Обрабатывай отдельно от других ошибок.",
+    "answer": "Стандартный API — AbortController. Создаёшь controller, передаёшь controller.signal в fetch options, при необходимости вызываешь controller.abort(). fetch reject'ится с AbortError. Используется для отмены устаревших запросов при смене параметров поиска (race-condition guard), для таймаутов (AbortSignal.timeout(5000)), для удаления event-listener'ов одной строкой через addEventListener(..., { signal }). В React useEffect создаёт controller, в cleanup вызывает abort. AbortError ловить отдельно — это нормальная отмена, не ошибка."
+  },
+  "javascript-fundamentals__event-loop-async__9": {
+    "hintEasy": "Несколько одновременных async-операций возвращаются в непредсказуемом порядке и затирают результаты друг друга.",
+    "hintFull": "Типичный кейс: пользователь печатает в search, каждое нажатие шлёт запрос. Запрос #5 вернулся раньше #6 — но #6 был стартован позже и его результат должен победить. Без guard'а UI покажет stale data.",
+    "answer": "Race condition — несколько одновременных async-операций приходят в непредсказуемом порядке и могут затирать друг друга. Классика: search-input — пользователь печатает 'foo', потом 'foobar'. Первый запрос медленнее второго, возвращается позже и перезаписывает результат. UI показывает 'foo'-результаты для 'foobar'. Защита: AbortController (отменяем устаревший), generation-counter (id запроса, применяем только если соответствует последнему), debounce. В React Query / SWR этим занимается библиотека."
+  },
+  "javascript-fundamentals__event-loop-async__10": {
+    "hintEasy": "AbortController + cleanup в useEffect, или флаг ignored в closure.",
+    "hintFull": "Паттерн: useEffect с cleanup. Внутри fetch с signal или флагом cancelled. На cleanup signal.abort() или cancelled = true. Перед setState — проверка.",
+    "answer": "Стандартный паттерн: useEffect(() => { const c = new AbortController(); fetch(url, { signal: c.signal }).then(setData).catch(e => { if (e.name !== 'AbortError') setError(e) }); return () => c.abort(); }, [url]). Старый запрос отменяется при смене url или unmount. Альтернатива: let cancelled = false; cleanup => cancelled = true. Реальная отмена через AbortController лучше — закрывает сетевое соединение. В реальных приложениях React Query / SWR закрывают этот класс багов из коробки."
+  },
+  "javascript-fundamentals__event-loop-async__11": {
+    "hintEasy": "Каждая итерация ждёт предыдущей — последовательное выполнение. Параллельность теряется.",
+    "hintFull": "for (const x of arr) { await f(x) } — итерации синхронны. Если функции независимы и хочется параллели — arr.map(f) и await Promise.all(...).",
+    "answer": "for...of с await выполняет итерации последовательно: каждая ждёт предыдущей. Правильно если есть зависимости или важен порядок side-effects. Если функции независимы — в N раз медленнее: const results = await Promise.all(arr.map(f)) запускает все параллельно. forEach с async НЕ работает как ожидается — promise'ы не await'ятся, цикл завершается синхронно. На больших массивах нужен concurrency-limit (5-10 одновременно), иначе откроешь сотни сокетов."
+  },
+  "javascript-fundamentals__event-loop-async__12": {
+    "hintEasy": "Parallel — независимые операции. Sequential — есть зависимости/нужен порядок/ограничения по нагрузке.",
+    "hintFull": "Parallel: загрузка нескольких независимых ресурсов, batch DB-чтений. Sequential: миграции, операции с зависимостями, со side-effects где порядок критичен.",
+    "answer": "Parallel (Promise.all) — операции независимы и порядок не важен: загрузить параллельно user, posts, comments. Sequential (await в for-of) — есть зависимости (B нуждается в результате A), важен порядок side-effects, нужно ограничить нагрузку (один lock). Гибрид — limited concurrency: по 5 одновременно — для batch'а с rate-limit'ом. Анти-паттерн: parallel для тысячи запросов одной DB — убьёт connection pool."
+  },
+  "javascript-fundamentals__event-loop-async__13": {
+    "hintEasy": "Worker pool: N воркеров берут из общей очереди задачи.",
+    "hintFull": "Простая реализация: массив воркеров, каждый async loop'ом достаёт задачу из shared queue. Готовые либы: p-limit, bottleneck. Использование: pLimit(5), tasks.map(t => limit(() => f(t))).",
+    "answer": "Worker pool: const limit = (n) => { const queue = []; let active = 0; const next = () => { if (active >= n || !queue.length) return; active++; const { fn, resolve, reject } = queue.shift(); fn().then(resolve, reject).finally(() => { active--; next() }); }; return (fn) => new Promise((res, rej) => { queue.push({ fn, resolve: res, reject: rej }); next() }); }. Использование: const run = limit(5); await Promise.all(urls.map(u => run(() => fetch(u)))). Готовые: p-limit, bottleneck (с rate-limit'ом)."
+  },
+  "javascript-fundamentals__event-loop-async__14": {
+    "hintEasy": "debounce — ждём паузу N ms после последнего вызова. throttle — выполняем не чаще раза в N ms.",
+    "hintFull": "debounce: каждый вызов сбрасывает таймер; финальный effect — после паузы. Search-input. throttle: первый проходит, остальные в окне игнорируются. Scroll, mousemove.",
+    "answer": "debounce(fn, ms) откладывает fn пока поток вызовов не утихнет на ms; каждый новый вызов сбрасывает таймер. Реализация: let t; return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), ms) }. throttle(fn, ms) гарантирует не чаще раза в ms — первый вызов проходит сразу, последующие в окне блокируются (или в trailing). Реализация через last-timestamp + setTimeout для trailing."
+  },
+  "javascript-fundamentals__event-loop-async__15": {
+    "hintEasy": "debounce — после паузы. throttle — регулярно с ограничением частоты.",
+    "hintFull": "debounce пропускает все промежуточные; нас интересует ИТОГ. throttle пропускает большинство, но регулярно даёт срабатывать; нас интересует ПРОГРЕСС.",
+    "answer": "debounce реагирует только на финал — все промежуточные вызовы отбрасываются, выполнение после паузы. Применения: search-input (отправляем когда юзер закончил), autosave, валидация формы. throttle реагирует регулярно: первый проходит, потом не чаще раза в ms. Применения: scroll-handler, mousemove (drag), price ticker (flush раз в 100ms). Правило: «нужен ИТОГ — debounce; нужна РЕГУЛЯРНОСТЬ — throttle»."
+  },
+  "javascript-fundamentals__event-loop-async__16": {
+    "hintEasy": "Любая работа, которую нужно сделать прямо перед paint — animations, smooth-scroll, DOM-измерения.",
+    "hintFull": "rAF-callback запускается прямо перед композицией кадра — текущий layout уже свежий. 60fps по дефолту. Хорош для анимаций (Canvas, transforms), для batching real-time updates.",
+    "answer": "requestAnimationFrame(cb) подписывает cb на запуск прямо перед следующим paint браузера (~16ms). Применения: (1) анимации — изменение transform/opacity внутри cb, плавно и синхронно с refresh rate; (2) DOM-измерения — getBoundingClientRect актуален; (3) batching real-time updates — копим WebSocket-сообщения, флашим раз в кадр. Главное преимущество — браузер сам знает когда tab background или зажат CPU и пропускает rAF. setInterval так не умеет."
+  },
+  "javascript-fundamentals__event-loop-async__17": {
+    "hintEasy": "Низкоприоритетная работа, которую можно отложить пока браузер не занят.",
+    "hintFull": "Запускается в idle-моменты event loop'а с deadline'ом. Полезно для аналитики, prefetching, indexing на background. Не для критичного UX.",
+    "answer": "requestIdleCallback(cb, { timeout }) выполняет cb в моменты когда браузер свободен; callback получает IdleDeadline.timeRemaining(). Применения: фоновая аналитика, prefetching данных следующей страницы, computing cache, low-priority logging. НЕ подходит для critical UX — браузер может вообще не вызвать cb если страница загружена. Safari исторически не поддерживал — нужен polyfill через setTimeout. В новых API заменено на scheduler.postTask с приоритетами."
+  },
+  "javascript-fundamentals__event-loop-async__18": {
+    "hintEasy": "Высокоприоритетные задачи крутятся бесконечно, не давая дойти до низкоприоритетных.",
+    "hintFull": "Бесконечный microtask loop блокирует render и macrotasks — это starvation render-фазы. Иначе: тяжёлый цикл задач не оставляет места для setTimeout/IO.",
+    "answer": "Starvation — высокоприоритетная работа не даёт низкоприоритетной выполниться. В JS типично: бесконечный promise.then-цикл дренирует microtask queue без остановки → render и macrotasks никогда не запустятся → UI замерзает. Менее очевидно: тяжёлый sync-код в одной macrotask блокирует следующие 100 (включая user input). Решения: yield через scheduler.yield() / setTimeout(0), разбиение работы на чанки, перенос в Web Worker. В React 18 useTransition помечает state-updates как low-priority."
+  },
+  "javascript-fundamentals__event-loop-async__19": {
+    "hintEasy": "0 — это минимум; runtime поставит в очередь macrotask, она выполнится не раньше следующего тика после current task + microtasks.",
+    "hintFull": "Спека требует минимум 4ms во вложенных setTimeout (clamping). Кроме этого, перед setTimeout-callback'ом всегда выполнятся microtasks и rAF (если пора).",
+    "answer": "setTimeout(fn, 0) гарантирует только МИНИМАЛЬНУЮ задержку — runtime ставит fn в macrotask queue, обработается не раньше следующей итерации loop. Сначала закончится текущая task, потом дренируются microtasks (Promise.then), потом могут пройти rAF + paint, и только потом — setTimeout. На практике задержка ≈4-15ms (clamping для nested setTimeout — 4ms). Если нужно «ASAP, но не сейчас» — лучше queueMicrotask или Promise.resolve().then() (выполнится до paint), для «после paint» — setTimeout 0 или MessageChannel."
+  },
+  "javascript-fundamentals__event-loop-async__20": {
+    "hintEasy": "Promise reject'ится. Если никто не .catch'ит — unhandled promise rejection.",
+    "hintFull": "async-функция всегда возвращает Promise. throw внутри = reject. Без catch'ера — попадает в window.unhandledrejection event, в Node.js может крашить процесс (--unhandled-rejections=strict).",
+    "answer": "Любая async-функция возвращает Promise; throw внутри (или await reject'нувшегося Promise) reject'ит этот Promise. Без catch — unhandled rejection: в браузере событие window.addEventListener('unhandledrejection') с promise и reason; в Node — process.on('unhandledRejection'), а с --unhandled-rejections=strict краш процесса. Sentry / другие error trackers ловят автоматически. Защита: всегда либо await с try/catch, либо .catch на корне chain. В React 19 unhandled-rejection можно поймать через onUncaughtError option в createRoot."
+  },
+
+  "javascript-fundamentals__closures-scope-memory__1": {
+    "hintEasy": "Функция, которая помнит переменные из своего lexical scope, даже когда внешняя функция уже вернулась.",
+    "hintFull": "В JS scope — лексический. Внутренняя функция держит ссылку на environment record внешней. После возврата эти переменные не GC'ятся, пока closure жив.",
+    "answer": "Closure — функция, у которой есть доступ к переменным из её lexical environment, даже после того как внешняя функция завершилась. Например: function counter() { let n = 0; return () => ++n }; — возвращённая функция помнит n. Каждое создание функции захватывает ссылки на enclosing scopes; пока closure жив, эти переменные не GC'ятся. Применения: encapsulation (приватные переменные), partial application, фабрики функций, hooks (useState — closure над setState). Цена: closure держит свои переменные → memory leak'и если ссылку забыли убрать."
+  },
+  "javascript-fundamentals__closures-scope-memory__2": {
+    "hintEasy": "Stale closure (старое значение переменной), unintended captures, memory leaks.",
+    "hintFull": "Типично: handler в setInterval помнит старый state; loop с let vs var capturing index; addEventListener один раз создан, видит initial values; large objects в closure'е удерживаются в памяти.",
+    "answer": "Главные баги: (1) stale closure — handler видит state из render'а, в котором был создан, не текущий; в React-hooks типично с useEffect/setInterval без правильных deps; (2) unintended capture большого объекта — closure держит весь outer scope в памяти; (3) loop с var — все callback'ы видят последний i (классика); решается let'ом или IIFE; (4) addEventListener один раз — closure захватил initial state, обновлений не видит. Решения: правильные deps, useRef для latest-value, removeEventListener'ы, Weak* структуры."
+  },
+  "javascript-fundamentals__closures-scope-memory__3": {
+    "hintEasy": "Closure захватил старое значение переменной и продолжает на него ссылаться, когда оно уже устарело.",
+    "hintFull": "Типично в React: useEffect/setInterval с пустым deps array захватывает state из mount-render'а. После update этот closure видит старый state. Лечится правильными deps или функциональным setState.",
+    "answer": "Stale closure — функция всё ещё держит ссылку на старое значение из прошлого scope/render'а, потому что closure был создан тогда. Самый частый кейс — React: useEffect(() => { const id = setInterval(() => setCount(count + 1), 1000); return () => clearInterval(id) }, []) — count в callback'е навсегда останется 0. Лечение: (1) правильные deps массив (но это перезапустит interval); (2) функциональный setState: setCount(c => c + 1); (3) useRef для latest-value; (4) useEffectEvent / useEvent (proposal) для callback'ов которые всегда видят свежие значения."
+  },
+  "javascript-fundamentals__closures-scope-memory__4": {
+    "hintEasy": "Каждый render — свой closure над своим state. Hook без правильных deps замораживается на одном render'е.",
+    "hintFull": "useState даёт новое значение state на каждом render'е, но callback'и внутри useEffect/useCallback захватывают то значение, которое было в момент создания closure. Без правильных deps closure не пересоздаётся.",
+    "answer": "В React каждый render компонента создаёт новые closures над текущими props/state. Если ты не указал переменную в deps массиве hook'а, hook не пересоздаст callback — и тот будет помнить значения из render'а где был создан. Типичный сценарий: useEffect с пустым deps + setInterval, useCallback с пропущенной dep, event listener созданный в useEffect и редко переподписанный. Это «фича» React-модели — снапшот закрепляется на каждый render — и одновременно её главная граната на ноге. eslint-plugin-react-hooks/exhaustive-deps ловит большинство случаев. Современная альтернатива: useEffectEvent (React 19+) для функций, которые должны видеть всегда последний state, не перезапуская effect."
+  },
+  "javascript-fundamentals__closures-scope-memory__5": {
+    "hintEasy": "Либо правильные deps + переподписка, либо useRef с latest-value, либо функциональный setState.",
+    "hintFull": "В React: useEffect с правильными deps пересоздаст handler. Но если переподписка дорогая — useRef с latest-value: ref.current = state на каждом render'е, handler читает ref.current. setState с функциональной формой не зависит от closure'а.",
+    "answer": "Три рабочих паттерна: (1) указать все используемые значения в deps массиве hook'а — handler пересоздаётся при их изменении, всегда свежий, но переподписывается каждый раз; (2) useRef-паттерн — useEffect(() => { ref.current = state }) обновляет ref на каждом render'е без переподписки; внутри handler'а читаем ref.current; (3) функциональный setState (setX(prev => ...)) — не зависит от closure'а, получает текущее значение от React. Новый proposal useEffectEvent (React 19) делает (2) встроенным. Eslint-plugin-react-hooks/exhaustive-deps практически всегда указывает на проблему."
+  },
+  "javascript-fundamentals__closures-scope-memory__6": {
+    "hintEasy": "Scope определяется по месту объявления в коде, не по месту вызова. Scope chain — цепочка вложенных scope'ов от внутреннего к глобальному.",
+    "hintFull": "При обращении к переменной runtime ищет её в текущем scope, потом в enclosing, потом globally. Лексически — значит на этапе парсинга, не runtime'ом. Это даёт closures.",
+    "answer": "Lexical scope — JS определяет видимость переменных по месту ОБЪЯВЛЕНИЯ в коде, а не по месту вызова. Когда внутри функции обращаешься к переменной, runtime сначала смотрит в локальный scope, потом во внешний (enclosing), потом дальше по цепочке вверх до глобального. Эта цепочка называется scope chain. Лексически — потому что определяется при парсинге, фиксируется навсегда. Альтернатива — dynamic scope (как в bash), где видимость зависит от runtime call stack — в JS этого нет. Closures работают именно благодаря lexical scope: функция помнит ссылки на свой enclosing scope, даже когда вышла за пределы вызова."
+  },
+  "javascript-fundamentals__closures-scope-memory__7": {
+    "hintEasy": "var — function-scope, hoisted с undefined. let/const — block-scope, в TDZ до объявления.",
+    "hintFull": "var: видна во всей функции, var x в for-loop — одна переменная для всех итераций. let/const: scope = ближайший {}, redeclare запрещён. const — нельзя реассайнить (но мутировать объект можно).",
+    "answer": "var имеет function-level scope: var x внутри if/for виден всей функции; hoist'ится с initial value undefined. let и const имеют block-level scope (любые {}); до строки объявления находятся в Temporal Dead Zone — обращение кидает ReferenceError. const запрещает реассайнмент переменной, но не мутацию её содержимого (const obj = {}; obj.x = 1 — ок). Практический эффект: цикл for(var i=0; i<3; i++) setTimeout(() => log(i)) выведет 3,3,3 (одна i на всю функцию); с let — 0,1,2 (новая i на каждой итерации). В современном коде var не используется."
+  },
+  "javascript-fundamentals__closures-scope-memory__8": {
+    "hintEasy": "Период от начала scope до объявления let/const, где обращение к переменной = ReferenceError.",
+    "hintFull": "let x — переменная существует, но не initialized. До строки объявления любое чтение/запись кидает ReferenceError 'Cannot access x before initialization'. Это форсит порядок: сначала declare, потом use.",
+    "answer": "TDZ — период с начала scope до строки `let x` или `const x`, в течение которого переменная уже зарезервирована scope'ом, но ещё не инициализирована. Любое обращение к ней (чтение или запись) кидает ReferenceError 'Cannot access x before initialization'. typeof тоже не спасает, в отличие от не-объявленных переменных. TDZ — сознательная дизайн-фича ES6: в отличие от var (которая hoist'ится с undefined и тихо работает), let/const заставляют писать «сначала declare, потом use», ловит баги где переменная использована до объявления. У function declarations — особый кейс: они hoist'ятся полностью, поэтому function f() {} вызвать до объявления — ок."
+  },
+  "javascript-fundamentals__closures-scope-memory__9": {
+    "hintEasy": "Closure держит ссылки на ВЕСЬ enclosing scope; если closure долгоживущий — переменные не GC'ятся.",
+    "hintFull": "Event listener с handler-closure'ом держит outer-scope в памяти пока listener жив. Если handler ссылается на DOM-node — нода тоже не убирается. Очисти listener'ы при unmount.",
+    "answer": "Closure хранит ссылки на свой enclosing scope — включая все переменные, не только те что использованы (в spec'е, на практике движки оптимизируют). Если closure долгоживущий (event listener, setInterval-callback, hold в global state), enclosing scope не GC'ится. Опасные кейсы: (1) addEventListener забыл removeEventListener при unmount; (2) setInterval создал closure который держит DOM-node, после navigation node остаётся; (3) в closure захвачен большой объект (всё state), хотя нужно одно поле — выньте поле в локальную переменную перед закрытием. Поиск: Chrome DevTools → Memory → Heap snapshot → Detached HTMLDivElement, retainers."
+  },
+  "javascript-fundamentals__closures-scope-memory__10": {
+    "hintEasy": "Chrome DevTools → Memory → Heap snapshots, сравниваем до/после действия.",
+    "hintFull": "(1) Performance → Memory checkbox — следим за heap-graph во времени; (2) Three Snapshot technique — снапшот, действие, снапшот, повторить, найти new objects; (3) Detached DOM nodes — DOM-ноды без parent но с references.",
+    "answer": "Базовый workflow: Chrome DevTools Memory tab. (1) Performance recording с галкой Memory — heap-graph показывает динамику, постоянный рост = leak. (2) Heap snapshots: сделай snapshot, выполни действие N раз, ещё snapshot — сравни в Comparison view, найди объекты которые накапливаются. (3) Three Snapshot Technique: snapshot → действие → snapshot → действие → snapshot; в третьем найди объекты созданные между 1 и 2 и не удалённые в 3 — они утекают. (4) Detached DOM nodes — фильтр в snapshot, эти ноды должны были быть GC. Retainers покажут цепочку. Виновники: forgotten event listeners, setInterval'ы, global cache without TTL, замкнутые closures."
+  },
+  "javascript-fundamentals__closures-scope-memory__11": {
+    "hintEasy": "Любая reachable-ссылка на объект из root (global, активный stack, closures, listeners).",
+    "hintFull": "GC mark-and-sweep: всё что reachable от root не собирается. Помехи: глобальные переменные, замкнутые closures, event listeners, set/map с регулярными ключами, setTimeout/setInterval, observers.",
+    "answer": "GC в современных JS-движках — generational mark-and-sweep: всё что reachable от GC roots (global object, активный call stack, registered handlers) не собирается. Типичные удержания: (1) global variables / window properties; (2) listeners на live target'ах; (3) Map/Set которые хранят references — даже если объект больше нигде не нужен; используй WeakMap/WeakSet; (4) setInterval/setTimeout — не отменили id; (5) closures, захватившие большой context; (6) retained DOM-nodes (detached, но кто-то держит ссылку); (7) circular references — современные GC справляются, но в old-engine cross-context (DOM ↔ JS) бывало проблемой."
+  },
+  "javascript-fundamentals__closures-scope-memory__12": {
+    "hintEasy": "Shallow копирует только верхний уровень. Deep — рекурсивно все вложенные объекты.",
+    "hintFull": "Shallow: { ...obj }, Object.assign, [...arr] — вложенные объекты остаются по ссылке. Deep: structuredClone, JSON.parse(JSON.stringify(...)), lodash.cloneDeep — рекурсивная копия.",
+    "answer": "Shallow copy создаёт новый объект, но вложенные объекты внутри остаются по ссылке. Spread { ...obj }, Object.assign({}, obj), [...arr] — это shallow. Изменение nested поля затронет оба объекта. Deep copy рекурсивно копирует все уровни — независимая структура. Современный native API: structuredClone (поддерживает Date, Map, Set, RegExp, Blob, циклы; не функции и DOM-ноды). Старая практика: JSON.parse(JSON.stringify(obj)) — fast, но теряет undefined, Date становится string'ом, не работает с function/Map/Set/Symbol/циклами. Lodash.cloneDeep — медленнее, но универсальнее."
+  },
+  "javascript-fundamentals__closures-scope-memory__13": {
+    "hintEasy": "Native алгоритм глубокого копирования, поддерживающий примитивы, Date, Map, Set, RegExp, циклы.",
+    "hintFull": "structuredClone(obj) — глобальная функция (Node 17+, все совр. браузеры). Поддерживает: примитивы, объекты, массивы, Map, Set, Date, RegExp, ArrayBuffer, Blob, циклические ссылки. НЕ поддерживает: функции, DOM-ноды, Symbol-keyed properties, prototypes.",
+    "answer": "Structured Clone — алгоритм глубокого копирования, встроенный в браузеры и Node 17+, доступный через global structuredClone(). Используется также внутри postMessage, IndexedDB, Worker.postMessage. Поддерживает: примитивы, plain objects, arrays, Map, Set, Date, RegExp, ArrayBuffer, TypedArrays, Blob, File, ImageData, циклические ссылки. НЕ поддерживает: function (бросит DataCloneError), DOM-ноды, Error (частично), prototypes (восстанавливает в Object.prototype), Symbol-keyed properties. Сильно лучше JSON.parse(JSON.stringify) — корректно работает с Date, Map, циклами; но медленнее."
+  },
+  "javascript-fundamentals__closures-scope-memory__14": {
+    "hintEasy": "Теряет undefined, Date → string, не работает с Map/Set/функциями, не пропускает циклические ссылки.",
+    "hintFull": "Преобразование через JSON: undefined и function исчезают, Date теряет тип, Map/Set/Symbol/RegExp ломаются. Циклы кидают TypeError. Для всего этого — structuredClone.",
+    "answer": "Эта старая идиома удобна, но ломается на нескольких типах: (1) undefined и function в полях — теряются; (2) Date → строка ISO, при parse уже не Date; (3) Map, Set, RegExp, ArrayBuffer — превращаются в {} или ломаются; (4) Symbol-keyed properties не сериализуются; (5) циклические ссылки кидают TypeError 'Converting circular structure'; (6) BigInt вообще не сериализуется. Для plain JSON-like данных — нормально, для всего остального используй structuredClone() (native, быстрый, корректный) или lodash.cloneDeep (более старый, поддерживает функции через ссылку)."
+  },
+  "javascript-fundamentals__closures-scope-memory__15": {
+    "hintEasy": "=== только по reference. Для значения — deep equality (lodash.isEqual или fast-deep-equal).",
+    "hintFull": "{ a: 1 } === { a: 1 } — false, разные ссылки. По значению: рекурсивный обход полей с проверкой типов. Edge cases: NaN === NaN false (в isEqual обычно true), Date, Map, Set, циклы.",
+    "answer": "=== сравнивает только references — два объекта с одинаковыми полями считаются разными. Для structural equality (по значению): рекурсивно обход keys и сравнение каждого поля. Готовые: lodash.isEqual, fast-deep-equal, dequal. Edge cases: NaN !== NaN (обычно isEqual делает их равными); Date — сравнивать через .getTime(); Map/Set — отдельно по содержимому; циклические ссылки — нужно отслеживать visited; разные prototypes — могут быть равны или нет в зависимости от либы. В тестах используй expect(...).toEqual (deep) vs .toBe (===)."
+  },
+  "javascript-fundamentals__closures-scope-memory__16": {
+    "hintEasy": "a === b возвращает true только если это одна и та же ссылка в памяти.",
+    "hintFull": "Для примитивов === сравнивает значения; для объектов/массивов/функций — references. Один объект «себе самому» равен; копия — нет.",
+    "answer": "Referential equality — сравнение по reference: два объекта равны только если это одна и та же ячейка памяти. Это значит { a: 1 } === { a: 1 } — false; const x = {a:1}; x === x — true. Для примитивов (string, number, boolean, null, undefined, symbol, bigint) === сравнивает значения. Понимание этого критично для React: [...arr] !== arr → re-render компонента-потребителя; { ...obj } !== obj → invalidation в useMemo. Правило: для performance/React оптимизаций мутации опасны (=== остаётся true), а namespace новых объектов на каждом render'е срывает мемоизации."
+  },
+  "javascript-fundamentals__closures-scope-memory__17": {
+    "hintEasy": "React сравнивает state и props по ===. Мутация не меняет ссылку — React не видит изменения.",
+    "hintFull": "setState(arr.push(x)) — arr та же ссылка, prev === next, useMemo/React.memo/PureComponent скипнут update. Возможен ещё двойной баг: внутренние снапшоты state ссылаются на тот же объект, мутация ломает time-travel.",
+    "answer": "React (и все библиотеки на shallow comparison) использует === для проверки изменений props/state. Если ты мутируешь массив или объект, ссылка остаётся прежней — prev === next, и React решает что update не нужен. Конкретно: setState(state.items.push(x)) — items та же reference, useMemo не invalidates, React.memo skip'ает render, useEffect с deps [items] не сработает. Дополнительно: state в useState/useReducer должен быть immutable, иначе devtools time-travel и Concurrent React видят разные снапшоты с одинаковыми values. Правило: всегда новые объекты — setItems([...items, x]), setUser({ ...user, name }). Immer / structuredClone — помощники."
+  },
+  "javascript-fundamentals__closures-scope-memory__18": {
+    "hintEasy": "Объект, который не меняется после создания. Изменения = новые объекты.",
+    "hintFull": "Каждое 'изменение' создаёт новый объект через spread/map/filter. Даёт: дешёвый shallow compare (===), undo/redo через массив снапшотов, безопасный sharing между потоками/components, легче дебажится.",
+    "answer": "Immutability — данные не меняются после создания; «изменение» = новый объект с другими значениями. Преимущества: (1) shallow compare через === — основа React performance optimizations и мемоизаций; (2) time-travel debugging и undo/redo — храним массив снапшотов; (3) safe sharing — нельзя случайно мутировать объект в другом куске кода; (4) предсказуемость — функции pure, легче тестировать и понимать. Цена: создание новых объектов на каждое 'изменение' (с моторны GC справляется, но на горячих путях может быть заметно). Tooling: spread/Object.assign/map/filter, Immer (mutable API + immutable result), Records & Tuples (proposal — native immutable примитивы)."
+  },
+  "javascript-fundamentals__closures-scope-memory__19": {
+    "hintEasy": "Map с key = объект, значения которого автоматически удаляются когда ключ GC'ится.",
+    "hintFull": "Ключи — только объекты (не примитивы). Не итерируется (нельзя size, forEach). Используется для приватных данных у объектов, кешей с автоматической очисткой.",
+    "answer": "WeakMap — Map-like структура, у которой keys — объекты, и map держит на них weak reference. Если на ключ-объект больше нигде не ссылок (только из WeakMap), он может быть собран GC; запись в WeakMap исчезнет автоматически. Это значит: нельзя итерировать (нет size, keys, values, forEach — порядок и количество depends on GC). API: get/set/has/delete. Применения: (1) приватные данные — const _private = new WeakMap(); class A { constructor() { _private.set(this, secret) } get() { return _private.get(this) } }; (2) кеш по объекту — не держит лишнего; (3) метаданные на DOM-node без свойств. Аналог — WeakSet и FinalizationRegistry."
+  },
+  "javascript-fundamentals__closures-scope-memory__20": {
+    "hintEasy": "Map — динамические ключи, неstring-keys, сохранение порядка вставки, известный размер. Object — known schema, JSON, default.",
+    "hintFull": "Map: keys любого типа (включая объекты), .size O(1), порядок вставки гарантирован, не имеет prototype-полей, лучше при frequent add/remove. Object: для записей с известными именами полей, JSON-serializable, статическая schema.",
+    "answer": "Map когда: (1) keys — не строки (объекты, числа); (2) ключи неизвестны заранее, добавляются/удаляются динамически; (3) важен порядок вставки; (4) нужен .size O(1); (5) не хочется конфликтов с prototype-полями (proto, hasOwnProperty); (6) heavy-load add/delete (Map оптимизирован, у object'а — slower на большом числе ключей). Object когда: (1) известная schema полей (DTO, config); (2) JSON serialization; (3) destructuring и shorthand syntax удобнее; (4) маленькие объёмы / static keys. Practical: типы / DTO — object; runtime cache, registries, Entity → Metadata — Map. Performance в современных движках близок, но Map чуть надёжнее на сложных кейсах."
+  },
+
+  "javascript-fundamentals__prototypes-objects-classes__1": {
+    "hintEasy": "Цепочка объектов, через которые JS ищет property: сначала own, потом proto, дальше до Object.prototype или null.",
+    "hintFull": "У каждого объекта есть [[Prototype]]. При чтении свойства — проверка own properties, затем proto, далее по цепочке. Класс A extends B — A.prototype.__proto__ === B.prototype.",
+    "answer": "Каждый объект в JS имеет внутреннюю ссылку [[Prototype]] (доступную через Object.getPrototypeOf или __proto__). При обращении к property: сначала ищется own property; если нет — проверяется prototype; если нет — prototype.prototype; и так до Object.prototype, у которого proto = null. Это и есть prototype chain. Реализация наследования: class A extends B — A.prototype.__proto__ === B.prototype, instance A имеет proto-цепочку instance → A.prototype → B.prototype → Object.prototype → null. Это позволяет shared-методы храниться один раз и переопределять их на конкретных уровнях."
+  },
+  "javascript-fundamentals__prototypes-objects-classes__2": {
+    "hintEasy": "Зависит от способа вызова: метод объекта → объект; обычный вызов → undefined (strict)/global; arrow — наследует из enclosing.",
+    "hintFull": "Правила: new — новый instance; explicit (call/apply/bind) — указанный; method (obj.fn()) — obj; standalone (fn()) — undefined в strict, global в non-strict; arrow — lexical this из enclosing scope.",
+    "answer": "В JS this определяется по ПРАВИЛУ ВЫЗОВА, не по месту определения. Иерархия: (1) new Foo() — this это новый instance; (2) explicit binding fn.call(ctx) / .apply / .bind — this = ctx; (3) method call obj.fn() — this = obj; (4) standalone fn() — undefined в strict mode, globalThis в non-strict; (5) arrow function — НЕ имеет своего this, наследует из enclosing lexical scope. Поэтому метод-arrow в классе всегда привязан, а класс-метод обычной функции теряет this при отрыве: const fn = obj.method; fn() — this undefined. Лечится bind(obj) или arrow в class field."
+  },
+  "javascript-fundamentals__prototypes-objects-classes__3": {
+    "hintEasy": "Arrow не имеет своего this/arguments, не может new, нет prototype, синтаксис компактнее.",
+    "hintFull": "Arrow: lexical this (из enclosing), нет arguments (используем rest), нельзя new, нет prototype, нельзя generator. Удобно для callbacks: фиксирует this без bind.",
+    "answer": "Различия: (1) this — у arrow не свой, наследуется из enclosing scope; у обычной — определяется по правилу вызова; (2) arguments — нет у arrow, используем (...args); у обычной есть; (3) new — нельзя у arrow (TypeError 'is not a constructor'); (4) prototype — нет у arrow; у обычной есть; (5) generator/async-function — обычная может, arrow только async (но не generator); (6) compact-syntax — () => x; вместо function. Практика: arrow для callbacks (не теряет this), method-shorthand или function для object/class methods."
+  },
+  "javascript-fundamentals__prototypes-objects-classes__4": {
+    "hintEasy": "call/apply вызывают функцию с указанным this. apply берёт args массивом. bind возвращает новую функцию с привязанным this.",
+    "hintFull": "fn.call(ctx, ...args) и fn.apply(ctx, [...args]) — вызывают сразу. fn.bind(ctx, ...partial) — возвращает new функцию с привязанным this и optional partial args. bind permanent (нельзя переопределить через call).",
+    "answer": "Все три задают this функции явно. fn.call(ctx, a, b) — вызывает fn с this=ctx и args=[a,b]; разворачивает args inline. fn.apply(ctx, [a, b]) — то же, но args массивом (полезно когда массив генерируется dynamic'ом). fn.bind(ctx, a) — возвращает НОВУЮ функцию, у которой this=ctx и первый arg уже = a; partial application. bind permanent — последующие вызовы через call/apply его не перебьют. Применения: bind в class-методах (обычно заменяется arrow class fields), reduce-aggregations через apply (Math.max.apply(null, arr)). С rest/spread всё чаще не нужно — Math.max(...arr)."
+  },
+  "javascript-fundamentals__prototypes-objects-classes__5": {
+    "hintEasy": "Создаёт новый объект, ставит его proto = Foo.prototype, вызывает Foo с this = объект, возвращает объект.",
+    "hintFull": "Шаги: (1) создать пустой {}; (2) obj.__proto__ = Foo.prototype; (3) вызвать Foo.call(obj, ...args); (4) если Foo вернула объект — возвращается он, иначе — obj. Поддерживается у function-declarations и class'ов.",
+    "answer": "new Foo(args) выполняет: (1) создаёт новый пустой объект; (2) устанавливает его [[Prototype]] = Foo.prototype; (3) вызывает Foo.call(newObj, args), внутри this = newObj; (4) если конструктор явно вернул object — возвращается он; иначе — newObj. Это работает для function declarations и для class'ов (за кулисами class — синтаксический сахар). Arrow functions нельзя вызывать с new (нет [[Construct]]). new.target внутри функции возвращает Foo если вызвано через new, undefined иначе — паттерн для функций которые работают и так и так."
+  },
+  "javascript-fundamentals__prototypes-objects-classes__6": {
+    "hintEasy": "JS class — синтаксический сахар над prototype-наследованием. Под капотом — single-dispatch, dynamic, без многонаследования.",
+    "hintFull": "Под капотом prototype chain. Нет access modifiers (только #private syntax), нет true overload (по типу), нет abstract class native, нет multiple inheritance (только mixins). super работает через prototype. Method'ы дёргают this — могут терять контекст.",
+    "answer": "JS class — синтаксический сахар над prototype-based наследованием, не классический Java/C# class. Что отличается: (1) prototype chain под капотом — методы лежат не на instance а на Class.prototype; (2) нет компилируемых access-modifiers — public по умолчанию, есть #privateField (real private), но нет protected; (3) методы — обычные функции, могут потерять this при отрыве — поэтому популярен arrow class field 'method = () => {}'; (4) нет true method overloading по типу аргументов; (5) нет multiple inheritance — только mixins через Object.assign(Class.prototype, mixin); (6) abstract class — нет native, эмулируется бросанием в конструкторе; (7) static — статические methods/fields на Class, не на prototype."
+  },
+  "javascript-fundamentals__prototypes-objects-classes__7": {
+    "hintEasy": "Объект-метаданные свойства: writable, enumerable, configurable, value/get/set.",
+    "hintFull": "Object.defineProperty задаёт descriptor. By default новые ключи через = имеют все три флага true. Через defineProperty можно делать read-only (writable: false), скрывать от for-in (enumerable: false).",
+    "answer": "Property descriptor — объект, описывающий мета-свойства поля. Виды: (1) data descriptor: { value, writable, enumerable, configurable }; (2) accessor descriptor: { get, set, enumerable, configurable }. Когда делаешь obj.x = 1 — descriptor создаётся с writable:true, enumerable:true, configurable:true. Через Object.defineProperty(obj, 'x', { ... }) можно настроить иначе: writable:false — read-only; enumerable:false — не появляется в for-in/Object.keys/JSON.stringify; configurable:false — нельзя delete или передефинировать. Применения: создание неизменяемых констант на объекте, скрытие internal-полей от итерации, getters/setters, freezing."
+  },
+  "javascript-fundamentals__prototypes-objects-classes__8": {
+    "hintEasy": "Enumerable появляется в for-in, Object.keys, JSON.stringify. Non-enumerable — нет.",
+    "hintFull": "Все встроенные методы Object.prototype non-enumerable (поэтому for-in не выдаёт toString). Свои свойства через = — enumerable. Через defineProperty можно настроить.",
+    "answer": "Enumerable property — отображается в for-in, Object.keys, Object.entries, Object.values, spread { ...obj }, JSON.stringify. Non-enumerable — нет, но всё ещё доступна по obj.prop, через Reflect.ownKeys, Object.getOwnPropertyNames. Все native-методы (Object.prototype.toString, Array.prototype.push) non-enumerable — иначе for-in бы их выдавал. Когда создаёшь свойство через obj.x = 1 — оно enumerable. Через Object.defineProperty без явного флага — non-enumerable (default). Применения non-enum: скрыть internal-поле от serialization, не показать в DevTools'овом 'expand', не итерироваться при копировании."
+  },
+  "javascript-fundamentals__prototypes-objects-classes__9": {
+    "hintEasy": "create(proto) — новый объект с указанным proto. assign(target, src) — копирует enumerable own props (shallow). freeze(obj) — запрещает мутацию (тоже shallow).",
+    "hintFull": "create(null) — словарь без prototype-наследования. assign — shallow merge, полезен для объединения объектов и поверхностных копий. freeze — поверхностный, nested objects всё ещё мутабельны; нужен deep-freeze.",
+    "answer": "Object.create(proto, descriptors?) — создаёт новый объект с proto = указанному; Object.create(null) даёт «чистый» объект без Object.prototype, удобен для словарей (нет конфликтов с toString, hasOwnProperty). Object.assign(target, ...sources) — копирует enumerable own свойства из sources в target; shallow; для merge configs или копирования. Object.freeze(obj) — делает все собственные свойства non-writable и non-configurable; tries to модифицировать — silent fail в non-strict, TypeError в strict; shallow (вложенные объекты остаются мутабельными). Для immutable structures — deep-freeze рекурсивно или Object.freeze + structuredClone."
+  },
+  "javascript-fundamentals__prototypes-objects-classes__10": {
+    "hintEasy": "=== — strict, без приведения типов. == — coercion.",
+    "hintFull": "=== требует совпадения типа и значения. == приводит типы по сложным правилам (string→number, null==undefined, NaN никогда не равен). Используй ===.",
+    "answer": "=== (strict equality) сравнивает без coercion: разные типы = false. NaN === NaN = false (NaN не равен ничему). +0 === -0 = true. == (loose equality) приводит типы перед сравнением: '5' == 5 → true, null == undefined → true, true == 1 → true, [] == false → true, [] == 0 → true. Правила coercion сложны и контр-интуитивны — поэтому всегда === в production-коде. Исключение: один вывод == null проверяет одновременно null и undefined (популярная идиома, но многие линтеры запрещают). Object.is — строже =, отличает -0 от +0 и считает NaN === NaN."
+  },
+  "javascript-fundamentals__prototypes-objects-classes__11": {
+    "hintEasy": "Автоматическое приведение типа в выражениях: '5' + 1 → '51', '5' - 1 → 4.",
+    "hintFull": "Implicit (==, +, -, ==, if(x), template-strings) применяет преобразования к примитивам по сложным правилам. Explicit — Number(), String(), Boolean(). + с string'ом конкатенирует, остальные арифметические приводят к number.",
+    "answer": "Coercion — автоматическое преобразование типа при использовании оператора. Implicit (неявное): + с string-операндом конкатенирует ('5'+1='51'), -*/%/== с не-number'ами приводит к number, if/!/&&/|| преобразуют к boolean (truthy/falsy), template-literals — к string. Explicit: Number(x), String(x), Boolean(x), parseInt/parseFloat. Известные ловушки: [] + [] = ''; [] + {} = '[object Object]'; '5' - '2' = 3; null+1=1, undefined+1=NaN. Хорошие практики: всегда явные приведения, ===, не полагаться на coercion в логике."
+  },
+  "javascript-fundamentals__prototypes-objects-classes__12": {
+    "hintEasy": "NaN !== NaN. parseInt('07a') = 7. Number.MAX_SAFE_INTEGER = 2^53-1. 0.1+0.2 !== 0.3.",
+    "hintFull": "IEEE 754 floating-point: 0.1+0.2 = 0.30000000000000004. Целых безопасно до 2^53-1, дальше нужны BigInt. NaN распространяется (NaN+1=NaN). Infinity появляется при делении на 0.",
+    "answer": "JS Number — IEEE 754 double-precision: 64 бита, ~15-17 десятичных цифр точности. Проблемы: (1) 0.1+0.2 ≠ 0.3 — нет конечных битов для 0.1; для денег используй cents-as-integer или decimal.js; (2) Number.MAX_SAFE_INTEGER = 2^53-1; больше — теряет точность, ID/timestamps от 2 ** 53 — нужен BigInt; (3) NaN — результат impossible math (0/0, parseInt('abc')); NaN !== NaN; проверять через Number.isNaN(); (4) Infinity — деление на 0 не throw'ит; isFinite(); (5) parseInt('07a') = 7 — игнорирует мусор после числа; используй Number() для строгого; всегда radix: parseInt(s, 10)."
+  },
+  "javascript-fundamentals__prototypes-objects-classes__13": {
+    "hintEasy": "?. — безопасно обращается к property/вызову; если до — undefined/null, всё выражение даёт undefined без error.",
+    "hintFull": "obj?.a?.b — если obj/a undefined/null, результат undefined. Поддерживает методы (fn?.()), индекс (arr?.[i]). Не работает на левой части присваивания.",
+    "answer": "Optional chaining ?. — синтаксис для безопасного доступа к свойствам/методам когда промежуточные могут быть null/undefined. obj?.a?.b — если obj === null/undefined → результат undefined, без TypeError. Работает с: свойствами (a?.b), индексами (arr?.[i]), вызовами (fn?.()). На левой стороне присваивания не работает — obj?.a = 1 — синтаксическая ошибка. Не путать с проверкой falsy: a?.b отличается от a && a.b — первый учитывает только null/undefined, второй любую falsy (включая 0, ''). Часто комбинируется с ?? для default: obj?.a?.b ?? 'default'. Поддерживается во всех совр. браузерах и Node 14+."
+  },
+  "javascript-fundamentals__prototypes-objects-classes__14": {
+    "hintEasy": "?? возвращает левую часть, кроме случаев когда она null/undefined.",
+    "hintFull": "a ?? b: если a — null или undefined, вернёт b; иначе a. Отличается от ||, который ловит любую falsy (0, '', false, NaN). Полезен для defaults где 0/'' валидны.",
+    "answer": "Nullish coalescing ?? возвращает левый операнд, если он не null и не undefined; иначе правый. Главное отличие от ||: || считает falsy любые 0, '', false, NaN — и подменяет их default'ом. Часто это баг: const port = config.port || 3000 — если в config port: 0 (валидно для random), уйдёт 3000. С ?? — const port = config.port ?? 3000 — 0 сохранится. Применения: defaults для config, API-параметров, optional props в React. Часто комбинируется с optional chaining: user?.name ?? 'Anonymous'. Также есть ??= (assignment): a ??= b — присвоит только если a null/undefined."
+  },
+  "javascript-fundamentals__prototypes-objects-classes__15": {
+    "hintEasy": "|| ловит любую falsy. ?? только null/undefined.",
+    "hintFull": "|| подменяет 0, '', false, NaN — может быть багом если 0/'' валидны. ?? более точный, ловит только истинно отсутствующие значения. Используй ?? в большинстве случаев.",
+    "answer": "|| возвращает первый truthy операнд; всё falsy (0, '', false, NaN, null, undefined) считается отсутствующим. Это удобно для дефолтов когда любая 'пустота' = no value: const name = input.value || 'Anonymous'. Но багует на валидных 0/'': const port = config.port || 3000 ставит 3000 даже если port: 0. ?? точнее: подменяет только null/undefined. Practical rule: ?? для defaults у численных/булевых/optional values; || для 'либо value, либо что угодно truthy'. Комбинировать в одном выражении нужно скобками: (a ?? b) || c — иначе SyntaxError, спека forbids ambiguity."
+  },
+  "javascript-fundamentals__prototypes-objects-classes__16": {
+    "hintEasy": "Iterable — объект с [Symbol.iterator]. Iterator — объект с .next() возвращающим {value, done}.",
+    "hintFull": "for-of, ..., destructuring используют Symbol.iterator. Array, String, Map, Set, NodeList — iterable. Самописный: { [Symbol.iterator]() { return { next() { return {value, done}; } }; } }.",
+    "answer": "Iterable — объект, который умеет возвращать iterator через метод [Symbol.iterator](). Iterator — объект с методом next(), возвращающим {value, done}: значение очередного элемента и флаг конца. Встроенные iterables: Array, String, Map, Set, TypedArrays, NodeList, arguments. for-of, spread (...arr), destructuring [a,b] = arr, Promise.all/race ожидают iterable. Своя iterable: const range = { [Symbol.iterator]() { let i = 0; return { next: () => i < 5 ? {value: i++, done: false} : {value: undefined, done: true} } } }; [...range]. Generator-функции (function*) автоматически возвращают iterator."
+  },
+  "javascript-fundamentals__prototypes-objects-classes__17": {
+    "hintEasy": "function* — возвращает iterator. yield ставит выполнение на паузу до следующего .next().",
+    "hintFull": "Каждый .next() возобновляет тело до следующего yield; возвращает {value, done}. Может принимать значение через next(arg) — оно станет результатом текущего yield. Используется для lazy sequences, async-flow.",
+    "answer": "function* declares a generator — функция, возвращающая iterator при вызове. Тело не выполняется сразу — каждый .next() возобновляет до следующего yield: function* range(n) { for (let i = 0; i < n; i++) yield i }; const g = range(3); g.next() → {value:0, done:false}; ... ; .next() → {value:undefined, done:true}. yield-выражение может принимать значение: const x = yield value; — x будет = arg переданному в next(arg). Применения: lazy sequences (бесконечные последовательности без памяти), async-flow до async/await (co, redux-saga), state-machines, custom iterables."
+  },
+  "javascript-fundamentals__prototypes-objects-classes__18": {
+    "hintEasy": "Уникальный примитив. Symbol() всегда новый, как property-key — не пересекается с string'овыми.",
+    "hintFull": "const s = Symbol('description'); — уникальное значение. Используются как ключи объектов чтобы не конфликтовать со строковыми. Symbol.iterator, Symbol.asyncIterator — well-known symbols для встроенных протоколов.",
+    "answer": "Symbol() — примитивный тип (как string, number), создаёт уникальное значение. Symbol('foo') !== Symbol('foo') — даже одинаковая описание даёт разные symbols. Применения как property-key: { [mySymbol]: value } — гарантированно не конфликтует с другими string-keyed свойствами; не появляется в for-in / Object.keys / JSON.stringify. Well-known symbols встроены в язык: Symbol.iterator (для iterables), Symbol.asyncIterator, Symbol.toPrimitive, Symbol.hasInstance — определяют поведение объекта в встроенных операциях. Symbol.for(key) / Symbol.keyFor — global registry для shared symbols через realms."
+  },
+  "javascript-fundamentals__prototypes-objects-classes__19": {
+    "hintEasy": "Уникальные ключи в объектах, well-known protocols (iterator, async-iterator, toPrimitive).",
+    "hintFull": "(1) Property-keys чтобы не пересекаться: библиотеки кладут metadata через Symbol-keys; (2) Реализация iterable через Symbol.iterator; (3) Customize toString/toPrimitive; (4) Симуляция enum'ов; (5) Hidden private state до появления #fields.",
+    "answer": "Применения symbols: (1) уникальные property-keys в библиотеках — нельзя случайно перебить через obj.someProp = ..., metadata-attached к объектам без конфликтов; React использует Symbol.for('react.element') для маркировки элементов; (2) встроенные протоколы — Symbol.iterator (объект для for-of/spread), Symbol.asyncIterator (for-await-of), Symbol.toPrimitive (custom +/string conversion), Symbol.hasInstance (instanceof override); (3) enum'ы — const Status = { Active: Symbol('active'), Idle: Symbol('idle') } — нельзя случайно подменить string'ом; (4) скрытие fields до появления #private-полей в classes; (5) cross-realm shared symbols через Symbol.for. В TypeScript — `unique symbol` для типов."
+  },
+  "javascript-fundamentals__prototypes-objects-classes__20": {
+    "hintEasy": "Поля с префиксом # доступны только внутри класса, технически приватные.",
+    "hintFull": "class A { #x = 0; getX() { return this.#x; } } — #x не доступно снаружи (TypeError при попытке a.#x), не enumerable, не наследуется в плохом смысле. Real privacy в отличие от _underscore-convention.",
+    "answer": "ES2022 private fields через # — настоящая приватность на runtime-уровне, не conventional underscore. Объявление: class Counter { #count = 0; inc() { this.#count++ } get value() { return this.#count } }. Доступ снаружи — SyntaxError на этапе parse: const c = new Counter(); c.#count — invalid. Поля приватны на per-class basis: даже в субклассе нельзя обращаться к #-полю родителя. Не enumerable, не появляются в Object.keys/Reflect. До появления # были workaround'ы: WeakMap-as-private, Symbol-as-key, _ underscore. Современный код для real-encapsulation использует #, для structural-typing — TS-only `private` (compile-time)."
   }
 }
