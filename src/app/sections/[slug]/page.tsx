@@ -103,6 +103,7 @@ export default async function SectionPage({ params }: { params: Params }) {
                 {g.items.map((q) => (
                   <QuestionCard
                     key={q.id}
+                    mode={category === "social" ? "social" : "tech"}
                     questionId={q.id}
                     number={q.number}
                     text={q.text}

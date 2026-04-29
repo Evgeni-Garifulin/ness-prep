@@ -4,6 +4,8 @@ import { useEffect, useRef, useState, useTransition } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 
+type Mode = "tech" | "social";
+
 type Props = {
   questionId: string;
   number: number;
@@ -12,11 +14,53 @@ type Props = {
   hintEasy: string;
   hintFull: string;
   correctAnswer: string;
+  /**
+   * tech (default) — стандартная карточка: HINT A / HINT B / REVEAL ANSWER,
+   *   textarea для собственного ответа, автосохранение, лейбл ANSWERED при заполнении.
+   * social — гайд-режим: ни textarea, ни тогглов; сразу показан блок
+   *   RECOMMENDED ANSWER WAY с готовым подходом к ответу на behavioral-вопрос.
+   */
+  mode?: Mode;
 };
 
 const SAVE_DEBOUNCE_MS = 700;
 
-export function QuestionCard({
+export function QuestionCard(props: Props) {
+  if (props.mode === "social") {
+    return <SocialCard {...props} />;
+  }
+  return <TechCard {...props} />;
+}
+
+function SocialCard({ number, text, correctAnswer }: Props) {
+  return (
+    <article className="border border-foreground bg-card p-4 sm:p-6">
+      <header className="flex items-baseline gap-4">
+        <div className="text-sm sm:text-base leading-snug font-medium tabular-nums shrink-0 min-w-[2ch] text-muted-foreground">
+          {String(number).padStart(2, "0")}
+        </div>
+        <h3 className="flex-1 min-w-0 text-sm sm:text-base leading-snug font-medium tracking-tight">
+          {text}
+        </h3>
+      </header>
+
+      {correctAnswer.trim().length > 0 ? (
+        <div className="mt-5 border border-foreground p-4">
+          <div className="yzy-label text-muted-foreground mb-2">
+            RECOMMENDED ANSWER WAY
+          </div>
+          <p className="text-sm leading-relaxed whitespace-pre-wrap">{correctAnswer}</p>
+        </div>
+      ) : (
+        <p className="mt-5 yzy-meta text-muted-foreground">
+          RECOMMENDED ANSWER WAY NOT YET FILLED IN.
+        </p>
+      )}
+    </article>
+  );
+}
+
+function TechCard({
   questionId,
   number,
   text,
@@ -157,8 +201,6 @@ export function QuestionCard({
   );
 }
 
-// Активный таб = чёрный, неактивный = светло-серый. Никаких подчёркиваний и
-// инверсий — поведение как в макете.
 function ToggleLink({
   active,
   disabled,
