@@ -103,8 +103,15 @@ export function NotesEditor({ initialNotes }: { initialNotes: Note[] }) {
                   activeId === n.id ? "text-foreground" : "text-muted-foreground",
                 )}
               >
-                <div className="flex items-center gap-1">
-                  {n.pinned && <span className="yzy-label">★</span>}
+                <div className="flex items-center gap-2">
+                  {n.pinned && (
+                    <span
+                      aria-label="Закреплено"
+                      className="yzy-label text-foreground tracking-normal"
+                    >
+                      PIN
+                    </span>
+                  )}
                   <span className="truncate text-sm font-medium uppercase tracking-tight">
                     {n.title || "UNTITLED"}
                   </span>
@@ -226,7 +233,7 @@ function ActiveNoteEditor({
           variant={note.pinned ? "default" : "outline"}
           onClick={onTogglePin}
         >
-          {note.pinned ? "★ Pinned" : "☆ Pin"}
+          {note.pinned ? "UNPIN" : "PIN"}
         </Button>
         <Button size="sm" variant="destructive" onClick={onDelete}>
           Delete
