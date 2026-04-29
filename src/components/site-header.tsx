@@ -7,7 +7,9 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 const NAV = [
-  { href: "/", label: "Секции" },
+  { href: "/", label: "Обзор", exact: true as const },
+  { href: "/tech", label: "Техника" },
+  { href: "/social", label: "Социалка" },
   { href: "/notes", label: "Заметки" },
 ];
 
@@ -30,7 +32,9 @@ export function SiteHeader({ username }: { username: string }) {
         <nav className="hidden sm:flex items-center gap-1 ml-2">
           {NAV.map((item) => {
             const active =
-              item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
+              "exact" in item && item.exact
+                ? pathname === item.href
+                : pathname === item.href || pathname.startsWith(item.href + "/");
             return (
               <Link
                 key={item.href}

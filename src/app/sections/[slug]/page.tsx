@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { SiteHeader } from "@/components/site-header";
 import { QuestionCard } from "@/components/question-card";
 import { ResetButton } from "@/components/reset-button";
+import { categoryFor, sortKey } from "@/lib/categories";
 
 export const dynamic = "force-dynamic";
 
@@ -45,29 +46,41 @@ export default async function SectionPage({ params }: { params: Params }) {
   const answered = answers.filter((a) => a.text.trim().length > 0).length;
   const pct = total ? Math.round((answered / total) * 100) : 0;
 
-  // Adjacent sections for prev/next nav
+  const category = categoryFor(section.slug);
+  const trackHref = category === "social" ? "/social" : "/tech";
+  const trackLabel = category === "social" ? "Социалка" : "Техника";
+  const trackAccent = category === "social" ? "text-sky-400" : "text-emerald-400";
+  const progressBarColor = category === "social" ? "bg-sky-500" : "bg-emerald-500";
+
+  // Соседние секции в рамках того же трека (а не глобально), чтобы prev/next
+  // не уносили из техники в социалку и наоборот.
   const all = await prisma.section.findMany({
     select: { slug: true, title: true, order: true },
     orderBy: { order: "asc" },
   });
-  const idx = all.findIndex((s) => s.slug === section.slug);
-  const prev = idx > 0 ? all[idx - 1] : null;
-  const next = idx >= 0 && idx < all.length - 1 ? all[idx + 1] : null;
+  const sameTrack = all
+    .filter((s) => categoryFor(s.slug) === category)
+    .sort(
+      (a, b) => sortKey(category, a.slug, a.order) - sortKey(category, b.slug, b.order),
+    );
+  const idx = sameTrack.findIndex((s) => s.slug === section.slug);
+  const prev = idx > 0 ? sameTrack[idx - 1] : null;
+  const next = idx >= 0 && idx < sameTrack.length - 1 ? sameTrack[idx + 1] : null;
 
   return (
     <>
       <SiteHeader username={username} />
       <main className="mx-auto max-w-3xl px-3 sm:px-6 py-4 sm:py-8">
         <Link
-          href="/"
+          href={trackHref}
           className="text-xs text-muted-foreground hover:text-foreground"
         >
-          ← Все секции
+          ← {trackLabel}
         </Link>
         <div className="mt-2 flex flex-wrap items-end justify-between gap-3">
           <div className="min-w-0">
-            <p className="text-[11px] uppercase tracking-wide text-muted-foreground">
-              {String(section.order).padStart(2, "0")}
+            <p className={`text-[11px] uppercase tracking-wide ${trackAccent}`}>
+              {trackLabel}
             </p>
             <h1 className="text-xl sm:text-2xl font-bold tracking-tight">
               {section.title}
@@ -80,7 +93,7 @@ export default async function SectionPage({ params }: { params: Params }) {
         </div>
 
         <div className="mt-2 h-1.5 w-full rounded bg-muted overflow-hidden">
-          <div className="h-full bg-emerald-500" style={{ width: `${pct}%` }} />
+          <div className={`h-full ${progressBarColor}`} style={{ width: `${pct}%` }} />
         </div>
 
         <div className="mt-6 space-y-8">
