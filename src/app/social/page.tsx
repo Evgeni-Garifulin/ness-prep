@@ -67,14 +67,12 @@ export default async function SocialPage() {
               HR · English · Behavioral · Reverse Q&amp;A
             </p>
           </div>
-          <div className="col-span-12 md:col-span-4 flex items-end justify-between md:justify-end gap-6">
-            <div className="text-right">
-              <p className="yzy-label text-muted-foreground">PROGRESS</p>
-              <p className="mt-1 text-3xl font-medium tabular-nums">{pct}%</p>
-              <p className="yzy-meta text-muted-foreground mt-0.5">
-                {answered} / {total} · {sections.length} SECTIONS
-              </p>
-            </div>
+          <div className="col-span-12 md:col-span-4 md:text-right">
+            <p className="yzy-label text-muted-foreground">PROGRESS</p>
+            <p className="mt-1 text-3xl font-medium tabular-nums">{pct}%</p>
+            <p className="yzy-meta text-muted-foreground mt-0.5">
+              {answered} / {total} · {sections.length} SECTIONS
+            </p>
           </div>
         </div>
         <div className="mt-6 h-px w-full bg-foreground/20" />
