@@ -30,3 +30,4 @@ next-env.d.ts
 
 # prisma local
 prisma/dev.db
+.env*.local
