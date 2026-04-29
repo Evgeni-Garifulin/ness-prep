@@ -52,14 +52,14 @@ export default async function TrainerPage() {
         <h1 className="mt-3 text-3xl sm:text-5xl font-medium uppercase leading-[1.05] tracking-tight">
           Trainer
         </h1>
-        <p className="mt-3 yzy-label text-foreground">
-          KNOW IT. OR FACE IT. NO MIDDLE.
-        </p>
-        <p className="mt-1 yzy-meta text-muted-foreground">
-          {SESSION_SIZE} random tech questions · self-assess each one
-        </p>
-
-        <div className="mt-6 h-px w-full bg-foreground" />
+        <div className="mt-4 yzy-label text-foreground space-y-1 leading-relaxed">
+          <p>NO INPUT. NO TIMER. JUST RECALL.</p>
+          <p>SEE THE QUESTION. ANSWER IT IN YOUR HEAD. REVEAL. JUDGE.</p>
+          <p>+ IF YOU KNEW IT. − IF YOU MISSED.</p>
+          <p>
+            {SESSION_SIZE} CARDS PER ROUND. WEAK SPOTS STACK BELOW.
+          </p>
+        </div>
 
         <TrainerSession
           questions={session.map((q) => ({

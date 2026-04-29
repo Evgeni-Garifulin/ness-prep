@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 
 type Question = {
@@ -35,6 +36,8 @@ function buildPrompt(question: string) {
 Пиши по-русски, без воды и без маркетинга. Если есть несколько подходов — сравни.`;
 }
 
+type Phase = "idle" | "running" | "done";
+
 export function TrainerSession({
   questions,
   initialStats,
@@ -42,7 +45,10 @@ export function TrainerSession({
   questions: Question[];
   initialStats: Stat[];
 }) {
+  const router = useRouter();
+  const [phase, setPhase] = useState<Phase>("idle");
   const [index, setIndex] = useState(0);
+  const [round, setRound] = useState({ known: 0, unknown: 0 });
   const [stats, setStats] = useState<Map<string, Stat>>(() => {
     const m = new Map<string, Stat>();
     for (const s of initialStats) m.set(s.questionId, s);
@@ -54,37 +60,16 @@ export function TrainerSession({
   const [copyState, setCopyState] = useState<"idle" | "copied" | "error">("idle");
   const [busy, setBusy] = useState(false);
 
-  if (questions.length === 0) {
-    return (
-      <p className="mt-6 yzy-meta text-muted-foreground">
-        NO QUESTIONS WITH FILLED ANSWERS YET — TRAINER NEEDS REFERENCE ANSWERS TO RUN.
-      </p>
-    );
-  }
-
   const total = questions.length;
-  const q = questions[index];
-  const stat = stats.get(q.id) ?? {
-    questionId: q.id,
-    text: q.text,
-    knownCount: 0,
-    unknownCount: 0,
-  };
-
-  // На переход к следующей карточке скрываем все панели — иначе видно ответ
-  // на вопрос #2 от прошлого взаимодействия с #1.
-  const goTo = (i: number) => {
-    if (i < 0 || i >= total) return;
-    setIndex(i);
-    setShowEasy(false);
-    setShowFull(false);
-    setShowAnswer(false);
-  };
 
   const onMark = async (result: "known" | "unknown") => {
-    if (busy) return;
+    if (busy || phase !== "running") return;
+    if (index >= total) return;
     setBusy(true);
-    // Optimistic update
+
+    const q = questions[index];
+
+    // Optimistic — обновляем глобальный счётчик и статистику раунда сразу.
     const prev = stats.get(q.id) ?? {
       questionId: q.id,
       text: q.text,
@@ -99,37 +84,35 @@ export function TrainerSession({
     const nextStats = new Map(stats);
     nextStats.set(q.id, optimistic);
     setStats(nextStats);
+    setRound((r) => ({
+      known: r.known + (result === "known" ? 1 : 0),
+      unknown: r.unknown + (result === "unknown" ? 1 : 0),
+    }));
 
     try {
-      const res = await fetch("/api/trainer/attempt", {
+      await fetch("/api/trainer/attempt", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ questionId: q.id, result }),
       });
-      if (res.ok) {
-        const body = await res.json();
-        const synced: Stat = {
-          questionId: q.id,
-          text: q.text,
-          knownCount: body.knownCount,
-          unknownCount: body.unknownCount,
-        };
-        const m2 = new Map(stats);
-        m2.set(q.id, synced);
-        setStats(m2);
-      }
     } catch {
-      // на ошибке откатываем оптимистичное обновление
-      setStats(stats);
+      /* при ошибке оставляем оптимистичное обновление; в логике это не критично */
     } finally {
       setBusy(false);
-      // переезд на следующую карточку — естественный UX в drill-режиме
-      if (index < total - 1) goTo(index + 1);
+      // Переход дальше: либо следующая карта, либо done.
+      if (index === total - 1) {
+        setPhase("done");
+      } else {
+        setIndex(index + 1);
+        setShowEasy(false);
+        setShowFull(false);
+        setShowAnswer(false);
+      }
     }
   };
 
-  const onCopy = async () => {
-    const prompt = buildPrompt(q.text);
+  const onCopy = async (text: string) => {
+    const prompt = buildPrompt(text);
     try {
       await navigator.clipboard.writeText(prompt);
       setCopyState("copied");
@@ -140,9 +123,39 @@ export function TrainerSession({
     }
   };
 
-  const pct = Math.round(((index + 1) / total) * 100);
+  const onStart = () => {
+    setIndex(0);
+    setRound({ known: 0, unknown: 0 });
+    setShowEasy(false);
+    setShowFull(false);
+    setShowAnswer(false);
+    setPhase("running");
+  };
 
-  // Сводка для нижнего списка — две колонки
+  const onRefresh = () => {
+    // Перезагружаем страницу — серверный шаффл выдаст новый набор.
+    router.refresh();
+    setPhase("idle");
+    setIndex(0);
+    setRound({ known: 0, unknown: 0 });
+  };
+
+  const onClearAll = async () => {
+    if (!confirm("Снести всю статистику тренажёра? Это нельзя откатить.")) return;
+    try {
+      const res = await fetch("/api/trainer/clear", { method: "DELETE" });
+      if (res.ok) {
+        setStats(new Map());
+        setRound({ known: 0, unknown: 0 });
+        setPhase("idle");
+        setIndex(0);
+      }
+    } catch {
+      /* silent — пользователь увидит, что не очистилось */
+    }
+  };
+
+  // Сводка для нижнего списка
   const knownList = useMemo(
     () =>
       Array.from(stats.values())
@@ -158,167 +171,255 @@ export function TrainerSession({
     [stats],
   );
 
+  if (total === 0) {
+    return (
+      <p className="mt-6 yzy-meta text-muted-foreground">
+        NO QUESTIONS WITH FILLED ANSWERS YET — TRAINER NEEDS REFERENCE ANSWERS
+        TO RUN.
+      </p>
+    );
+  }
+
   return (
     <div className="mt-6">
-      {/* Прогресс */}
-      <div className="flex items-baseline justify-between yzy-meta text-muted-foreground tabular-nums">
-        <span>
-          {String(index + 1).padStart(2, "0")} / {String(total).padStart(2, "0")}
-        </span>
-        <span>{pct}%</span>
-      </div>
-      <div className="mt-2 h-px w-full bg-foreground/20">
-        <div className="h-px bg-foreground" style={{ width: `${pct}%` }} />
-      </div>
-
-      {/* Навигация: ←  card  → */}
-      <div className="mt-6 grid grid-cols-[auto_1fr_auto] items-center gap-3 sm:gap-4">
+      {/* Сверху — REFRESH TEST */}
+      <div className="flex items-center justify-end">
         <button
           type="button"
-          onClick={() => goTo(index - 1)}
-          disabled={index === 0}
-          aria-label="Previous question"
-          className={cn(
-            "yzy-label transition-colors px-2",
-            index === 0
-              ? "text-muted-foreground/40 cursor-not-allowed"
-              : "text-muted-foreground hover:text-foreground",
-          )}
+          onClick={onRefresh}
+          className="yzy-label text-muted-foreground hover:text-foreground transition-colors"
         >
-          ←
-        </button>
-
-        <article className="border border-foreground bg-card p-4 sm:p-6">
-          <header className="flex items-baseline gap-4">
-            <div className="text-sm sm:text-base leading-snug font-medium tabular-nums shrink-0 min-w-[2ch] text-muted-foreground">
-              {String(q.number).padStart(2, "0")}
-            </div>
-            <h3 className="flex-1 min-w-0 text-sm sm:text-base leading-snug font-medium tracking-tight">
-              {q.text}
-            </h3>
-            {(stat.knownCount > 0 || stat.unknownCount > 0) && (
-              <span className="yzy-label tabular-nums text-muted-foreground whitespace-nowrap">
-                +{stat.knownCount} / −{stat.unknownCount}
-              </span>
-            )}
-          </header>
-
-          <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-2 text-xs">
-            <ToggleLink
-              active={showEasy}
-              disabled={!q.hintEasy}
-              onClick={() => setShowEasy((v) => !v)}
-            >
-              {showEasy ? "HIDE HINT A" : "HINT A"}
-            </ToggleLink>
-            <ToggleLink
-              active={showFull}
-              disabled={!q.hintFull}
-              onClick={() => setShowFull((v) => !v)}
-            >
-              {showFull ? "HIDE HINT B" : "HINT B"}
-            </ToggleLink>
-            <ToggleLink
-              active={showAnswer}
-              disabled={!q.answer}
-              onClick={() => setShowAnswer((v) => !v)}
-            >
-              {showAnswer ? "HIDE ANSWER" : "REVEAL ANSWER"}
-            </ToggleLink>
-            <button
-              type="button"
-              onClick={onCopy}
-              className={cn(
-                "yzy-label transition-colors whitespace-nowrap",
-                copyState === "copied"
-                  ? "text-foreground"
-                  : "text-muted-foreground hover:text-foreground",
-              )}
-            >
-              {copyState === "copied"
-                ? "COPIED"
-                : copyState === "error"
-                  ? "ERROR"
-                  : "COPY PROMPT"}
-            </button>
-          </div>
-
-          {showEasy && q.hintEasy && (
-            <Hint label="HINT A — LIGHT">{q.hintEasy}</Hint>
-          )}
-          {showFull && q.hintFull && (
-            <Hint label="HINT B — FULL">{q.hintFull}</Hint>
-          )}
-
-          {showAnswer && q.answer && (
-            <div className="mt-4 border border-foreground p-4">
-              <div className="yzy-label text-muted-foreground mb-2">
-                REFERENCE ANSWER
-              </div>
-              <p className="text-sm leading-relaxed whitespace-pre-wrap">
-                {q.answer}
-              </p>
-            </div>
-          )}
-
-          {/* +/- большие кнопки */}
-          <div className="mt-6 grid grid-cols-2 gap-px border border-foreground bg-foreground">
-            <button
-              type="button"
-              onClick={() => onMark("known")}
-              disabled={busy}
-              aria-label="Знаю ответ"
-              className={cn(
-                "bg-background py-4 text-2xl font-medium transition-colors",
-                "hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed",
-              )}
-            >
-              +
-            </button>
-            <button
-              type="button"
-              onClick={() => onMark("unknown")}
-              disabled={busy}
-              aria-label="Не знаю ответ"
-              className={cn(
-                "bg-background py-4 text-2xl font-medium transition-colors",
-                "hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed",
-              )}
-            >
-              −
-            </button>
-          </div>
-        </article>
-
-        <button
-          type="button"
-          onClick={() => goTo(index + 1)}
-          disabled={index === total - 1}
-          aria-label="Next question"
-          className={cn(
-            "yzy-label transition-colors px-2",
-            index === total - 1
-              ? "text-muted-foreground/40 cursor-not-allowed"
-              : "text-muted-foreground hover:text-foreground",
-          )}
-        >
-          →
+          REFRESH TEST
         </button>
       </div>
 
-      {/* Нижний список: две колонки KNOWN / UNKNOWN */}
-      <section className="mt-12">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-px border border-foreground bg-foreground">
-          <StatColumn label="KNOWN" sign="+" entries={knownList} kind="known" />
-          <StatColumn
-            label="UNKNOWN"
-            sign="−"
-            entries={unknownList}
-            kind="unknown"
+      {/* Прогресс — только во время прохождения */}
+      {phase === "running" && (
+        <>
+          <div className="mt-6 flex items-end justify-between gap-4">
+            <span className="yzy-meta text-muted-foreground tabular-nums">
+              {String(index + 1).padStart(2, "0")} /{" "}
+              {String(total).padStart(2, "0")}
+            </span>
+            <span className="text-2xl sm:text-3xl font-medium tabular-nums leading-none">
+              {Math.round(((index + 1) / total) * 100)}%
+            </span>
+          </div>
+          <div className="mt-3 h-px w-full bg-foreground/20">
+            <div
+              className="h-px bg-foreground"
+              style={{ width: `${Math.round(((index + 1) / total) * 100)}%` }}
+            />
+          </div>
+        </>
+      )}
+
+      {/* Карточка / экран начала / экран финала */}
+      <div className="mt-6">
+        {phase === "idle" && (
+          <div className="border border-foreground bg-card p-8 sm:p-12 flex flex-col items-center text-center">
+            <p className="yzy-label text-muted-foreground">READY?</p>
+            <button
+              type="button"
+              onClick={onStart}
+              className="mt-4 yzy-label text-foreground border border-foreground px-8 py-4 text-base hover:bg-foreground hover:text-background transition-colors"
+            >
+              START
+            </button>
+            <p className="mt-4 yzy-meta text-muted-foreground">
+              {total} cards · self-assess each one
+            </p>
+          </div>
+        )}
+
+        {phase === "running" && (
+          <RunningCard
+            q={questions[index]}
+            stat={
+              stats.get(questions[index].id) ?? {
+                questionId: questions[index].id,
+                text: questions[index].text,
+                knownCount: 0,
+                unknownCount: 0,
+              }
+            }
+            showEasy={showEasy}
+            showFull={showFull}
+            showAnswer={showAnswer}
+            onToggleEasy={() => setShowEasy((v) => !v)}
+            onToggleFull={() => setShowFull((v) => !v)}
+            onToggleAnswer={() => setShowAnswer((v) => !v)}
+            copyState={copyState}
+            onCopy={() => onCopy(questions[index].text)}
+            busy={busy}
+            onPlus={() => onMark("known")}
+            onMinus={() => onMark("unknown")}
           />
-        </div>
+        )}
+
+        {phase === "done" && (
+          <div className="border border-foreground bg-card p-8 sm:p-12 flex flex-col items-center text-center">
+            <p className="yzy-label text-muted-foreground">RESULT</p>
+            <h2 className="mt-3 text-2xl sm:text-3xl font-medium uppercase tracking-tight">
+              Test passed
+            </h2>
+            <p className="mt-4 text-sm sm:text-base text-muted-foreground">
+              Your result for this round
+            </p>
+            <p className="mt-2 text-2xl sm:text-3xl font-medium tabular-nums">
+              +{round.known} / −{round.unknown}
+            </p>
+            <button
+              type="button"
+              onClick={() => {
+                router.refresh();
+                onStart();
+              }}
+              className="mt-6 yzy-label text-foreground border border-foreground px-8 py-4 text-base hover:bg-foreground hover:text-background transition-colors"
+            >
+              START AGAIN
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* Нижний список — простые две колонки без бордеров */}
+      <section className="mt-12 grid grid-cols-1 sm:grid-cols-2 gap-x-10 gap-y-6">
+        <StatList label="KNOWN" sign="+" entries={knownList} kind="known" />
+        <StatList label="UNKNOWN" sign="−" entries={unknownList} kind="unknown" />
       </section>
+
+      {/* Кнопка очистки базы — только на странице тренера, внизу */}
+      <div className="mt-12 flex items-center justify-center">
+        <button
+          type="button"
+          onClick={onClearAll}
+          className="yzy-label text-muted-foreground hover:text-foreground transition-colors"
+        >
+          CLEAR ALL STATS
+        </button>
+      </div>
     </div>
+  );
+}
+
+function RunningCard({
+  q,
+  stat,
+  showEasy,
+  showFull,
+  showAnswer,
+  onToggleEasy,
+  onToggleFull,
+  onToggleAnswer,
+  copyState,
+  onCopy,
+  busy,
+  onPlus,
+  onMinus,
+}: {
+  q: Question;
+  stat: Stat;
+  showEasy: boolean;
+  showFull: boolean;
+  showAnswer: boolean;
+  onToggleEasy: () => void;
+  onToggleFull: () => void;
+  onToggleAnswer: () => void;
+  copyState: "idle" | "copied" | "error";
+  onCopy: () => void;
+  busy: boolean;
+  onPlus: () => void;
+  onMinus: () => void;
+}) {
+  return (
+    <article className="border border-foreground bg-card p-4 sm:p-6">
+      <header className="flex items-baseline gap-4">
+        <div className="text-sm sm:text-base leading-snug font-medium tabular-nums shrink-0 min-w-[2ch] text-muted-foreground">
+          {String(q.number).padStart(2, "0")}
+        </div>
+        <h3 className="flex-1 min-w-0 text-sm sm:text-base leading-snug font-medium tracking-tight">
+          {q.text}
+        </h3>
+        {(stat.knownCount > 0 || stat.unknownCount > 0) && (
+          <span className="yzy-label tabular-nums text-muted-foreground whitespace-nowrap">
+            +{stat.knownCount} / −{stat.unknownCount}
+          </span>
+        )}
+      </header>
+
+      <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-2 text-xs">
+        <ToggleLink active={showEasy} disabled={!q.hintEasy} onClick={onToggleEasy}>
+          {showEasy ? "HIDE HINT A" : "HINT A"}
+        </ToggleLink>
+        <ToggleLink active={showFull} disabled={!q.hintFull} onClick={onToggleFull}>
+          {showFull ? "HIDE HINT B" : "HINT B"}
+        </ToggleLink>
+        <ToggleLink
+          active={showAnswer}
+          disabled={!q.answer}
+          onClick={onToggleAnswer}
+        >
+          {showAnswer ? "HIDE ANSWER" : "REVEAL ANSWER"}
+        </ToggleLink>
+        <button
+          type="button"
+          onClick={onCopy}
+          className={cn(
+            "yzy-label transition-colors whitespace-nowrap",
+            copyState === "copied"
+              ? "text-foreground"
+              : "text-muted-foreground hover:text-foreground",
+          )}
+        >
+          {copyState === "copied"
+            ? "COPIED"
+            : copyState === "error"
+              ? "ERROR"
+              : "COPY PROMPT"}
+        </button>
+      </div>
+
+      {showEasy && q.hintEasy && <Hint label="HINT A — LIGHT">{q.hintEasy}</Hint>}
+      {showFull && q.hintFull && <Hint label="HINT B — FULL">{q.hintFull}</Hint>}
+
+      {showAnswer && q.answer && (
+        <div className="mt-4 border border-foreground p-4">
+          <div className="yzy-label text-muted-foreground mb-2">REFERENCE ANSWER</div>
+          <p className="text-sm leading-relaxed whitespace-pre-wrap">{q.answer}</p>
+        </div>
+      )}
+
+      {/* Аккуратные +/-: просто две кнопки в строке, без огромной обводки */}
+      <div className="mt-6 flex items-center justify-center gap-6">
+        <button
+          type="button"
+          onClick={onPlus}
+          disabled={busy}
+          aria-label="Знаю ответ"
+          className={cn(
+            "h-12 w-12 text-2xl font-medium border border-foreground transition-colors",
+            "hover:bg-foreground hover:text-background",
+            "disabled:opacity-40 disabled:cursor-not-allowed",
+          )}
+        >
+          +
+        </button>
+        <button
+          type="button"
+          onClick={onMinus}
+          disabled={busy}
+          aria-label="Не знаю ответ"
+          className={cn(
+            "h-12 w-12 text-2xl font-medium border border-foreground transition-colors",
+            "hover:bg-foreground hover:text-background",
+            "disabled:opacity-40 disabled:cursor-not-allowed",
+          )}
+        >
+          −
+        </button>
+      </div>
+    </article>
   );
 }
 
@@ -361,7 +462,7 @@ function Hint({ label, children }: { label: string; children: React.ReactNode })
   );
 }
 
-function StatColumn({
+function StatList({
   label,
   sign,
   entries,
@@ -373,8 +474,8 @@ function StatColumn({
   kind: "known" | "unknown";
 }) {
   return (
-    <div className="bg-background">
-      <div className="border-b border-foreground px-4 py-3 flex items-baseline justify-between">
+    <div>
+      <div className="flex items-baseline justify-between pb-2">
         <span className="yzy-label">
           {sign} {label}
         </span>
@@ -383,19 +484,14 @@ function StatColumn({
         </span>
       </div>
       {entries.length === 0 ? (
-        <p className="px-4 py-6 yzy-meta text-muted-foreground text-center">
+        <p className="yzy-meta text-muted-foreground">
           {kind === "known" ? "Nothing marked yet" : "All clean so far"}
         </p>
       ) : (
-        <ul className="divide-y divide-foreground/30">
+        <ul className="space-y-2">
           {entries.map((e) => (
-            <li
-              key={e.questionId}
-              className="px-4 py-3 flex items-baseline gap-3"
-            >
-              <span className="flex-1 min-w-0 text-sm leading-snug">
-                {e.text}
-              </span>
+            <li key={e.questionId} className="flex items-baseline gap-3">
+              <span className="flex-1 min-w-0 text-sm leading-snug">{e.text}</span>
               <span className="yzy-label tabular-nums text-muted-foreground whitespace-nowrap">
                 {kind === "known" ? e.knownCount : e.unknownCount}
               </span>
