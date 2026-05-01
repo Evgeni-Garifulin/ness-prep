@@ -96,7 +96,6 @@ export default async function SectionPage({ params }: { params: Params }) {
   const idx = sameTrack.findIndex((s) => s.slug === section.slug);
   const prev = idx > 0 ? sameTrack[idx - 1] : null;
   const next = idx >= 0 && idx < sameTrack.length - 1 ? sameTrack[idx + 1] : null;
-  const positionLabel = `${String(idx + 1).padStart(2, "0")} / ${String(sameTrack.length).padStart(2, "0")}`;
 
   return (
     <>
@@ -119,11 +118,6 @@ export default async function SectionPage({ params }: { params: Params }) {
             />
           }
           title={stripSectionPrefix(section.title)}
-          description={
-            <p>
-              {trackLabel}    {positionLabel}
-            </p>
-          }
           progress={{ percent: pct }}
         />
 
