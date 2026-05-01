@@ -1,0 +1,102 @@
+{
+  "code-review__1": {
+    "hintEasy": "Корректность, безопасность, читаемость, тесты, дизайн. Не на стиль.",
+    "hintFull": "Корректность поведения, security/perf/a11y, читаемость на 6 месяцев вперёд, есть ли тесты на новое поведение, согласованность с архитектурой. Style — линтер.",
+    "answer": "В code review смотрю на несколько вещей. Корректность — делает ли код то, что обещает; есть ли edge-cases; не сломает ли существующее. Безопасность, performance, accessibility — для serious-приложений эти не отдельно, а часть quality bar. Читаемость через 6 месяцев — будет ли понятно человеку, который не писал. Тесты — есть ли на новое поведение, имеют ли смысл. Архитектурная согласованность — соблюдены ли границы слоёв, нет ли дублирования с existing-кодом. На стиль не смотрю — это работа линтера, не review. И главное — давать feedback с учётом контекста: junior нужны объяснения, senior — обсуждение trade-offs."
+  },
+  "code-review__2": {
+    "hintEasy": "Серьёзный риск: bug, security, broken behavior, нарушение архитектуры.",
+    "hintFull": "Конкретный bug с воспроизведением, security risk, нарушение архитектурного контракта, явная регрессия. Должен быть явный risk merge-а.",
+    "answer": "Blocker comment — это не «мне не нравится», а явный риск merge-а. Конкретный bug с воспроизведением. Security issue (XSS, exposed secret, auth bypass). Performance regression на критичном path (хорошее правило: > 2x slowdown). Нарушение архитектурного контракта (импорт через 5 слоёв, breaking change в DS-package без bump-а). Явная регрессия покрытия тестами. И — отсутствие тестов на новый код в критичной области (платежи, auth). Не блокирующее: code style, минор naming preferences, личные предпочтения. Если не уверен — формулируй как suggestion, не blocker. Каждый blocker должен иметь чёткое обоснование: «это сломает X, потому что Y»."
+  },
+  "code-review__3": {
+    "hintEasy": "Личное предпочтение, idea для рассмотрения, optional improvement.",
+    "hintFull": "«Можно сделать X», «вариант — Y». Автор сам решает, применять или нет. Помечать явно nit/suggestion, чтобы не путали с blocker.",
+    "answer": "Non-blocking suggestion — это идея для рассмотрения, но автор имеет право не применить. Стиль кода (преференции по naming, структуре). Альтернативный подход, который ты бы выбрал, но текущий тоже работает. Optional improvement — можно сейчас, можно потом. Я помечаю явно: 'nit:', 'suggestion:', 'optional:' — чтобы не было путаницы с blocker-ом. Хорошее правило — 70-80% комментариев должны быть non-blocking, иначе review превращается в gauntlet. Особенно важно для junior — слишком много blocker-ов отбивают желание. И уважать решение автора — если он не применил suggestion с обоснованием, не настаивать."
+  },
+  "code-review__4": {
+    "hintEasy": "Концентрироваться на коде, не на человеке. Объяснять why. Признавать good things.",
+    "hintFull": "Не «ты сделал плохо», а «эта строка вызовет X». Объяснять контекст, не приказывать. Хвалить хорошее в той же ревьюхе. Тон — нейтральный.",
+    "answer": "Несколько техник. Концентрируйся на коде, не на человеке: 'эта функция может сломать X', не 'ты не подумал'. Объясняй why: 'предлагаю изменить, потому что в нашей системе race-condition будет вот тут'. Признавай хорошее в той же ревьюхе: 'отличный refactor here, в комментарии 5 хочу уточнить'. Используй questions, не commands: 'не лучше ли использовать useReducer?' вместо 'используй useReducer'. Тон нейтральный, без иронии и сарказма. И — если что-то срочно или эмоционально — лучше созвониться, чем писать в комментариях. Письменный feedback легко прочитать как агрессивный, даже если не имелось в виду."
+  },
+  "code-review__5": {
+    "hintEasy": "Аргументы с trade-off-ами, не authority. Если тупик — третий человек или MVP-data.",
+    "hintFull": "Свою позицию обосновывать, выслушивать другую. Не «я прав» — а «вот тут такие risk-и». Если consensus невозможен — вызвать tech-lead-а или попробовать обоими подходами на MVP.",
+    "answer": "Спор в PR — это нормально. Обе стороны представляют аргументы с trade-off-ами, не позицию авторитета. 'Я думаю X, потому что Y и Z — это даёт A, но платит B'. Выслушивать оппонента — не perfunctory, а реально пытаться понять его контекст. Часто разногласие = разный context (один знает legacy-код, другой — новый pattern). Если consensus невозможен и спор затягивается — escalate третьему человеку (tech-lead, architect) или попробовать оба подхода на MVP, увидеть в практике. Но не дать спору блокировать delivery более 1-2 дней — лучше merge с follow-up, чем стопор. И в любом случае — после решения respect-ить выбор."
+  },
+  "code-review__6": {
+    "hintEasy": "Когда пишутся длинные thread-ы или эмоционально накаляется — встретиться live.",
+    "hintFull": "Третья итерация комментариев на ту же тему = signal для звонка. Эмоциональные комментарии = немедленный звонок. Совет нескольким людям = synchronous discussion.",
+    "answer": "Письменный review хорош для большинства случаев. Но stop-критерии для звонка. Длинные thread-ы — третья итерация комментариев на ту же тему = signal, что в письме не понимают друг друга, нужен sync. Эмоциональный накал — кто-то начал писать резко, неудовольствие в формулировках; немедленный звонок, не дать эскалации. Сложный архитектурный выбор с несколькими равно-валидными подходами — synchronous discussion быстрее. Объяснение нового концепта junior-у — лучше показать, чем расписать. После звонка — резюме в комментариях для history. Live communication быстрее resolve-ит, и тон легче поддержать конструктивный."
+  },
+  "code-review__7": {
+    "hintEasy": "Сначала понять контекст и motivation, потом проверять boundaries и trade-offs.",
+    "hintFull": "Прочитать ADR (если есть), discuss мотивацию с автором. Проверить: соблюдены ли границы слоёв, не вводит ли coupling, как масштабируется, как тестируется.",
+    "answer": "Архитектурное review требует больше context-а, чем feature-PR. Шаг 1 — прочитать ADR или description, понять motivation: какую проблему решаем, какие альтернативы рассматривали. Шаг 2 — обсудить с автором лично перед детальным review, чтобы выровнять понимание. Шаг 3 — проверить: соблюдены ли границы слоёв, не вводит ли cross-feature coupling, как scaling-ed (что будет на 10x объёме), testability (как unit-тестировать), observability (как мониторить). Шаг 4 — конкретные риски: data migration story, rollback plan, breaking changes. Архитектурный review часто длится дни и требует sync-discussion-ов. Не ускорять."
+  },
+  "code-review__8": {
+    "hintEasy": "Dependencies array, cleanup, stable references, usage rules of hooks.",
+    "hintFull": "exhaustive-deps соблюдены? cleanup есть на subscriptions/timers? Зависимости стабильные? Hook не вызывается в условном блоке? Кастомные hooks тестируемы?",
+    "answer": "React hooks review checklist. Dependencies — exhaustive-deps правило соблюдено, или явный комментарий с обоснованием отступления. Cleanup — useEffect возвращает cleanup для subscriptions, timers, AbortController. Stable references — useCallback/useMemo для функций и объектов в deps других hooks. Rules of hooks — не вызывается в условном блоке или цикле. Stale closures — особенно в setTimeout/setInterval/setState callbacks; functional updates или useEffectEvent. Custom hooks — изолированы и тестируемы; не зависят от глобального state без явного аргумента. И производительность — не делает ли hook лишних рендеров вверх по дереву."
+  },
+  "code-review__9": {
+    "hintEasy": "Точность типов, нет any, narrow по возможности, generic-параметры обоснованы.",
+    "hintFull": "Не any (или с явным комментарием). Narrow types вместо широких. Discriminated unions для variant-ов. Generic-параметры обоснованы. exactOptionalPropertyTypes соблюдён. Inference > explicit где возможно.",
+    "answer": "TypeScript review checklist. Нет any — или есть явный комментарий с обоснованием (типа external-API без типов). Narrow по возможности — Status: 'success'|'error'|'loading' вместо string. Discriminated unions для variant-ов с разными полями. Generic-параметры обоснованы — не Generic ради Generic. unknown вместо any для внешнего input — заставляет валидировать. exactOptionalPropertyTypes — undefined != optional. Inference преференция: const x = ... выводится автоматически, не нужен явный type. exported types — стабильные, breaking changes major. И zod-schema для runtime-валидации внешних данных — TypeScript не runtime, нужна валидация на границе."
+  },
+  "code-review__10": {
+    "hintEasy": "Render tree size, лишние перерендеры, тяжёлые operations в render.",
+    "hintFull": "useMemo/memo на тяжёлое. Стабильные references. Виртуализация для больших списков. startTransition для тяжёлого. Проверить bundle-impact.",
+    "answer": "Performance-sensitive review checklist. React-специфические — useMemo/React.memo на дорогие вычисления и компоненты, стабильные references в deps, виртуализация для больших списков. startTransition для нерочных тяжёлых обновлений. Не делать тяжёлое в render-фазе компонента (только в useMemo). Bundle — добавляются ли тяжёлые dependencies (moment vs dayjs), импортируется ли только нужная часть. Network — оптимизирован ли запрос (одно поле или весь объект), есть ли кеширование, не приведёт ли к waterfall. И измерять, не предполагать: PR с performance-claim должен иметь Profiler-screenshot или benchmark-numbers."
+  },
+  "code-review__11": {
+    "hintEasy": "Sanitization, secrets-leak, auth-проверки, dependency-supply-chain.",
+    "hintFull": "User-input sanitized? Secrets не в bundle? Auth-проверка серверная? Новые deps audit-нуты? CSRF/XSS векторы рассмотрены?",
+    "answer": "Security review checklist. User-input — все points sanitized или escaped перед рендером (React делает basic, но dangerouslySetInnerHTML — флаг). Secrets — нет API-keys, AWS-creds в коде или env-vars без public-prefix. Auth — серверная проверка для каждого sensitive-action, фронт только UX. CSRF — для cookie-based auth есть SameSite или token. Dependency — новые deps audit-нуты (npm audit, Snyk). PII в logs — beforeSend scrubbing работает. Rate-limiting на forms (защита от brute force). Не делать обходов CORS на фронте без понимания. Любая sensitive-фича (auth, payments, KYC) — обязательный security-focused review со second pair of eyes."
+  },
+  "code-review__12": {
+    "hintEasy": "Semantic HTML, accessible names, keyboard, focus-management, aria.",
+    "hintFull": "<button> вместо div. label-связь. Tab-order. Focus trap для модалок. ARIA только если нужно. Тестирование с jest-axe и keyboard.",
+    "answer": "Accessibility review checklist. Semantic HTML — button для кнопок, nav, main, form (не div везде). Form-fields — связаны с label через id или aria-labelledby. Кнопки-иконки имеют accessible name. Keyboard — Tab проходит интерактивы в правильном порядке, нет tabindex > 0. Esc закрывает модалки и popover-ы. Focus-management — focus на первый интерактив при открытии модалки, return focus на trigger при закрытии. ARIA — используется только когда нативного нет (combobox), правильно (не role='button' на button). Тестирование — jest-axe в test-suite, keyboard-проход в Playwright. Real screen reader — раз в спринт для critical-фич."
+  },
+  "code-review__13": {
+    "hintEasy": "Тестируют поведение, не implementation. Покрывают edge-cases. Стабильны.",
+    "hintFull": "RTL-style — тестируют, что видит пользователь, не как реализовано. Edge-cases (null, error, empty). Не flaky. Не over-mocked. Не дублируют логику в asserts.",
+    "answer": "Tests review checklist. Тестируют поведение — что юзер видит, что произошло, не какой hook вызвался. Edge-cases — null, undefined, empty array, error path, slow network. Стабильны — не flaky, не зависят от order, не sleep. Не over-mocked — каждый mock = риск decoupling от реальности; меньше моков, реальнее тест. Не дублируют логику в asserts (assertion должен описывать ожидаемое поведение, не повторять код функции). Имеют meaningful names — describe и it читаются как спецификация. Для critical-фич — отдельный focus на edge-cases. И coverage — не самоцель: 80% при тестировании trivial-getter-ов хуже 60% при тестировании реальных flow."
+  },
+  "code-review__14": {
+    "hintEasy": "Больше 400-500 строк или несколько unrelated changes — сигнал к разбиению.",
+    "hintFull": "PR > 500 строк — сложно review-ить, баги пропускаются. Несколько unrelated changes — сложно decline один, не блокируя другие. Лучше 3 PR-а по 150 строк, чем 1 на 500.",
+    "answer": "Сигналы, что PR слишком большой. Размер — больше 400-500 строк net diff (без auto-generated). Time-to-review — если ты прокручиваешь и теряешь focus, reviewer тоже теряет. Multi-purpose — несколько unrelated changes (refactor + new feature + bugfix). Невозможно отказаться от части — все или ничего. Reviewer оставляет вежливое 'LGTM' без deep-look — это rubber-stamp, не review. Коммитов 30+ — обычно история сообщает о пути, не о finished-product. Решение — split на series of PRs: refactor отдельно (без behavior change), потом feature, потом bugfix. Каждый PR — atomic и review-able за < 30 минут."
+  },
+  "code-review__15": {
+    "hintEasy": "Refactor → infrastructure → feature → tests. Каждый stack-able.",
+    "hintFull": "Сначала extract reusable части (без behavior change). Потом infrastructure. Потом feature. Потом tests если не вместе. Каждый PR проходит CI, можно merge независимо.",
+    "answer": "Стратегия разбиения. Refactor (no behavior change) — выделить reusable части, переименовать, переместить файлы. PR изолированный, легко проверить. Infrastructure — новые utility, helpers, hooks. Тоже изолированный. Feature — главный PR с новым поведением, но уже на готовой инфраструктуре. Tests — если не получается одним PR-ом с feature, отдельный PR с tests. Каждый PR проходит CI, можно merge независимо. Это даёт reviewer-ам managed-size-of-change, и при возникновении проблем proще rollback конкретного куска. Stack-tools (Graphite, Sapling) помогают с зависимыми PR-ами в череде."
+  },
+  "code-review__16": {
+    "hintEasy": "Чек-лист в PR-template, обязательные reviewer-ы по областям, спросить «что проверил».",
+    "hintFull": "PR-template с обязательными checkpoint-ами. CODEOWNERS для critical files. Если у reviewer-а нет конкретных комментариев — спросить «как протестировал», «какие edge cases проверил».",
+    "answer": "Rubber-stamp review (LGTM без реальной проверки) — серьёзная проблема. Лечится организационно. PR-template с обязательным checklist-ом: «протестировано на X», «edge-cases проверены», «accessibility проверено». CODEOWNERS — критичные файлы требуют approve от ответственной команды. Pair-review для critical-фич — два reviewer-а независимо. На уровне культуры — поощрять detailed feedback, не премировать просто merge-rate. И periodic audit: какие PR прошли быстро, что в них было? Регулярные training-сессии по review. И сам — задавать вопросы reviewer-у, если LGTM без комментариев: 'что проверил, какие риски видишь?'"
+  },
+  "code-review__17": {
+    "hintEasy": "Начинать с минимального чек-листа, итеративно добавлять по learning-ам.",
+    "hintFull": "Не сразу 50 пунктов — никто читать не будет. Начать с 5-10 critical: typecheck, security, a11y, tests. Добавлять после каждого incident-а пункт.",
+    "answer": "Введение review checklist — постепенный процесс. Шаг 1 — минимальный list из 5-10 пунктов: TypeScript-strict, no secrets in bundle, accessibility, tests for new behavior. Огромный list никто читать не будет. Шаг 2 — встроить в PR-template, чтобы автор checked перед review. Шаг 3 — обсудить с командой, learning-ах за квартал, добавить пункт после каждого significant incident-а. Шаг 4 — automate всё, что можно: lint-rules, CI-checks, codeowners — tools заменяют human-checking. Не превращать checklist в bureaucracy. Главное — culture-change, а documents — поддержка. Через год checklist живёт сам по себе."
+  },
+  "code-review__18": {
+    "hintEasy": "Лидерство примером, регулярные tech-talks, blameless postmortems, tooling.",
+    "hintFull": "Senior пишут квalitative-код и review-ят others. Tech-talks по best practices. Postmortems учат на ошибках. Lint, types, tests автоматизируют basic-checks.",
+    "answer": "Code quality в команде — комбинация культуры и tooling. Лидерство примером — senior показывают качественный код в собственных PR, делают thoughtful review. Tech-talks раз в спринт по best practices, новым techniques, learning-ам. Blameless postmortems — incident-ы становятся learning-events, не finger-pointing. Pairing — junior работает с senior на сложных задачах. Tooling — лента lint, types, tests автоматизирует basic-checks, освобождая review для real concerns. Onboarding — новые члены команды учатся standard-ам с первого дня. И patience — quality растёт месяцами, не за неделю. Quick wins не работают; sustained focus — работает."
+  },
+  "code-review__19": {
+    "hintEasy": "Не требовать совершенства — только не делать хуже. Параллельно — refactor strategy.",
+    "hintFull": "Legacy-код плохой, но работает. Не требовать в каждом PR full-refactor. Сделать «не хуже» + добавить tests при касании. Параллельно — strategy постепенного рефакторинга.",
+    "answer": "Legacy PR review — отдельная философия. Не требовать perfection — код плохой, но работает; полный refactor — separate effort. Правило 'leave it better than you found it' — каждый touch добавляет немного improvement (extract function, rename for clarity, добавить tests). Не блокировать PR с legitimate-фичей из-за legacy-смежных проблем — это снижает delivery без выгоды. Параллельно — обсудить с командой strategy постепенного refactor-а: какие модули outdated, в каком порядке улучшать, что важнее. Boy scout rule + dedicated refactor-time-blocks — лучшая комбинация. И legacy-код часто учит history — не торопиться его 'улучшать' без понимания, почему он такой."
+  },
+  "code-review__20": {
+    "hintEasy": "Различать blocker от nit. Не просить совершенства. Разрешать follow-up.",
+    "hintFull": "Главное — нет broken behavior, security risk, blatant inconsistency. Остальное — nice-to-have, можно follow-up PR. Не блокировать delivery из-за минорных предпочтений.",
+    "answer": "Перфекционизм в review — реальный анти-паттерн. Лекарство в нескольких практиках. Чёткое разделение blocker vs nit — blocker имеет конкретный, voicable risk; всё остальное — nice-to-have. Allowing follow-up — 'это можно сделать в следующем PR' для минорных improvement-ов. Time-box — review должен занимать 30-60 минут, не дни. Если затягивается — sync с автором, понять, в чём боль. Помнить главную метрику — shipping working software, не perfect code; baseline качества + iteration лучше, чем wait-for-perfect. Хороший review — это help автору ship faster, не блок-checkpoint. Нанимать senior, способных балансировать quality и velocity."
+  }
+}

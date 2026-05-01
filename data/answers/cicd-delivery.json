@@ -1,0 +1,177 @@
+{
+  "cicd-delivery__1": {
+    "hintEasy": "Lint+typecheck+unit на каждом PR; build+integration на main; e2e+deploy на release.",
+    "hintFull": "PR-pipeline: lint, typecheck, unit/integration tests, build, bundle-size check. Main: + smoke-e2e + deploy на staging. Release: + full e2e + deploy на prod через GitOps.",
+    "answer": "Стандартный frontend pipeline. На каждый PR: install (cached), typecheck, lint, unit и integration тесты, build (с проверкой bundle size), preview deploy. Quality gates всё или ничего — fail = no merge. На merge в main: всё то же + smoke-e2e suite на staging-environment, auto-deploy туда. Release: full e2e suite + deploy на production через GitOps (Argo CD), monitoring health checks после rollout. Параллельно — visual regression через Chromatic, security audit (npm audit), accessibility checks (axe). Каждый шаг логирует в observability. Время — PR pipeline < 10 минут, иначе разработчики начинают bypass-ить."
+  },
+  "cicd-delivery__2": {
+    "hintEasy": "Typecheck, lint, unit, integration, build, bundle-size, security audit.",
+    "hintFull": "TS errors, lint violations, failed tests, broken build, bundle превысил budget, vulnerable deps — все блокируют merge. Опционально: visual regression, a11y.",
+    "answer": "Quality gates — это автоматические проверки, которые блокируют merge при провале. Базовый набор: TypeScript-errors (no any-creep, типы строгие), ESLint-violations (формат, anti-patterns), unit/integration tests (coverage thresholds), production build success, bundle-size budget (не превысили N КБ), security audit (npm audit, no high-severity vulnerabilities). Расширенный — visual regression (Chromatic), accessibility (jest-axe, axe-core), license compliance, secret scanning. Принцип — gates срабатывают перед глазами reviewer-а, чтобы человек ревьюил суть, не базовые проблемы. И не дают плохой код проникнуть в main."
+  },
+  "cicd-delivery__3": {
+    "hintEasy": "В CI на каждом PR. Локально — IDE и pre-commit.",
+    "hintFull": "tsc --noEmit в CI как один из quality gates. Локально — TS server в IDE + pre-commit hook через husky. Двойная защита.",
+    "answer": "TypeScript-проверка в нескольких местах. Локально — IDE через TS-server (VSCode, WebStorm) показывает ошибки в реальном времени. Pre-commit hook (husky + lint-staged) запускает tsc --noEmit на staged-файлах перед commit-ом — ловит то, что разработчик мог проигнорировать. CI — full project tsc --noEmit на каждом PR как обязательный gate. Если TS-error — merge блокируется. Это критично, потому что один забытый any в API-response может проникнуть и расплестись по коду. Project references для больших monorepos ускоряют typecheck. И incremental builds (.tsbuildinfo) cached в CI."
+  },
+  "cicd-delivery__4": {
+    "hintEasy": "Pre-commit + CI. Pre-commit на staged files, CI на полном codebase.",
+    "hintFull": "Husky + lint-staged: при commit-е ESLint только на изменённых. CI — на всём codebase, fail при violations. IDE-плагин для realtime-feedback.",
+    "answer": "Lint в трёх местах. IDE-плагин (ESLint) — realtime feedback во время написания кода. Pre-commit hook через husky + lint-staged — ESLint только на staged files, fix-able проблемы автоматически чинит, при unfixable — блокирует commit. CI — eslint на полном codebase как quality gate, fail при violations. Conf-file (.eslintrc) shared в repo, чтобы все использовали одинаковые правила. Запрет --fix в CI — иначе локально проходит, удаленно фейлит. И регулярно — обновление правил через PR с обоснованием. Без enforcement через CI lint-config становится украшением."
+  },
+  "cicd-delivery__5": {
+    "hintEasy": "На каждом PR. Pre-commit опционально для скорости.",
+    "hintFull": "В CI на каждом PR — обязательно. Локально перед commit (если быстро) или вручную. С coverage-threshold — fail если покрытие упало.",
+    "answer": "Unit-тесты — обязательный gate в CI на каждом PR. Запуск через jest или vitest, обычно с coverage-threshold (80% statements, например) — если покрытие упало, fail. Параллельный запуск через --maxWorkers для ускорения. Cached node_modules для быстрого setup-а. Pre-commit — опционально, обычно только если суит быстрый (<30 секунд); иначе ломает flow. Локально разработчик запускает test:watch для активной части кода. CI прогоняет всё. При flaky тестах — retry в CI (jest-circus-retry), но обязательно fixing на источнике. Affected-builds в monorepo — только тесты затронутых packages."
+  },
+  "cicd-delivery__6": {
+    "hintEasy": "На каждом PR — параллельно с unit. Чуть медленнее, но дешевле e2e.",
+    "hintFull": "Integration через RTL + MSW. На PR в общем тест-suite. Время — 1-3 минуты, приемлемо. Покрывают самое ценное — поведение компонентов.",
+    "answer": "Integration-тесты (RTL + MSW + API mocks) запускаются вместе с юнит-тестами в CI на каждом PR. По сути они в том же jest/vitest-процессе, поэтому не требуют отдельного pipeline-а. Время — 1-3 минуты на средний suite, приемлемо. Покрывают поведение компонентов с моками сети — самый ценный слой по cost/value ratio. Coverage обычно тоже считается. Для Storybook-тестов (test-runner) — отдельный CI-job, прогоняет stories как тесты. Affected-builds в monorepo — только integration на затронутых packages. И обязательное условие — стабильность: flaky integration ломает confidence."
+  },
+  "cicd-delivery__7": {
+    "hintEasy": "На каждом PR (smoke-set) — preview deploy + быстрый прогон. Full suite — на main.",
+    "hintFull": "PR: smoke-e2e на preview deploy (Vercel/Netlify), 5-10 критичных сценариев, < 5 минут. Main: full suite после merge на staging. Release: regression-suite перед prod.",
+    "answer": "Playwright smoke на каждом PR — критичный gate. Preview deploy (Vercel, Netlify) собирает приложение, smoke-suite (10-15 сценариев — login, navigation, key conversions) прогоняется на этом preview. Время — 3-5 минут с параллельным запуском по shards. Полный e2e-suite (50-100 сценариев) — после merge на staging, занимает 15-30 минут, не блокирует PR. Перед production-deploy — regression-suite + visual regression. Auth через storageState (не login через UI каждый раз). Артефакты при fail (screenshots, video, traces) сохраняются как CI-artifacts для debug-а. Slack-notifications при fail."
+  },
+  "cicd-delivery__8": {
+    "hintEasy": "На каждом PR — fail если bundle превысил budget.",
+    "hintFull": "size-limit или bundlesize plugin сравнивает с baseline. Превысил — fail. Чтобы случайно не вкатить тяжёлую зависимость.",
+    "answer": "Bundle-size — performance budget gate. На каждом PR build генерирует stats, сравниваются с baseline (main или прошлым коммитом). Превысил — fail с объяснением. Tools: size-limit, bundlesize, или custom-script. В Next.js — встроенная проверка через @next/bundle-analyzer. Лимиты: initial JS < 200КБ gzipped, total page < 1МБ, individual chunk < 100КБ. Без budget bundle-size деградирует тихо: каждый PR добавляет немного, через год страница тормозит. С budget — каждое превышение видно сразу, разработчик мотивирован выбрать lighter alternative или lazy-load. Также — diff-comment в PR, показывающий +X KB."
+  },
+  "cicd-delivery__9": {
+    "hintEasy": "На каждом PR — npm audit с порогом severity. Высокие — block.",
+    "hintFull": "npm audit --audit-level=high в CI. Critical/high → fail merge. Snyk или GitHub Dependabot для расширенного scan-а. Автоматические PR от Dependabot для fixes.",
+    "answer": "Security audit на каждом PR. Базовый — npm audit (или yarn/pnpm) с --audit-level=high. Critical/high vulnerabilities — fail merge, нужно фикситься. Moderate — log warning, фиксить в течение спринта. Low — игнор или ежемесячный аудит. Расширенные tools — Snyk, Socket.dev — ловят даже unpublished малварь и подозрительные пакеты. GitHub Dependabot создаёт автоматические PR с обновлениями. Для большого зонтика — periodic audit в shared dashboard. Критическое правило — не add-ить зависимость на «один раз поюзать»: каждая новая dep — это поверхность атаки."
+  },
+  "cicd-delivery__10": {
+    "hintEasy": "Tagged container или archive в storage (S3, registry) — immutable, по версии.",
+    "hintFull": "После build артефакт упакован (tar.gz, container) и залит в S3 / GitHub Packages / Artifactory с tag = commit-sha или version. Immutable, не перезаписывается.",
+    "answer": "Build artifacts хранятся immutable в реестре. Несколько вариантов. Container image (Docker) — тaged по commit-sha и semver, push в registry (ECR, GHCR, Artifactory). Static-сайт — tar.gz архив или папка в S3, ключ = commit-sha. Каждый build = новый артефакт с уникальным tag, никаких overwrite. Это позволяет тривиальный rollback — переключить указатель на предыдущий артефакт. И гарантирует reproducibility — build id однозначно соответствует одному набору файлов. Lifecycle policy — старые артефакты (старше N дней) удаляются автоматически, кроме release-tags. Manifest и source maps хранятся рядом."
+  },
+  "cicd-delivery__11": {
+    "hintEasy": "Один artifact для всех environment — staging и prod идентичны.",
+    "hintFull": "Build один раз на main → одна версия. Staging и prod деплоят тот же artifact, разница только в runtime config. Меньше surprise при release.",
+    "answer": "Build once, deploy many — это принцип, при котором один артефакт билдится один раз и деплоится в несколько environment без перебилда. Различия (URL API, feature flags) — runtime config. Преимущества: confidence — staging и prod идентичны на байт-уровень, тестирование на staging реально валидно для prod. Скорость — не тратишь время на повторный build. Reproducibility — один commit → один артефакт. Если build-per-environment — staging != production, dev/prod parity нарушен, ловить баги дольше. Реализация требует runtime-config: переменные читаются на старте приложения, не вшиваются в bundle инлайном."
+  },
+  "cicd-delivery__12": {
+    "hintEasy": "Тот же artifact с тем же tag деплоится последовательно: dev → staging → prod.",
+    "hintFull": "Promote = переключить указатель на тот же artifact в новом environment. Никаких rebuild-ов. GitOps: PR на values.yaml в env-folder.",
+    "answer": "Стандартный подход — promotion того же артефакта по environment-у. На main-merge — деплой на dev и staging автоматический. После validation — promote в production. Promote = обновить указатель (manifest, deployment yaml) на тот же artifact tag, никаких rebuild-ов. В GitOps это PR на repo-конфиг: меняешь values.yaml в production-folder на новый image-tag, Argo CD это видит и применяет. Critical — между environment-ами должна быть проверка: smoke-tests на staging, manual approval gate перед production, monitoring window после deploy. Для critical fintech — multi-step approval с разными ролями."
+  },
+  "cicd-delivery__13": {
+    "hintEasy": "Переключить указатель на предыдущий artifact tag.",
+    "hintFull": "Immutable artifacts с tag-ами. Rollback — обновить production-config на предыдущий tag. Argo CD синхронизирует за минуты. Никаких rebuild-ов.",
+    "answer": "Rollback должен быть простым и быстрым. Архитектура: immutable artifacts с tag-ами в registry, никогда не перезаписываются. Production deployment ссылается на конкретный tag. Rollback — обновить config на предыдущий tag. В GitOps — PR (или revert-commit) в config-repo на предыдущую версию, Argo CD автоматически применяет. Время от решения до prod — обычно минуты. Для serious fintech — auto-rollback на критичных метриках: error-rate > N%, latency > threshold, SLO violation — automated revert, пока команда дебажит. Это требует CI-дисциплины и хорошего monitoring-а. Без auto-rollback серьёзные incidents длятся часами."
+  },
+  "cicd-delivery__14": {
+    "hintEasy": "Запустить новую версию для % юзеров, мониторить, расширять или откатывать.",
+    "hintFull": "Canary — 5% трафика → метрики держатся → 25% → 50% → 100%. Метрики деградируют — auto-rollback. Без редеплоя host-а через feature flags или routing.",
+    "answer": "Canary release — постепенный rollout новой версии для процента пользователей. Стандартный flow: deploy новый артефакт параллельно со старым, в начале 5% трафика идёт на canary (через service mesh, ingress rules, или feature flag). Мониторинг ключевых метрик: error-rate, p95 latency, business-conversion. Если держатся — поднять до 25%, потом 50%, 100%. Если ухудшились — auto-rollback на старую версию. Время на каждой stage — 15-60 минут в зависимости от criticality. Для frontend-у — реализуется через feature flags (если совместимо с backend), через CDN-routing rules, или через client-side bucketing с одним bundle. Aналитика обязательно тегируется вариантом."
+  },
+  "cicd-delivery__15": {
+    "hintEasy": "Две идентичные среды — green (live) и blue (new). Switch traffic atomic-ом.",
+    "hintFull": "Деплоишь новую версию в blue env (parallel к live green). Smoke-тесты в blue. Switch traffic от green к blue. При проблемах — switch обратно за секунды.",
+    "answer": "Blue-green deployment — две полностью идентичные production-среды. Одна (green) принимает трафик, вторая (blue) — idle или принимает 0%. Новая версия деплоится в blue, прогоняются smoke-тесты на реальном environment. После validation — switch trafficа: load balancer / DNS переключает на blue. Старая green остаётся idle, готовая принять обратно при проблеме. Преимущества — atomic switch, мгновенный rollback (просто переключить обратно), realistic testing на prod-инфраструктуре. Минусы — двойная инфраструктура (дороже), требует stateless-архитектуры (или careful migration с DB-changes). Для frontend на CDN это легче — просто routing rule на новую папку."
+  },
+  "cicd-delivery__16": {
+    "hintEasy": "Включай новый код за флагом. Можно выключить мгновенно при проблеме.",
+    "hintFull": "Новая фича написана за if (flag). Деплой = код в проде, но скрыт. Включаешь флаг постепенно (gradual rollout), мониторишь, расширяешь. Issue — выключаешь за секунды.",
+    "answer": "Feature flags — это переключатели в коде, отделяющие deploy от release. Новый код deploys в production за if (flag) — он там, но не active. Включение — отдельное решение через UI flag-management (LaunchDarkly, GrowthBook). Стратегии: gradual rollout (5% → 25% → 100%), targeting (только для admin-ов сначала), kill-switch (выключить мгновенно при incident). Это снижает риск deploy — даже если код плохой, его можно выключить за секунды без redeploy. Для миграций — old и new пути живут параллельно, флаг рулит. Hygiene — удалять flag-и после full rollout, иначе технический долг."
+  },
+  "cicd-delivery__17": {
+    "hintEasy": "Kill-switch flag — выключаешь фичу в UI flag-management, без deploy.",
+    "hintFull": "Через минуту после релиза увидел error-spike — открываешь LaunchDarkly, выключаешь флаг, фича пропадает у всех юзеров мгновенно. Никаких redeploy.",
+    "answer": "Kill-switch — это flag, специально проектируемый для аварийного выключения фичи без redeploy-а. Stand-by-default mode — фича работает, flag выключен. При incident — оператор открывает flag-management UI (LaunchDarkly, GrowthBook), выключает флаг, фронт всех юзеров перестаёт показывать сломанное. Время — секунды-минуты, в зависимости от как часто фронт обновляется (обычно через WS-push или периодический рефетч). Это must-have для high-risk фич: payments, trading-execution, KYC-flows. Без kill-switch incident длится столько, сколько нужно для редеплоя — часы. С kill-switch — минуты."
+  },
+  "cicd-delivery__18": {
+    "hintEasy": "Health-check endpoint + monitoring на error-rate, latency, business-метрики.",
+    "hintFull": "/health endpoint возвращает 200 при ОК. Post-deploy monitor 15-30 минут: error-rate, p95 latency, conversion. Auto-rollback при degradation.",
+    "answer": "Post-deployment health checks — обязательная часть serious release flow. Уровни: infrastructure-level (приложение запустилось, /health возвращает 200), application-level (ключевые endpoints отвечают, БД-connection живой), business-level (метрики conversion, error-rate, latency сохраняются). Monitoring window — обычно 15-30 минут после deploy, в течение которого автоматика следит и может откатить. Дашборд показывает release marker как vertical line на всех графиках, чтобы видеть impact. Алерт срабатывает при превышении threshold-а — page on-call. Это снижает MTTR (mean time to recovery) от часов до минут."
+  },
+  "cicd-delivery__19": {
+    "hintEasy": "Error-rate, Web Vitals, конверсии, route-load-success.",
+    "hintFull": "JS-errors per session, LCP/INP/CLS, bundle-load-success, API-error-rate, business-conversions. Сравнивать pre/post-deploy.",
+    "answer": "Frontend health checks включают несколько слоёв. Технические: JS-errors per session (Sentry), bundle-load-success-rate, route-render-success, hydration-errors. Web Vitals: LCP, INP, CLS — деградация = плохой release. Network: API-error-rate, slow-request-percentage, retry-rate. Business: conversion-rates на key flows (signup, checkout), session-length, page-views per session. Сравнение pre-deploy/post-deploy на 1-2 часа после rollout. Алерты на резкие изменения — обычно threshold ±20% от baseline. Для канарейка — отдельные метрики для canary-cohort vs control-cohort. Без таких checks team узнаёт о проблеме от пользователей через support."
+  },
+  "cicd-delivery__20": {
+    "hintEasy": "Release annotation на дашбордах + Sentry release tag + correlation ID.",
+    "hintFull": "Каждый deploy создаёт annotation в Datadog/Grafana — vertical line на графиках. Sentry получает release tag для group-by. Эта же commit-sha — в version-API frontend-а.",
+    "answer": "Связь deployment ↔ monitoring через release annotations. На каждый deploy CI отправляет annotation в Datadog/Grafana — vertical line на всех дашбордах с release-tag и commit-info. Видно, как метрики изменились после deploy. Sentry получает release-tag для group-by — error-rate per release, regression detection. Frontend bundle тоже знает свой release: window.__APP_VERSION__ или meta-tag, отправляется в каждом telemetry-event. Source maps загружаются с release-tag для расшифровки stack-traces. CI шлёт slack-notification: «Released v1.2.3, commits #abc..xyz» с link на дашборд. Это даёт мгновенный context при incident-investigation."
+  },
+  "cicd-delivery__21": {
+    "hintEasy": "Деплой описан как состояние в git. Кластер постоянно sync-ит к этому состоянию.",
+    "hintFull": "Git — единственная source of truth для desired state. Argo CD / Flux мониторит config-repo, реальное состояние кластера приводит к нему. PR = изменение продакшена.",
+    "answer": "GitOps — это методология deployment, в которой git-репозиторий является единственной source of truth для desired state кластера. Описание ресурсов (Kubernetes manifests, Helm charts) хранится в repo. GitOps-агент (Argo CD, Flux) непрерывно мониторит repo и синхронизирует кластер к описанному состоянию. PR в config-repo = изменение в production. Преимущества — версионированный history каждого изменения, audit log в git, rollback через revert-commit, separation-of-concerns (CI билдит, CD деплоит, дополнительные права). И drift-detection — если кто-то изменил кластер вручную, GitOps это увидит и либо вернёт, либо алерт-нет."
+  },
+  "cicd-delivery__22": {
+    "hintEasy": "Argo CD = GitOps-агент. Слушает config-repo, применяет изменения в кластер.",
+    "hintFull": "Argo подключён к config-repo и кластеру. На push в repo — sync. UI показывает state: синхронизирован или drift. Deploy = git push.",
+    "answer": "Argo CD — популярный open-source GitOps-агент для Kubernetes. Архитектура: Argo подключён к config-repo (читает manifests) и к кластеру (применяет). При push в repo Argo замечает изменение и синхронизирует кластер. UI показывает state каждого приложения: in-sync, out-of-sync, healthy/unhealthy. Sync можно настраивать — automatic (мгновенно) или manual (с approval). Rollback — revert commit в repo, Argo откатит. Notifications в Slack при success/fail. Helm/Kustomize support из коробки. Multi-cluster, multi-environment управление через ApplicationSet. Альтернатива — Flux. Для frontend это часто overkill, но в enterprise-продуктах стандарт."
+  },
+  "cicd-delivery__23": {
+    "hintEasy": "Безопасность: CI = supply-chain, скомпрометированный CI = скомпрометированный prod.",
+    "hintFull": "CI — выполняет код из PR (включая возможно вредоносный). Direct prod-доступ = supply-chain атака может задеплоить malicious code. GitOps убирает этот вектор.",
+    "answer": "Безопасность. CI выполняет код из репозитория, включая зависимости — поверхность атаки большая. Если supply-chain атака просочилась через npm-package, CI это выполнит. Если CI имеет direct prod-доступ через credentials, атакующий может задеплоить malicious code. GitOps инвертирует контроль: CI только building artifact и push в config-repo (PR на изменение image-tag). GitOps-agent (Argo) пулит изменения и применяет — он внутри prod-кластера. Никаких outbound-credentials к prod в CI. Дополнительно — review на config-repo PR, audit-log в git, ограниченные права. Это разделение защищает от компрометации CI-системы."
+  },
+  "cicd-delivery__24": {
+    "hintEasy": "Один build, env-specific config через runtime-загрузку.",
+    "hintFull": "Артефакт идентичен для dev/staging/prod. Config грузится с сервера при старте (config.json, /api/config). Или env-vars в server-side для Next.js.",
+    "answer": "Environment-specific config через runtime, не build-time. Стандартные подходы: config.json на сервере, фронт грузит при старте через fetch('/config.json'); env-vars читаются server-side в Next.js (process.env.NEXT_PUBLIC_*); meta-теги на index.html, заполняемые server-side при первой загрузке. Все три варианта дают один build для всех environment. Build-time переменные — только для constant settings, не меняющихся между средами. И обязательно — все env-vars документированы с описанием и default-значением. Локальный dev — .env.local в gitignore, secrets не коммитятся. Production — vault, AWS Parameter Store, или платформенные secrets (Vercel, Netlify)."
+  },
+  "cicd-delivery__25": {
+    "hintEasy": "В Vault / AWS Secrets Manager / GitHub Secrets — никогда в git.",
+    "hintFull": "Secrets никогда в .env-файлах git-а. Production — Vault, AWS Secrets Manager, GitHub Secrets для CI. Inject-ятся в runtime, не build-time.",
+    "answer": "Secrets никогда не в git. Стандартные хранилища: AWS Secrets Manager, HashiCorp Vault, Google Secret Manager — для production runtime. GitHub Secrets / GitLab CI Variables — для CI/CD pipelines. .env.local в .gitignore — для локальной разработки с placeholder-значениями. Inject-secrets в runtime через env-vars или mounted volumes. Никогда не commit .env с реальными secrets — gitleaks pre-commit hook это ловит. Rotation — раз в N месяцев или при инциденте. Audit — кто, когда читал secret. Никаких secrets в frontend bundle (он публичен) — backend читает secrets и проксирует в API."
+  },
+  "cicd-delivery__26": {
+    "hintEasy": "Bundle открыт всем — view-source видит. Никаких приватных ключей.",
+    "hintFull": "Frontend bundle = публичный код. View-source, DevTools, downloadable. API-keys приватных сервисов, AWS-creds, signing-keys в bundle — leak.",
+    "answer": "Frontend bundle полностью открыт пользователю — он видит и DevTools, и view-source, и сетевые запросы. Поэтому никаких secrets: API-keys приватных сервисов (Stripe secret, Sendgrid), AWS-credentials, encryption keys, internal admin endpoints, debug-flags. Использовать только переменные с публичным префиксом (VITE_, NEXT_PUBLIC_). Серверные secrets — в server-only коде (Next.js API routes, отдельный backend-service), никогда не доходят до клиента. Если случайно засветили — ротация ключа обязательна, bundle уже залит на CDN. Public — URL API, public-keys (например, Stripe publishable key), feature flags. Privacy — всё, что secret-suffix имеет."
+  },
+  "cicd-delivery__27": {
+    "hintEasy": "Build генерит source maps, CI заливает в Sentry, prod-bundle без публичных map.",
+    "hintFull": "Sentry CLI или plugin: после build загружает source maps с release-tag. Bundle ссылается на map через //# sourceMappingURL — но файл скрыт от публики.",
+    "answer": "Стандартный flow с Sentry. Build генерирует source maps. Bundle обычно содержит //# sourceMappingURL=app.js.map в конце. В CI после build — sentry-cli sourcemaps upload --release v1.2.3 ./dist — заливает .map файлы в Sentry с привязкой к release. Sentry использует их для расшифровки stack traces в production: вместо 'a.js:1:234' видно 'OrdersPage.tsx:42:15'. Сами .map файлы НЕ выкладываются на CDN рядом с bundle — это раскрытие исходников. Hidden source maps в Vite/Webpack — без sourceMappingURL комментария, файлы только для CI. Release tag совпадает с frontend-version, чтобы Sentry знал, какой map для какого bundle."
+  },
+  "cicd-delivery__28": {
+    "hintEasy": "Deploy remote bundle в CDN, manifest указывает на новую версию.",
+    "hintFull": "CI builds remote → push в S3/CDN с tag = version. Manifest (remoteEntry.js) обновляется на актуальный URL. Host подхватывает в runtime.",
+    "answer": "Release microfrontend remote — независимый от host. CI builds remote → push artifact в S3 или CDN с unique tag (commit-sha или version). Manifest (remoteEntry.js или config.json) — единственная mutable точка, указывает на текущую версию remote-bundle-а. Cache TTL: manifest короткий (1-5 минут), bundle long-term (1 год, immutable). Host при следующей загрузке тянет новый manifest, видит обновлённый remote, грузит. Никакого redeploy host-а. Smoke-tests перед обновлением manifest-а — host со staging-remote проверяет интеграцию. Canary через manifest с %-ом юзеров. Rollback — revert manifest к предыдущей версии, секунды."
+  },
+  "cicd-delivery__29": {
+    "hintEasy": "Changesets bump-ит версию, npm publish, потребители обновляют через PR.",
+    "hintFull": "Changesets — version bump + changelog. CI publishes в npm registry. Dependabot создаёт PR в потребительских repo. Major bump — coordinated с командами.",
+    "answer": "Shared UI package релизится через стандарт npm-flow с автоматизацией. Changesets — добавление changeset на каждый PR с описанием изменения и semver-bump-ом. На release-PR (или main-merge) tool обрабатывает все pending changesets: bump-ит версии, генерит CHANGELOG.md, делает git tag. CI публикует в npm registry (private или public). Dependabot в потребительских repos автоматически создаёт PR с обновлением. Major bump — заранее коммуницируется командам, можно через beta-канал protestировать. Minor/patch — обычно безопасны, потребители обновляют по мере удобства. Документация версий обязательна для DS-package."
+  },
+  "cicd-delivery__30": {
+    "hintEasy": "Runbook в Confluence: что, кто, какие команды, rollback.",
+    "hintFull": "Шаги release: kick-off CI, prerelease checks, deploy command, validation steps, rollback. Runbook в Confluence/Notion, обновляется после каждого incident-а.",
+    "answer": "Release process документируется как runbook. Содержит: prerequisites (что должно быть готово перед release), step-by-step процедура (какие команды, в каком порядке), validation steps (как проверить успех), rollback procedure (что делать при провале), contact list (кто on-call, кому эскалировать). Хранится в Confluence/Notion с version-history. Обновляется после каждого release-incident-а — добавляется learning. Pre-release checklist — структурированный документ для команды (PR merged, tests passed, stakeholders notified, monitoring готов). Для critical fintech — отдельные approval gates с разными ролями (Engineering, QA, Security, Compliance)."
+  },
+  "cicd-delivery__31": {
+    "hintEasy": "Auto-rollback или manual revert; postmortem; найти root cause.",
+    "hintFull": "Failed deploy — auto-rollback (если настроен) или ручной через manifest revert. Затем — investigation: что пошло не так. Postmortem без blame.",
+    "answer": "Failed deployment process. Шаг 1 — немедленный rollback: auto, если monitoring detected critical metric degradation, или manual через config-revert (PR на предыдущий tag). MTTR должен быть минуты, не часы. Шаг 2 — incident-channel в Slack, на-call сообщает status каждые 15 минут. Шаг 3 — investigation на staging (не на prod): что именно сломалось, почему prod-validation не поймала. Шаг 4 — fix + thorough validation на staging. Шаг 5 — повторный deploy в hours-окне с extra monitoring. Шаг 6 — postmortem (без blame): timeline, root-cause, action-items. Документируется как learning для команды и обновлений процесса."
+  },
+  "cicd-delivery__32": {
+    "hintEasy": "Изолировать affected часть, граceful degradation остального, rollback или fix-forward.",
+    "hintFull": "Один остаток падает — error boundaries дают fallback. Весь UI продолжает работать. Дефект — fix-forward или rollback только этой части.",
+    "answer": "Partial outage — лучший сценарий, чем total. Системы должны быть проектированы под graceful degradation. Один microfrontend упал — error boundaries в host-е показывают fallback на этом блоке, остальные работают. Один API-endpoint лагает — соответствующая фича помечается «временно недоступно», остальное в норме. На уровне operation: feature flag-ом выключаешь сломанную часть (kill-switch), пользователь не теряет доступ ко всему. Fix-forward (быстрый patch) если корневая причина простая, rollback если корень не ясен или impact большой. Communication — статус-страница обновляется, пользователи видят affected services."
+  },
+  "cicd-delivery__33": {
+    "hintEasy": "Smoke-suite + monitoring window + manual sanity check на ключевых flow.",
+    "hintFull": "После deploy: автоматический smoke-suite на prod, мониторинг метрик 30-60 минут, ручная проверка ключевых сценариев on-call-ом.",
+    "answer": "Post-release validation — структурированный процесс для подтверждения, что release не сломал prod. Шаг 1 — automated smoke-suite на production (read-only сценарии или с test-аккаунтом). Шаг 2 — monitoring window: 30-60 минут детальный watch ключевых метрик (error-rate, latency, conversion). Алерты на отклонения. Шаг 3 — manual sanity check on-call-ом: пройтись по 5-10 ключевым сценариям своими руками, проверить «не сломалось ли что-то очевидное». Шаг 4 — feedback loop: если что-то notice — open incident, иначе close release. Документируется в release-ticket с timestamps. Через сутки — followup на slow-burning issues, которые не сразу видны."
+  },
+  "cicd-delivery__34": {
+    "hintEasy": "Auto-generate из commits (conventional commits + changesets) или вручную в PR.",
+    "hintFull": "Conventional commits parsed → changeset auto-generates changelog. Или changeset на каждый PR с описанием. Группировка: features, fixes, breaking, chore.",
+    "answer": "Changelog автоматизируется. Conventional Commits (feat:, fix:, breaking:) — формат commit-message-ей; tools (semantic-release, changesets) парсят и генерят changelog. Changesets — на каждый PR прикладывается changeset-файл с типом и описанием; на release tool агрегирует. Группировка: Features (new), Bug Fixes, Breaking Changes, Chore. Версия по semver: feat → minor, fix → patch, breaking → major. Changelog публикуется как CHANGELOG.md в repo, в GitHub release notes, в Slack. Для продуктовых — высокоуровневый changelog в notification (что изменилось для пользователя), отдельно от technical-changelog."
+  },
+  "cicd-delivery__35": {
+    "hintEasy": "Каждая фича имеет требования к metrics/logs/traces и dashboard перед merge.",
+    "hintFull": "DoD checklist: фича генерит соответствующие events, есть dashboard и алерты, обработаны error-cases, post-deploy monitoring рассчитан. Без этого — merge не allowed.",
+    "answer": "Observability как часть Definition of Done — это организационное правило. PR-ревью включает чек: новая фича имеет соответствующий telemetry (events, errors, custom metrics); создан или обновлён dashboard в Grafana/Datadog; алерты на критичные метрики настроены (например, error-rate > 5% на новом endpoint); error-paths корректно обрабатывают и логируют. Без этого PR не merge-ится. Для критичных фич — post-deploy monitoring window (30-60 минут), документированный в release-plan. Это меняет культуру — observability становится частью разработки, не something to add later. И снижает MTTR для incidents в новых фичах с часов до минут."
+  }
+}

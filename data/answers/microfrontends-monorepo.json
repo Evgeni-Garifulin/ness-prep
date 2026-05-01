@@ -1,0 +1,177 @@
+{
+  "microfrontends-monorepo__1": {
+    "hintEasy": "Несколько независимых frontend-приложений, объединённых в один UX.",
+    "hintFull": "Большое приложение разделено на части, каждая разрабатывается отдельной командой со своим репо/деплоем. На странице склеиваются runtime через Module Federation, iframe, или server-side composition.",
+    "answer": "Microfrontend — это архитектурный паттерн, разбивающий большое frontend-приложение на независимо разрабатываемые и деплоящиеся части. Каждая команда владеет своей частью end-to-end: код, тесты, deploy, мониторинг. Технические подходы: Module Federation (Webpack/Vite), iframe (изоляция), server-side composition (BFF собирает HTML), build-time integration (npm-пакет). Runtime-композиция позволяет деплоить части независимо без координации. Подходит для крупных организаций с несколькими продуктовыми командами; для маленьких — overhead не оправдан."
+  },
+  "microfrontends-monorepo__2": {
+    "hintEasy": "Когда у тебя 5+ команд и они блокируют друг друга в одном monolith.",
+    "hintFull": "Большая команда (50+ инженеров), несколько продуктовых треков, разные технологии или скорости. Когда координация деплоя становится bottleneck-ом.",
+    "answer": "Microfrontends оправданы в нескольких сценариях. Большая организация (50+ frontend-инженеров), где команды конкурируют за один codebase и блокируют друг друга. Несколько продуктовых треков с разными жизненными циклами — admin, customer, partner-portal. Разные технологии (например, унаследованные: Vue + React) или разные скорости релиза. Также — независимое масштабирование команд: купили компанию, у неё свой стек. Главный signal — координация деплоя стала bottleneck-ом, и команды задерживают друг друга. Если этого нет, microfrontends добавляют сложность без выгоды."
+  },
+  "microfrontends-monorepo__3": {
+    "hintEasy": "Маленькая команда, простое приложение, нет реальных проблем с координацией.",
+    "hintFull": "1-2 команды могут работать в одном repo без коллизий. SPA с понятной структурой не требует runtime-композиции. Microfrontends добавят инфраструктурную сложность без пользы.",
+    "answer": "Microfrontends — overengineering, когда нет реальных проблем масштабирования. Маленькая команда (5-10 человек) может работать в одном repo без коллизий. Простое продуктовое приложение с одной командой — структура папок и code-review закрывают потребности. Стартап с быстро меняющимися требованиями — runtime-фрагментация замедлит итерации. Сложности microfrontends: сетевой overhead, version skew между remotes, сложнее observability, больше инфраструктуры (CI/CD на каждый remote, отдельные deploy-pipelines). Перед внедрением стоит честно ответить — какую конкретную боль решаем, и можно ли её решить дешевле в monolith."
+  },
+  "microfrontends-monorepo__4": {
+    "hintEasy": "Webpack/Vite-feature: один app может импортировать модули другого app в runtime.",
+    "hintFull": "Module Federation позволяет одному приложению exposeить компоненты, другие — importить их через специальный async-import. Shared dependencies (React) — один экземпляр на странице.",
+    "answer": "Module Federation — feature Webpack 5+ (и портов на Vite), позволяющий одному приложению предоставлять модули другому в runtime. Shell (host) импортирует Component из remote-app: import('mfe-orders/Dashboard'). На сборке Webpack пишет manifest, в runtime скачивает remote-bundle через fetch. Shared dependencies (React, дизайн-система) — один экземпляр на странице, через singleton-конфигурацию. Главное преимущество — независимый deploy: обновил остров, host автоматически подхватит новую версию. Это самый популярный механизм microfrontends для пост-2020 архитектур."
+  },
+  "microfrontends-monorepo__5": {
+    "hintEasy": "Главное приложение, которое подгружает remote-модули.",
+    "hintFull": "Host = shell. Контейнер: layout, navigation, auth, routing. Внутри подгружает remote-приложения и встраивает их в свои routes/regions.",
+    "answer": "Host (или shell) — это главное приложение, которое объединяет всё в единый UX. Содержит общий layout (header, sidebar, footer), навигацию между остатками, auth-механику, базовый routing. Внутри его routes или regions встраиваются components из remotes через Module Federation. Host знает имена remotes и mounting-points, но не их implementation. Часто host деплоится реже, чем remotes — он отвечает за стабильность общей структуры, а не за продуктовый функционал. Например, employee-portal как host, внутри HR-mfe, finance-mfe, ops-mfe."
+  },
+  "microfrontends-monorepo__6": {
+    "hintEasy": "Независимое frontend-приложение, экспонирующее модули в host.",
+    "hintFull": "Remote — отдельный SPA, exposeит components через Module Federation. Деплоится независимо. Host подгружает remote-bundle в runtime.",
+    "answer": "Remote — это независимо разрабатываемое и деплоящееся frontend-приложение, которое экспонирует часть своих модулей через Module Federation для host-а. Имеет собственный CI/CD, тесты, репо (или package в monorepo), команду. Состоит из двух частей: standalone-app (можно открыть напрямую для разработки) и exposed-modules (Component, Page, Hook, экспортируемые наружу). Host через специальный async-import получает доступ к этим модулям и встраивает их. Remote может в свою очередь зависеть от других remotes (если архитектура позволяет), но обычно ставится плоская иерархия для простоты."
+  },
+  "microfrontends-monorepo__7": {
+    "hintEasy": "Зависимость, разделяемая между host и remotes — один React на странице, не несколько.",
+    "hintFull": "В Module Federation config указываешь shared: { react, react-dom }. Браузер скачивает один экземпляр, все остальные используют его. Иначе — multiple React, ломает context, hooks.",
+    "answer": "Shared dependency — это пакет, который должен иметь один экземпляр на странице, разделяемый между host и всеми remotes. React, react-dom, дизайн-система, auth-context — типичные кандидаты. В config Module Federation указываются как shared. Runtime: первый загруженный модуль регистрирует версию, последующие используют её. Без sharing — каждое приложение приносит свой React, у тебя 5 React-ов на странице, hooks работают неправильно (useState из одного React не виден в другом), Context рассыпается. Sharing должен быть singleton: { react: { singleton: true, requiredVersion: '^18.0.0' } }."
+  },
+  "microfrontends-monorepo__8": {
+    "hintEasy": "Version skew, breaking changes в shared package, shared state.",
+    "hintFull": "Один remote обновил React 18→19, host остался — runtime-error. Shared package с breaking change ломает всех потребителей. Shared state — один remote меняет, другой ломается.",
+    "answer": "Shared dependencies несут риски. Version skew — один remote ожидает React 19, другой — React 18; если singleton, кто-то выходит из combat-зоны API. Breaking changes в shared package (дизайн-система обновила Button) — все remotes должны протестироваться, иначе ломается. Shared state — общий auth-context: один remote делает logout, остальные могут не среагировать корректно. Lazy loading shared — порядок загрузки влияет на то, какая версия победит. Лечение — strict version policy (singleton с requiredVersion), CI-проверки совместимости, contract testing между host и remotes."
+  },
+  "microfrontends-monorepo__9": {
+    "hintEasy": "Разные части приложения используют разные версии одной библиотеки.",
+    "hintFull": "Host на React 18, remote A — на 18, remote B — на 19. В singleton-режиме одна версия победит, остальные могут сломаться.",
+    "answer": "Version skew — это ситуация, когда разные части системы используют разные версии общей зависимости. В microfrontends — host и remotes на разных React-ах. В singleton-режиме Module Federation выбирает одну версию (по requiredVersion и semver-rules), остальные используют её. Если выбранная версия несовместима — runtime-error. Скуем сложно избежать в крупных организациях: команда A обновляется быстро, команда B — медленно. Лечение — strict version requirements в shared config, периодические coordinated upgrades, мониторинг runtime-ошибок «no matching shared version»."
+  },
+  "microfrontends-monorepo__10": {
+    "hintEasy": "Singleton + requiredVersion в Module Federation. CI-проверки на совместимость.",
+    "hintFull": "shared: { react: { singleton: true, requiredVersion: '^18.0.0', strictVersion: true } }. CI прогоняет smoke-test всех remote-ов на host-е перед deploy.",
+    "answer": "Несколько слоёв. В Module Federation config shared: { react: { singleton: true, requiredVersion: '^18.0.0', strictVersion: true } } — заставляет host и remotes использовать совместимый React. strictVersion фейлит сборку, если версии не совпадают. CI: при изменении shared dep в host — прогоняется smoke-suite всех remote-ов, чтобы убедиться, что не сломались. Coordinated upgrades — все команды апгрейдят React в одно release-window. Внутренний registry shared-deps — список разрешённых версий, обновляется централизованно. И monitoring runtime-ошибок «invalid hook call» обычно сигнализирует о multiple React."
+  },
+  "microfrontends-monorepo__11": {
+    "hintEasy": "Каждый remote деплоится своим pipeline-ом, host подхватывает новый bundle в runtime.",
+    "hintFull": "Remote build → CDN → manifest URL обновлён. Host при загрузке читает manifest и тянет последний remote-bundle. Никакой coordination между deploy-ями.",
+    "answer": "Independent deployment — главная цель microfrontends. Каждый remote имеет свой CI/CD: build, test, deploy на CDN. Manifest (remoteEntry.js) живёт по стабильному URL, который не меняется. Когда remote обновлён, host при следующей загрузке тянет свежий bundle через этот manifest. Никаких redeploy host-а. Архитектура: host в config указывает URL manifest-ов, не конкретных bundle-имён с hash — так автоматически подхватывается актуальная версия. Cache-policy для manifest-а — short (no-cache или 5 минут), чтобы новые deploys видны быстро. Для самих bundle-ов — long-term cache по hash."
+  },
+  "microfrontends-monorepo__12": {
+    "hintEasy": "Контракт между host и remotes; semantic versioning; smoke-tests перед deploy.",
+    "hintFull": "Заранее зафиксированный API: какие компоненты, какие props, какие event-ы. Изменение — minor/major bump. CI запускает smoke-test всех потребителей.",
+    "answer": "Runtime compatibility — гарантия, что remote, задеплоенный сейчас, не ломает host или соседние remotes. Несколько практик. Контракт между host и remote — какие компоненты exposeятся, какие props принимают, какие events emit-ят. TypeScript-типы зафиксированы и шарятся (через npm-пакет с types). Semantic versioning — breaking change → major bump, новые поля → minor. CI прогоняет smoke-test актуального host-а с новым remote-bundle перед deploy. Canary release — новый remote получает 5% трафика, мониторим errors. И contract testing (Pact) для крупных систем — pact-файлы между host и remotes."
+  },
+  "microfrontends-monorepo__13": {
+    "hintEasy": "TypeScript-types в shared package + конкретный API exposed components.",
+    "hintFull": "Shared types-package описывает props и event-ы. Каждый remote импортирует и реализует. Изменение интерфейса — major bump shared package.",
+    "answer": "Контракты между shell (host) и remotes — это TypeScript-интерфейсы для exposed components: какие props они принимают, какие events emit-ят, какие routes покрывают. Стандартный подход: отдельный shared/contracts npm-package с types. Каждый remote импортирует и реализует. Host также импортирует и использует. Любое изменение контракта — bump версии package-а с правильным major/minor. Дополнительно — runtime-проверки (zod) на границе host-remote, чтобы поймать рассинхрон даже если TS-types не совпали. Documentation в README package-а: какие компоненты, какие slots/regions для встраивания."
+  },
+  "microfrontends-monorepo__14": {
+    "hintEasy": "Через published npm-package с .d.ts файлами.",
+    "hintFull": "Shared types живут в npm-package (publish или workspace). Remotes и host import-ят из него. Изменения проходят через PR + version-bump.",
+    "answer": "Стандартный механизм — npm-package с types. В monorepo это workspace package (через pnpm/yarn workspaces); в multi-repo — публикуется в private npm registry. Каждый remote и host добавляет его как dependency, импортирует types. Сборка генерирует .d.ts через tsc или dts-bundle-generator. Изменения — обычный PR + version bump через changesets. После публикации потребители обновляют version. Альтернатива — Module Federation для types: remote shareит types в runtime через специальные пакеты, но это эксперимент. Проверенный путь — npm-package."
+  },
+  "microfrontends-monorepo__15": {
+    "hintEasy": "Один общий DS-package, peer-dependency, единая major-version у всех.",
+    "hintFull": "DS — npm-package, у всех на одной major-версии. Tokens через CSS-переменные на host-е. Module Federation — share singleton.",
+    "answer": "Дизайн-система в microfrontend архитектуре — критичная общая зависимость. Стандарт: один DS-package, обязательная dependency для всех remotes. Версионирование строгое — peer-dependency, все на одной major-версии, иначе runtime-конфликты (несколько React-context-ов одного DS). Tokens (CSS-переменные) определяются на host-приложении, дочерние их наследуют — единая тема для всех. Module Federation — share как singleton, чтобы не было multiple instances. Periodic audits проверяют, что используется. Без enforcement DS на microfrontends никто не будет — каждая команда экономит время. CI-checks и lint-rules помогают."
+  },
+  "microfrontends-monorepo__16": {
+    "hintEasy": "Auth-context в host-е, exposed через shared module или React Context.",
+    "hintFull": "Host управляет auth: login, refresh-token, logout. Exposeит useAuth() hook через Module Federation. Remotes используют как обычный hook.",
+    "answer": "Auth обычно живёт в host-приложении и exposeится remotes. Стандартная схема: host реализует AuthProvider с current user, permissions, login/logout-методами. Через Module Federation или shared package exposeит useAuth() hook. Remotes импортируют и используют как обычный hook — не знают о деталях реализации auth. Shared singleton React Context критичен — иначе у remotes свой context, не подключённый к host-у. Refresh-token, logout-broadcast — host-уровень, потому что shell-нужен. Альтернатива — auth-server, и каждое приложение само ходит к нему; меньше связности, но больше логики дублируется."
+  },
+  "microfrontends-monorepo__17": {
+    "hintEasy": "Host владеет роутером, remotes регистрируют routes через slot или manifest.",
+    "hintFull": "Host имеет React Router. Remotes регистрируют свои routes (по path) при загрузке manifest-а. Внутри remote-а — sub-routes остатка.",
+    "answer": "Routing в microfrontends обычно multi-level. Top-level — host владеет основным роутером, отдаёт большие areas (/orders/*, /users/*). На каждый area — соответствующий remote, который рендерит внутри своего scope. Remote имеет свой sub-router для внутренней навигации. Регистрация routes — либо config-driven (host знает mapping path → remote), либо динамически через manifest, который remote загружает. URL-state шарится прозрачно: host-router и remote-router используют один и тот же history. Главное — единая модель URL, чтобы пользователь не запутался."
+  },
+  "microfrontends-monorepo__18": {
+    "hintEasy": "Error boundary вокруг каждого remote, при падении показать fallback.",
+    "hintFull": "<ErrorBoundary fallback={<RemoteUnavailable />}><RemoteApp /></ErrorBoundary>. Один remote упал — остальные работают, UX деградирует gracefully.",
+    "answer": "Изоляция через React Error Boundaries. Каждый remote оборачивается в свой error boundary в host-е. При падении — fallback UI «remote недоступен, попробуйте позже». Остальные remotes продолжают работать. Дополнительно — failed dynamic import (manifest unreachable, remote bundle 500): catch в Suspense с fallback. Логи об ошибке шлются в Sentry с тегами remote-id, version, чтобы команда remote-а знала о проблеме. Не давать одному падающему remote-у валить весь UX. Дополнительно — если remote критичен (auth, navigation), нужно более серьёзная стратегия (cache последней рабочей версии)."
+  },
+  "microfrontends-monorepo__19": {
+    "hintEasy": "Suspense с fallback + ErrorBoundary + retry.",
+    "hintFull": "Lazy-import remote-а в Suspense. Не загрузился — ErrorBoundary показывает 'service unavailable, retry'. Кнопка retry перезапускает import.",
+    "answer": "Когда remote не загрузился — несколько слоёв fallback. Lazy-import обёрнут в Suspense с loading-fallback (skeleton). ErrorBoundary вокруг ловит import-failures (manifest 500, bundle 404, network error). Fallback UI: «service unavailable, please try again later» с retry-кнопкой. Retry — дёргает re-mount, новый import-attempt. Для critical remote-ов (auth, navigation) — кеш последнего рабочего bundle в SW или localStorage, fallback на эту версию при недоступности нового. Telemetry — каждое падение шлётся в RUM с тегами remote-name, version, чтобы команда видела impact в продакшене."
+  },
+  "microfrontends-monorepo__20": {
+    "hintEasy": "Метрика 'remote load failure' в RUM — каждое падение телеметрия.",
+    "hintFull": "На каждое import-rejection шлём metric event: remote-name, version, error-type. Дашборд показывает failure-rate per remote. Алерт на спайк.",
+    "answer": "Стандартная RUM-метрика — remote load failure rate. Каждый dynamic import remote-а оборачивается в try-catch. При reject — отправляется telemetry event: remote-name, version, error-type (network, parse, exec), user-agent, route. Дашборд показывает breakdown по remote-ам и версиям, тренды по времени, корреляцию с deploy-ями. Alert на резкий рост — сигнал инфраструктурной проблемы (CDN-issue, manifest сломан, bad deploy). Для каждого remote команда видит health своего сервиса. Метрика часто связана с overall app health: если 30% юзеров не загружают конкретный remote — это серьёзный incident."
+  },
+  "microfrontends-monorepo__21": {
+    "hintEasy": "Manifest указывает на конкретную version-folder; rollback = переключить указатель.",
+    "hintFull": "Каждый release лежит в своей папке /v1.2.3/. Manifest указывает на текущую. Rollback — обновить manifest на предыдущую version. Мгновенно.",
+    "answer": "Rollback strategy для microfrontend строится на immutable releases. Каждый build лежит в своей папке /releases/v1.2.3/, никогда не перезаписывается. Manifest (remoteEntry.js или config.json) — единственная точка mutation, указывает на текущую версию. Rollback — обновить manifest на предыдущий v1.2.2, занимает секунды. Никаких redeploy host-а, кеш CDN-manifest-а инвалидируется быстро (short TTL). Auto-rollback на критичных метриках: error-rate > N%, latency > threshold — automated revert, пока команда дебажит. Это требует CI-дисциплины и monitoring-а, но даёт уверенность в release-ах."
+  },
+  "microfrontends-monorepo__22": {
+    "hintEasy": "Юнит-тесты внутри remote, e2e на host с реальным remote, contract testing на API между ними.",
+    "hintFull": "Unit/integration внутри remote изолированно. E2E на host со staging-remotes для realistic check. Contract tests фиксируют API между ними.",
+    "answer": "Тестирование federated modules в нескольких слоях. Внутри remote — обычные unit и integration tests, как для standalone-приложения. E2E — на host с реальным staging-remote, проверяет полный flow от UI до API. Contract testing — Pact или схожее: host описывает, какие компоненты ожидает с какими props; remote проверяет соответствие при build-е. CI команды remote-а прогоняет smoke host-а с новым bundle перед deploy — чтобы поймать регрессию интеграции. Тесты host-а с моками remote-ов — для быстрых проверок без подъёма всех инфраструктур."
+  },
+  "microfrontends-monorepo__23": {
+    "hintEasy": "Запустить host локально, remotes указать на staging-URL или локальные dev-server-ы.",
+    "hintFull": "Host config поддерживает env-переменные для remote URL. Локально — dev-server каждого нужного remote, host подключается к localhost:300X. Не нужно поднимать всё.",
+    "answer": "Local development — главная боль microfrontend архитектуры. Решение: host config поддерживает env-переменные REMOTES_URLS, можно указать каждый remote отдельно. Локально — поднимаешь host (npm run dev) и нужный remote-dev-server (npm run dev в его папке). Остальные remotes указываешь на staging-URL — они грузятся как в production, но без локальной разработки. Это позволяет работать с одним-двумя remote-ами одновременно, не поднимая всю систему. Configuration через .env.local: REMOTE_ORDERS=http://localhost:3001, REMOTE_USERS=https://staging.../users. Документировано в README, чтобы новые разработчики не путались."
+  },
+  "microfrontends-monorepo__24": {
+    "hintEasy": "Общий design system, design review гайды, automated visual regression.",
+    "hintFull": "Принудительный DS как зависимость. Design guidelines в Confluence. Visual regression на host-е с реальными remotes. Periodic audits — что используется в каждом mfe.",
+    "answer": "Consistent UX на microfrontend сложнее, чем кажется. Несколько техник. DS как hard dependency — все используют один package, lint-проверка на использование hardcoded стилей. Design guidelines в Confluence/Figma — пишут стандарты использования компонентов и паттернов. Visual regression на host с реальными remotes — Chromatic делает скриншоты intergated UI, ловит deviations. Periodic audits — automated scan кода каждого remote, отчёт о used components, deviation-ах. Cross-team design review — раз в спринт показывают другим командам свои изменения. И главное — owner DS-team, который постоянно поддерживает quality bar и тренирует команды."
+  },
+  "microfrontends-monorepo__25": {
+    "hintEasy": "Strangler — постепенно вытеснять SPA по фичам в новые microfrontends.",
+    "hintFull": "Host оборачивает старый SPA. По одной фиче выносится в remote. Старая часть уменьшается, в итоге уходит. Big-bang rewrite — анти-паттерн.",
+    "answer": "Strangler-pattern. Шаг 1: добавить host-приложение, которое оборачивает existing SPA целиком (как один большой remote). Шаг 2: выбрать одну фичу — например, settings — переписать в новый remote, host-роутер направляет /settings туда вместо старого SPA. Шаг 3: повторять для следующих фич. Старый SPA уменьшается с каждой итерацией, в итоге его можно удалить. Параллельно — выкидывание dead-кода, обновление зависимостей. Преимущества — минимальный риск, постоянная поставка фич, возможность откатиться. Big-bang переписывание SPA с нуля — анти-паттерн, занимает год+, замораживает фичи, часто проваливается."
+  },
+  "microfrontends-monorepo__26": {
+    "hintEasy": "Постепенно заменять старое новым, пока старое не «удушено» полностью.",
+    "hintFull": "Имя из метафоры fig vine, удушающего дерево. Новое окружает старое снаружи. По кускам мигрируешь функционал. Старое уменьшается до полного исчезновения.",
+    "answer": "Strangler-pattern (Мартин Фаулер) — это постепенная миграция, при которой новая система растёт вокруг старой и заменяет её по кускам. Метафора — fig-vine, удушающий дерево. На фронте — добавляешь новый стек (новый bundler, framework, microfrontend) рядом со старым. Новые фичи — в новом. Старые — мигрируют по очереди. Граница между двумя системами обычно через router (часть routes — на старом, часть — на новом), через iframe, или через runtime-композицию. В итоге старое уменьшается до нуля, можно удалить. Это противоположность big-bang rewrite — медленнее, но без рисков и без замораживания фич."
+  },
+  "microfrontends-monorepo__27": {
+    "hintEasy": "Только strangler, постепенная миграция. Big-bang почти всегда заканчивается катастрофой.",
+    "hintFull": "Big-bang: год переписывания, нет новых фич, рискованный switch. Чаще проваливается и возвращаются к старому. Strangler: новые фичи каждый месяц, риск минимизирован.",
+    "answer": "Big-bang rewrite — это переписывание с нуля параллельно с существующей системой, потом switch. На словах звучит хорошо, на практике почти всегда катастрофа. Год+ инженерных ресурсов, без новых фич — бизнес недоволен. Новая система не имеет всех corner-cases старой — багорегрессии. Switch-day — стресс, часто откат. Изначальная мотивация (плохой код) обычно остаётся, потому что переписывали те же люди с тем же контекстом. Альтернатива — strangler-pattern: постепенная замена. Новые фичи в новом стеке, старые мигрируют по куску. Может быть медленнее в начале, но риск управляем, бизнес продолжает получать value, и в любой момент можно остановиться без потерь."
+  },
+  "microfrontends-monorepo__28": {
+    "hintEasy": "Monorepo — один репо с несколькими пакетами. Microfrontends — несколько runtime-приложений.",
+    "hintFull": "Monorepo — про organization кода (один git, несколько packages). Microfrontends — про runtime-архитектуру (несколько deploy-able units). Можно совмещать.",
+    "answer": "Monorepo и microfrontends решают разные задачи. Monorepo — это организация кода: один git-репозиторий, несколько packages в workspaces (yarn, pnpm, nx). Все коммиты в одном месте, atomic-changes между packages, shared lint/test/build. Не имеет отношения к runtime. Microfrontends — это runtime-архитектура: несколько independently-deployable frontend-приложений, склеиваемых в один UX через Module Federation, iframe, или server composition. Можно сочетать: microfrontends в monorepo (популярная схема — один git, отдельные deploy-pipelines на каждый package). Можно отдельно: microfrontends в multi-repo, или monorepo для standalone-приложения."
+  },
+  "microfrontends-monorepo__29": {
+    "hintEasy": "Несколько связанных пакетов с общей tooling, atomic changes между ними.",
+    "hintFull": "Один git, общий lint/test/build, atomic PR через несколько пакетов. Полезен для DS + apps, monorepo backend+frontend, shared utility packages.",
+    "answer": "Monorepo полезен в нескольких сценариях. Несколько связанных приложений, разделяющих общий код — apps + design system + utilities. Atomic changes — один PR может изменить и shared package, и его потребителей, прогоняя tests на всех в одной CI. Shared tooling — один lint config, один test setup, один tsconfig base. Onboarding проще — новый разработчик клонит один репо, видит всё. Refactoring проще — переименование функции через все packages автоматизирован-codemod-ом. Минусы — длинные CI на больших monorepo (нужны affected builds), сложнее acl на куски кода. Стандартные tools — pnpm workspaces + Nx или Turborepo для CI optimization."
+  },
+  "microfrontends-monorepo__30": {
+    "hintEasy": "Длинные CI, сложно изолировать ownership, размер репо растёт, риск coupling.",
+    "hintFull": "Без affected-build-ов CI прогоняет всё. ACL на отдельные packages — сложно. Coupling через shared code — рассыпается, когда команды расходятся. Размер репо растёт.",
+    "answer": "Риски monorepo. CI-time — без affected-build-ов каждое изменение прогоняет тесты на всех packages, минуты превращаются в часы. Решение — Nx, Turborepo, Lerna с affected-graph. ACL — сложно дать команде доступ только к своему package; обычно это весь репо. Coupling — близость кода соблазняет шарить utility-функции, но потом один package меняется ради другого. Когда команды расходятся, decoupling сложнее, чем в multi-repo. Размер — checkout, клон, IDE-индексация замедляются на >100k файлов. И требует дисциплины — без правил кладут всё в shared/, monorepo превращается в monolith с git."
+  },
+  "microfrontends-monorepo__31": {
+    "hintEasy": "apps/ для приложений, packages/ для shared code, по слоям FSD-style.",
+    "hintFull": "apps/web, apps/admin — приложения. packages/ui — design system. packages/utils — утилиты. packages/api-client — общий API. И rule-of-thumb: 1 package = 1 ответственность.",
+    "answer": "Стандартная структура: apps/* для finished-приложений (web, admin, mobile), packages/* для shared библиотек (ui, utils, api-client, types). Внутри packages — каждый имеет одну ответственность: ui отвечает за компоненты, не за бизнес-логику. По слоям feature-sliced design можно разделить также: packages/entities, packages/features, packages/shared. apps депендят от packages, packages между собой строго иерархично (utils ← api-client ← features ← apps). Граф зависимостей чистый, без циклов. Tooling — pnpm workspaces + Nx/Turbo для tracking зависимостей и affected-builds. README в корне описывает структуру и owner-ов."
+  },
+  "microfrontends-monorepo__32": {
+    "hintEasy": "Один tsconfig base, общий ESLint, единая стратегия test setup.",
+    "hintFull": "tsconfig.base.json в корне, packages extend. ESLint config один на весь monorepo. Test setup в shared package или в config-package. Husky + lint-staged.",
+    "answer": "Shared conventions держат monorepo консистентным. tsconfig.base.json в корне — все packages его extend, добавляя только свои specifics. ESLint config один на весь monorepo (или один base + минимальные overrides). Prettier config глобальный. Test setup — общий в config-package или shared фикстуры. Build configs — общий tsup или vite-base, packages override только entry. Husky + lint-staged на pre-commit чистят код. CI-checks стандартные для всех packages. Это снижает cognitive load — новые packages не изобретают своего setup-а, а наследуют общий. Изменение convention — один PR в shared config, обновление всех packages."
+  },
+  "microfrontends-monorepo__33": {
+    "hintEasy": "Nx / Turbo / Lerna определяют, какие packages affected — прогоняется тесты только на них.",
+    "hintFull": "Nx graph знает зависимости. Изменил packages/ui — affected = ui + apps, использующие ui. CI прогоняет lint/test/build только на affected. От часов к минутам.",
+    "answer": "Affected builds — оптимизация CI для monorepo. Tooling (Nx, Turborepo, Lerna) строит граф зависимостей. На каждый PR смотрит, какие packages изменились, transitively вычисляет affected (изменил packages/ui — affected = ui + всё, что от ui зависит). Запускает lint/test/build только на affected. На большом monorepo это разница между «прогон 30 минут» и «прогон 3 минуты». Cache — успешные результаты для package-version-pair кешируются (Nx cloud, Turbo remote cache); если ничего в package не изменилось, тесты переиспользуются. Это критично для productivity — без affected-builds команда страдает от long CI."
+  },
+  "microfrontends-monorepo__34": {
+    "hintEasy": "Changesets — тулза для управления version-bump-ами и changelog в monorepo.",
+    "hintFull": "Каждый PR прикладывает changeset с описанием. На release — changesets bump-ит версии, генерит changelog, публикует в registry.",
+    "answer": "Changesets — стандарт для monorepo. На каждый изменяющий PR — changeset-файл: какой package меняется, тип bump-а (major/minor/patch), описание. На release-PR (или main-merge) tool обрабатывает все pending changesets: bump-ит версии в package.json, генерирует/обновляет CHANGELOG.md, делает один git tag. Дополнительно — публикация в npm registry (private или public), обновление peer-deps в потребителях. Альтернативы — Lerna versioning, Nx release. Главное — без manual version-management — это error-prone и забывается. Все mutations идут через автоматизацию."
+  },
+  "microfrontends-monorepo__35": {
+    "hintEasy": "Когда есть преимущества monorepo, но не нужна runtime-фрагментация.",
+    "hintFull": "Команды могут работать в одном monorepo с чёткими границами packages, но deploy — один application. Меньше runtime-сложности, чем microfrontends.",
+    "answer": "Modular monolith — это organisation кода как microfrontends-структуры (отдельные packages с чёткими границами), но deploy — один общий приложение. Подходит, когда нужна логическая декомпозиция, но не нужна runtime-фрагментация. Преимущества — простота deploy (один CI/CD, один artifact), нет version skew, нет network overhead, простая observability. Команды могут работать параллельно с lint-проверкой границ (no cross-feature imports). Это опимально для средних проектов: 10-30 разработчиков, single product. Microfrontends оправданы, когда команды реально хотят независимый deploy и принимают за это сложность."
+  }
+}

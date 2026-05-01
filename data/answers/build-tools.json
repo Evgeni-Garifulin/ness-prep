@@ -1,0 +1,152 @@
+{
+  "build-tools__1": {
+    "hintEasy": "Превращает кучу исходников и зависимостей в небольшой набор production-файлов.",
+    "hintFull": "Анализирует import-граф, разрешает зависимости, транспилит TS/JSX, минифицирует, делит на чанки, генерит source maps. На выходе — оптимизированные js/css/assets.",
+    "answer": "Bundler — инструмент, превращающий исходный код и зависимости в готовые к production файлы. Анализирует import-граф начиная с entry, разрешает npm-зависимости, транспилит TS/JSX через swc/esbuild/babel, прогоняет CSS через postcss, минифицирует, делит на чанки для code splitting, добавляет hash в имена для cache busting, генерирует source maps. На выходе — несколько JS/CSS-файлов и assets, которые загружает HTML. Без bundler-а пришлось бы вручную тянуть сотни модулей, тратить трафик на зависимости, не было бы tree-shaking. Современные — Vite, Webpack, Rspack, Turbopack, esbuild."
+  },
+  "build-tools__2": {
+    "hintEasy": "Vite — native ESM в dev (мгновенный старт), Webpack — bundler с самого начала.",
+    "hintFull": "Vite в dev отдаёт нативные модули браузеру через ESM, минимум обработки. Webpack бандлит всё. На production оба дают похожий output (Rollup или Webpack).",
+    "answer": "Главное отличие — dev-режим. Webpack бандлит весь граф зависимостей при каждом старте, на больших проектах это десятки секунд. Vite использует native ESM в браузере: модули отдаются по запросу, без bundling-а. Старт — почти мгновенный. Только third-party deps пре-бандлятся через esbuild один раз. На production оба строят оптимизированный bundle (Vite через Rollup). Дополнительно Vite даёт быстрый HMR, простой config, встроенная поддержка TS/JSX/CSS-modules. Webpack — более старый, более гибкий через loaders, лучший для legacy и сложных setup-ов. Современный выбор для нового проекта — Vite."
+  },
+  "build-tools__3": {
+    "hintEasy": "Поднимает HTTP-сервер, отдаёт исходники как ESM, transform на лету.",
+    "hintFull": "Браузер делает import → Vite перехватывает запрос, на лету транспилит TS/JSX в JS, отдаёт. Зависимости пре-бандлятся через esbuild один раз. HMR через WebSocket.",
+    "answer": "Vite dev server — это HTTP-сервер с on-demand-трансформацией. Браузер делает import('./App.tsx') — сервер перехватывает, прогоняет файл через esbuild (TS → JS, JSX → React.createElement), отдаёт как нативный ES-модуль. Никакого bundling-а, только конкретный файл. Зависимости из node_modules пре-бандлятся в один файл при первом старте через esbuild — иначе браузер делал бы тысячи запросов. HMR работает через WebSocket: файл изменился — Vite пересылает обновление, модуль hot-replace-ится. Это даёт мгновенный старт и почти-мгновенное обновление, независимо от размера проекта."
+  },
+  "build-tools__4": {
+    "hintEasy": "Стандартные ES-модули, понимаемые браузером — import/export через <script type='module'>.",
+    "hintFull": "Современные браузеры понимают ES-модули нативно. <script type='module' src='main.js'>. import 'foo' из main.js — браузер сам тянет foo, parse-ит, выполняет.",
+    "answer": "Native ESM — это поддержка ES-модулей в браузерах без bundler-а. Указываешь <script type='module' src='main.js'>, в main.js пишешь import './app.js' — браузер сам делает HTTP-запрос на app.js, parse-ит, выполняет. Поддерживается всеми современными браузерами (chrome 61+, safari 11+). Это база, на которой работает Vite dev server. На production native ESM не используется напрямую — слишком много мелких HTTP-запросов и нет tree-shaking. Но появляются edge-проекты (es-module-shims, importmaps) для прямого использования. И import maps позволяют разрешать пакеты без bundler-а."
+  },
+  "build-tools__5": {
+    "hintEasy": "Hot Module Replacement — обновление модулей в browser без перезагрузки страницы.",
+    "hintFull": "Изменил файл — bundler перекомпилирует только его, шлёт в браузер через WS, страница патчит модуль на лету. Сохраняет state приложения.",
+    "answer": "Hot Module Replacement — техника, при которой изменения кода применяются в работающем приложении без полной перезагрузки. Bundler следит за файлами, при изменении — перекомпилирует затронутые модули, через WebSocket посылает обновление в браузер. Браузер «вырезает» старый модуль, импортирует новый, продолжает выполнение. Главный плюс — сохранение state: ты не теряешь открытую модалку или заполненную форму при каждом сохранении. React Refresh специально интегрирован: меняешь компонент — он re-mounts, но state hooks сохраняется. Без HMR разработка большой формы превращается в «изменил-перезагрузил-восстановил state»."
+  },
+  "build-tools__6": {
+    "hintEasy": "Side-effects в коде, циркулярные зависимости, изменения вне React-компонентов.",
+    "hintFull": "Изменения не в компоненте (utility, store, side-effect) — full reload. Циркулярные импорты ломают граф. Изменения в config (env-vars) — full reload.",
+    "answer": "HMR работает не всегда. Side-effects на module-уровне (timer-ы, listener-ы, mutations глобальных переменных) — после patch-а старый side-effect остаётся, новый запускается, дублирование. Изменения вне React-компонентов (utility-функции, custom hooks, context-providers) — bundler делает full reload, чтобы не было неконсистентности. Циркулярные импорты ломают granular HMR. Изменения в config (env-vars, build-time константы) — обязательно full reload. И сложные state-управления (Redux store с middleware) могут терять state при HMR. Поэтому HMR — приятная оптимизация, но не магия — на сложные сценарии нужен подход «save state, restore on reload»."
+  },
+  "build-tools__7": {
+    "hintEasy": "Vite использует Rollup для production: bundling, minification, code splitting, tree shaking.",
+    "hintFull": "vite build вызывает Rollup. Rollup строит граф, делает tree-shaking, минифицирует через esbuild/terser, разделяет на chunks по dynamic imports, генерит source maps.",
+    "answer": "vite build делает production-сборку через Rollup. Rollup анализирует import-граф из entry, делает aggressive tree-shaking (сильнее Webpack-а на ESM-коде), минифицирует через esbuild или terser, разделяет на чанки по точкам dynamic import, добавляет hash в имена для cache busting, генерирует source maps. Output — index.html с правильными <script>/<link> тегами, JS/CSS chunks, assets с long-term-cache именами. Vite добавляет легаль-режим (через @vitejs/plugin-legacy) для ES5-фолбэка для старых браузеров. Build быстрый — обычно несколько секунд для среднего React-приложения, минуты для крупного."
+  },
+  "build-tools__8": {
+    "hintEasy": "Bundler, заточенный под ESM и tree shaking. Сильно лучше Webpack в production.",
+    "hintFull": "Rollup создан вокруг ES-модулей и pure functions. Делает aggressive tree shaking. Используется в Vite, Next.js, библиотеках (Vue, React внутренние tooling).",
+    "answer": "Rollup — bundler, ориентированный на ES-модули и tree shaking. В отличие от Webpack, который изначально создан вокруг CommonJS, Rollup анализирует ESM-граф и aggressively выкидывает неиспользуемый код. Именно поэтому Vite использует его для production-сборки. Также популярен для библиотек: одиночный output без runtime-overhead-а, поддержка нескольких форматов (esm, cjs, umd) одной командой. Внутри современных tooling-ов: Vite, esbuild plugins, библиотечные сборки (Vue, Svelte). Минусы — медленнее в dev (для этого Vite использует esbuild + native ESM), сложнее legacy-кейсы."
+  },
+  "build-tools__9": {
+    "hintEasy": "Сверхбыстрый JS/TS bundler и минификатор на Go. Используется внутри Vite/Next.",
+    "hintFull": "esbuild написан на Go, в 10-100 раз быстрее JS-альтернатив. Используется как dependency pre-bundler в Vite, как минификатор в Rollup, как standalone bundler.",
+    "answer": "esbuild — bundler и transformer на Go, известный сверхвысокой скоростью (10-100x быстрее JS-альтернатив). Bundling, transpilation TS/JSX, minification — всё через единый бинарник. Используется внутри множества tooling-ов: Vite (для pre-bundling deps и dev-transform), Next.js, Remix. Сам по себе как production bundler менее популярен, чем Rollup, потому что меньше plugin-экосистема и менее aggressive tree-shaking. Но для библиотечных сборок и маленьких apps — отличный выбор. Особенно полезен для CI: где Rollup-сборка занимает минуты, esbuild — секунды."
+  },
+  "build-tools__10": {
+    "hintEasy": "Удаление неиспользуемого кода из bundle при сборке.",
+    "hintFull": "Bundler анализирует import-граф, видит, что функция/класс не импортируется или не используется, выкидывает её из output. Работает только для ES-модулей.",
+    "answer": "Tree shaking — это техника удаления dead code на этапе сборки. Bundler анализирует ES-модульный граф, отслеживает, какие экспорты реально используются, и выкидывает остальные. Работает только на чистом ESM (CommonJS-модули не shake-ятся, потому что dynamic). Например, импортируешь { debounce } из lodash-es — в bundle попадает только debounce, не весь lodash. Эффективность зависит от того, как написан код: side-effects ломают, mutate глобальных объектов мешают. package.json должен иметь поле \"sideEffects\": false (или массив исключений), чтобы bundler знал, что модули pure. Самая дешёвая оптимизация bundle size."
+  },
+  "build-tools__11": {
+    "hintEasy": "Side-effects в импортах, CommonJS-зависимости, неправильные re-exports.",
+    "hintFull": "import './polyfill' имеет side-effect — не уберётся. CommonJS не shake-ится. Re-export через index.ts тянет всё, если sideEffects не помечены false.",
+    "answer": "Главные причины. Side-effects в модулях: import './polyfill' выполняется при загрузке, bundler не уберёт. CommonJS-пакет (require/module.exports) — не shake-ится, попадает целиком; решение — выбрать ESM-версию (lodash-es вместо lodash). Re-export через index.ts: import { x } from 'lib' тянет весь index.ts; sideEffects: false в package.json лечит. Класс или функция, на которую есть reference, но она реально не используется — bundler не может это доказать. Polyfills — обычно sideEffects по дизайну. Babel или TS-конфиг, преобразующий ESM в CommonJS — отрубает tree-shaking; нужно держать ESM до bundler-а."
+  },
+  "build-tools__12": {
+    "hintEasy": "Поле в package.json, которое говорит bundler-у, что в пакете нет side-effects.",
+    "hintFull": "\"sideEffects\": false → bundler уверен, что unused импорты можно выкинуть. \"sideEffects\": ['*.css'] — массив исключений (CSS имеет side-effect).",
+    "answer": "sideEffects в package.json — это hint для bundler-а: «можно агрессивно убирать unused imports из этого пакета». \"sideEffects\": false означает, что весь пакет pure, любой неиспользуемый экспорт можно выкинуть. Если есть исключения (например, CSS-импорты, polyfills) — массив паттернов: \"sideEffects\": [\"*.css\", \"./polyfill.ts\"]. Без этого поля bundler консервативно сохраняет всё, на всякий случай. Это критично для tree-shaking. Современные библиотеки (React 19, lodash-es, date-fns) ставят sideEffects: false. При публикации своей библиотеки тоже стоит ставить — даёт потребителям меньший bundle."
+  },
+  "build-tools__13": {
+    "hintEasy": "Разбиение bundle на несколько файлов, грузятся по требованию.",
+    "hintFull": "Динамический import('./module') = bundler создаёт отдельный chunk. Initial bundle меньше, остальное приходит lazy. Стандарт через React.lazy и dynamic routes.",
+    "answer": "Code splitting — техника разбиения bundle на несколько кусков, которые грузятся по требованию. В коде — динамический import('./module'), bundler автоматически создаёт отдельный chunk. Для React-компонентов — React.lazy(() => import('./Heavy')) в связке с Suspense. Вместо одного 2 МБ файла приходит 200 КБ initial и догружается остальное. Снижает initial load и time-to-interactive. Стратегии — splitting по routes (одна страница = один chunk), по фичам (модалка догрузится при открытии), по библиотекам (vendor chunk кешируется отдельно). Современные frameworks (Next.js, Remix) делают route-splitting автоматически."
+  },
+  "build-tools__14": {
+    "hintEasy": "import() как функция — возвращает Promise<Module>, грузит lazy.",
+    "hintFull": "const mod = await import('./feature'). Bundler создаёт отдельный chunk, при выполнении import() chunk скачивается через fetch и evaluate-ится.",
+    "answer": "Dynamic import — это import() как функция (а не statement). Возвращает Promise<Module>. const { Heavy } = await import('./heavy'). Bundler видит дин-import и автоматически создаёт отдельный chunk для импортируемого модуля. На runtime — chunk скачивается через fetch при первом вызове, evaluate-ится, возвращается. Используется для code splitting: lazy-load компонентов, условная загрузка библиотек, optional features. Поддерживается нативно браузерами, не требует tooling-а. Дополнительно — webpack magic comments для именования и prefetch (/* webpackPrefetch: true */), Vite имеет аналоги."
+  },
+  "build-tools__15": {
+    "hintEasy": "Выходной файл от bundler-а — кусок bundle, который грузится отдельно.",
+    "hintFull": "Bundler делит код на chunks по точкам splitting (entry, dynamic import, vendor). Каждый chunk — отдельный JS-файл с уникальным hash.",
+    "answer": "Chunk — это выходной файл от bundler-а, отдельный кусок bundle. Initial chunk грузится сразу при загрузке страницы. Async chunks — по dynamic import. Vendor chunk — выделенные node_modules (для long-term cache). Common chunk — код, разделяемый между несколькими entry. Каждый chunk имеет уникальный hash в имени (app.a1b2c3.js), чтобы при изменении содержимого менялось имя — браузер скачает новый, старый из кеша останется. Bundler автоматически разруливает — какой chunk загружать когда. На продакшен page-load обычно несколько chunks параллельно: index, vendor, react, css."
+  },
+  "build-tools__16": {
+    "hintEasy": "Через manualChunks (Rollup/Vite) или splitChunks (Webpack).",
+    "hintFull": "В Vite: build.rollupOptions.output.manualChunks = { vendor: ['react'], ui: ['@/components'] }. В Webpack: optimization.splitChunks с правилами.",
+    "answer": "Контроль chunk splitting через config bundler-а. В Vite (Rollup): build.rollupOptions.output.manualChunks — функция или объект, разделяющий модули по чанкам. Например, vendor chunk с react/react-dom, ui chunk с дизайн-системой, остальное — auto-split по dynamic imports. В Webpack: optimization.splitChunks с правилами по cacheGroups: vendors, common, async. Зачем — оптимизировать кеширование (vendor меняется редко, должен быть в отдельном chunk), параллельная загрузка (несколько файлов вместо одного огромного), распределение нагрузки. Не overdo — слишком много chunks даёт overhead на HTTP-запросы."
+  },
+  "build-tools__17": {
+    "hintEasy": "vite-bundle-analyzer / webpack-bundle-analyzer — treemap размеров.",
+    "hintFull": "Plugin для bundler-а строит treemap, где видно каждый пакет с размерами. Сразу видны монстры (moment, lodash full). Source-map-explorer — альтернатива на готовом bundle.",
+    "answer": "Базовый инструмент — bundle-analyzer (vite-bundle-analyzer для Vite, webpack-bundle-analyzer для Webpack). Plugin для bundler-а, после build-а открывает treemap-карту: видно все chunks, и каждый разбит на пакеты с размерами. Сразу выявляются монстры — moment с локалями, lodash целиком, дублирующиеся версии React. Альтернатива для готового build-а — source-map-explorer, работает на любом bundle с source maps. В IDE — плагин import-cost подписывает рядом с каждым импортом его вес. И bundlephobia.com — проверка пакета до установки. Без анализа оптимизация bundle — выстрел в темноту."
+  },
+  "build-tools__18": {
+    "hintEasy": "Файл, маппирующий минифицированный код в исходный — для дебага и error reporting.",
+    "hintFull": "После минификации код нечитаем. Source map (.map-файл) маппит каждую позицию в build-е на исходную позицию. DevTools показывают source, а не минифицированный код.",
+    "answer": "Source map — JSON-файл, маппирующий позиции в build-output на исходники. После минификации код типа 'a()=>b' не читаем — source map позволяет DevTools показать исходный TS/JSX. Ссылка в конце build-файла: //# sourceMappingURL=app.js.map. Также Sentry и подобные observability-tools используют source maps для расшифровки stack traces в production: вместо 'a.js:1:234' видно 'OrdersPage.tsx:42:15'. Без них debug в production почти невозможен. Bundler генерирует автоматически с настройками: inline (внутри файла), separate (отдельный .map), hidden (только пометка для tools, не для браузеров)."
+  },
+  "build-tools__19": {
+    "hintEasy": "Любой может скачать source map и получить readable исходники приложения.",
+    "hintFull": "Source map = читаемые исходники. Если выложить публично — раскрывает бизнес-логику, секретные API endpoints, любые комментарии. Лучше hidden + загрузка в Sentry.",
+    "answer": "Главный риск — раскрытие исходников. Если source map лежит публично рядом с минифицированным js, любой откроет его и получит вашу бизнес-логику, имена внутренних API, комментарии в коде, скрытые branches. Атакующему легче найти уязвимости, конкуренту — проанализировать реализацию. Решение — hidden source maps: в build-е нет //# sourceMappingURL комментария, .map-файлы не выкладываются на CDN. Загружаются только в Sentry/observability через CI: они расшифровывают traces server-side, клиент source maps не видит. Это стандарт для serious-приложений."
+  },
+  "build-tools__20": {
+    "hintEasy": "Hash в имени файла — изменился контент, изменилось имя, браузер скачает новое.",
+    "hintFull": "app.a1b2c3.js — hash от содержимого. При изменении файла hash меняется → new URL → cache miss → fresh download. Старый кеш не используется.",
+    "answer": "Cache busting — техника, при которой имя файла меняется при изменении содержимого, заставляя браузер скачать обновление вместо использования кеша. Bundler добавляет hash от содержимого в имя: app.a1b2c3d4.js. CDN/сервер настроен с long-term cache (max-age=1 год) для этих файлов. При изменении кода — новый hash → новое имя → браузер не находит в кеше → скачивает свежее. HTML обычно не cache-ится (или ETag), он содержит ссылки на актуальные имена. Это даёт два преимущества: aggressive cache (не делать revalidation для unchanged файлов) и instant invalidation (при изменении сразу видно новое)."
+  },
+  "build-tools__21": {
+    "hintEasy": "[name].[contenthash].[ext] — hash от содержимого в имени.",
+    "hintFull": "JS/CSS: app.[contenthash:8].js — 1 год Cache-Control max-age. HTML: без hash — short Cache-Control + ETag, всегда актуальный.",
+    "answer": "Стандартное соглашение. JS/CSS-файлы имеют hash от content-а в имени: app.a1b2c3d4.js, vendor.e5f6g7h8.js. CDN отдаёт с Cache-Control: public, max-age=31536000 (1 год), immutable. Браузер кеширует aggressive — для одного и того же URL никогда не делает revalidation. HTML — без hash, имя постоянное (index.html), Cache-Control: no-cache или max-age=0 — всегда revalidate через ETag. Когда меняется код, HTML обновляется (новые ссылки), JS/CSS приходят как новые URL, старые остаются в кеше пользователей до eviction. Это идеальная схема — instant updates без проблем кеша."
+  },
+  "build-tools__22": {
+    "hintEasy": "Замена тяжёлых на легкие, отказ от ненужных, lazy-load, проверка дублей.",
+    "hintFull": "moment → date-fns/dayjs. lodash → lodash-es или нативный JS. axios на маленьком проекте → fetch. Проверять дубли версий через npm ls.",
+    "answer": "Несколько направлений. Замена тяжёлых: moment → date-fns или dayjs (10x меньше). lodash full → lodash-es с tree-shaking, или ES2022-нативный JS. axios на маленьком проекте → fetch. Удаление ненужного: проверять usage анализатором, удалять неиспользуемые. Lazy-load — большие, но редко-используемые либы (markdown editor, chart library) грузить динамически. Проверка дублей — npm ls показывает, нет ли двух версий одного пакета (часто из-за peer deps). Регулярные аудиты с bundle-analyzer, performance budget в CI чтобы не разрасталось со временем."
+  },
+  "build-tools__23": {
+    "hintEasy": "Включать только нужные через browserslist или target-config.",
+    "hintFull": "browserslist в package.json описывает поддерживаемые браузеры. Bundler/Babel/postcss добавляют только нужные polyfills. Для React → core-js + browserslist.",
+    "answer": "Polyfills — это код, реализующий новые API на старых браузерах. Стандартный подход — browserslist в package.json: 'last 2 versions, not dead'. Bundler/Babel/postcss читают это и добавляют только нужные polyfills для целевых браузеров. core-js — основной набор для JS-API (Promise, Array.from, Map). @vitejs/plugin-legacy — legacy-сборка для совсем старых. Не использовать @babel/polyfill (deprecated, тяжёлый), не импортировать вручную polyfill-ы — пусть build-tool решает. Для современных браузеров polyfills почти не нужны (всё нативно). Если поддержка старых не требуется — отказаться вообще, экономия bundle."
+  },
+  "build-tools__24": {
+    "hintEasy": "@vitejs/plugin-legacy или Babel preset-env с broad target.",
+    "hintFull": "Build генерит две версии — modern (es2020+) и legacy (ES5 + polyfills). HTML использует <script type='module'> для modern и <script nomodule> для legacy.",
+    "answer": "Поддержка legacy браузеров (IE11, старые Safari) делается через двойную сборку. @vitejs/plugin-legacy создаёт две версии — modern (ES2020+, без polyfills, для современных браузеров) и legacy (ES5 + core-js + dynamic imports polyfill). HTML содержит <script type='module' src='modern.js'> и <script nomodule src='legacy.js'> — браузер выбирает то, что понимает. В Webpack — через несколько entry с разными targets. Цена — bundle растёт в 2x, дополнительный CI-time. Перед включением legacy — проверить usage analytics: возможно, поддержка не нужна, и можно от них отказаться."
+  },
+  "build-tools__25": {
+    "hintEasy": "Префикс наподобие VITE_/NEXT_PUBLIC_ для публичных, .env.{environment} для разделения.",
+    "hintFull": "В коде доступ через import.meta.env (Vite) или process.env (Webpack). Только публичные через специальные префиксы. Разделение через .env.development / .env.production.",
+    "answer": "Стандартная схема. .env-файлы для каждого окружения: .env.development, .env.production, .env.test. В коде доступ через import.meta.env.VITE_API_URL (Vite) или process.env.NEXT_PUBLIC_API_URL (Next). Только переменные с публичным префиксом (VITE_, NEXT_PUBLIC_) попадают в frontend bundle. Остальные доступны только server-side (на API-routes, getServerSideProps). .env.local — для локальных секретов разработчика, в gitignore. Production env-vars устанавливаются на хостинге (Vercel, AWS), не в файле. Build-time константы заменяются bundler-ом инлайном — никаких runtime-чтений. Для runtime config — отдельный JSON, грузится при старте."
+  },
+  "build-tools__26": {
+    "hintEasy": "API-keys приватных сервисов, secrets, internal endpoints, debug-flags.",
+    "hintFull": "Frontend bundle открыт всем. Никаких API-keys внешних сервисов, AWS-creds, signing-keys. Только публичные конфиги (URL, public-IDs, feature flags).",
+    "answer": "Frontend bundle полностью открыт пользователю — он виден в DevTools, view-source, downloadable. Поэтому в нём не должно быть никаких секретов: API-keys приватных сервисов (Stripe secret key, Sendgrid), AWS-credentials, encryption keys, internal admin endpoints, debug-flags. Использовать только переменные с публичным префиксом (VITE_, NEXT_PUBLIC_). Серверные секреты — только в server-only коде или API-routes. Если случайно засветили — ротация ключа обязательна, потому что bundle уже залит на CDN. Помогают аудиты — gitleaks для предотвращения коммита, bundle-analyzer проверяет, что не попало лишнее."
+  },
+  "build-tools__27": {
+    "hintEasy": "Один build, разные runtime-config-ы для каждого environment.",
+    "hintFull": "Build once → артефакт. Config для dev/staging/prod подменяется при deploy через env-vars или config.json, который грузится при старте.",
+    "answer": "Best practice — build once, deploy many. Один общий build-артефакт для всех окружений; различия (URL API, feature flags) — runtime-config. Реализация: config.json с placeholders, при deploy подменяется на актуальный. Или env-vars читаются server-side в Next.js. Не делать build-per-environment: тогда staging != production, ловить баги дольше, нет confidence в release. Public env-переменные, которые меняются между средами (VITE_API_URL) — берутся из runtime-config, не из build-time. Это требует дисциплины: ничего environment-specific не вставлять в bundle инлайном."
+  },
+  "build-tools__28": {
+    "hintEasy": "Один codebase, разные tokens/themes/configs на build по бренду.",
+    "hintFull": "Multi-tenant build: BRAND env-var выбирает theme.json, brand.config, custom компоненты. Один CI-pipeline собирает несколько брендированных артефактов.",
+    "answer": "White-label UI — это один codebase, генерящий несколько брендированных приложений. Стандартный подход: BRAND env-var (например, BRAND=acme), build читает соответствующий config (themes/acme.json, configs/acme.ts), CSS-переменные подменяются под бренд, иконки/логотипы — отдельные assets. Optionally — brand-specific overrides компонентов через alias. CI-pipeline собирает несколько артефактов параллельно, каждый деплоится на свой домен. Architecturally — большая часть кода shared, brand-specific лежит в отдельных папках. Tests запускаются с проверкой каждого бренда. Дороже обычного, но дешевле fork-codebase per-brand."
+  },
+  "build-tools__29": {
+    "hintEasy": "Внутренний npm-package или workspace, bundler-friendly с чёткой entry.",
+    "hintFull": "Package с package.json (main, module, types). ESM + CJS + d.ts. peerDeps для React. sideEffects: false. Workspaces для monorepo.",
+    "answer": "Shared UI package — это библиотека компонентов, которую используют несколько приложений. Структура: package.json с main (CJS), module (ESM), types (d.ts), exports field для современных bundler-ов. Сборка — Rollup или tsup, генерирует ESM + CJS + types. peerDependencies для React (не bundle, потребитель приносит сам). sideEffects: false для tree-shaking. Storybook рядом для разработки и документирования. В monorepo — workspace package с локальной линковкой; в multi-repo — публикуется в private npm-registry. Версионирование через changesets. CSS — лучше CSS-in-JS или CSS-modules, не глобальный, чтобы избежать конфликтов."
+  },
+  "build-tools__30": {
+    "hintEasy": "Lockfile, single version policy, peer-dependencies, dedupe-команда.",
+    "hintFull": "package-lock.json фиксирует версии. peerDeps вместо deps в shared-package-ах. npm dedupe / pnpm dedupe удаляет дубли. resolutions/overrides форсируют единую версию.",
+    "answer": "Дубли зависимостей — частая проблема, раздувающая bundle. Лечение в нескольких слоях. Lockfile (package-lock.json, pnpm-lock.yaml) — обязателен, фиксирует версии. peerDependencies в shared-package-ах вместо dependencies — потребитель приносит React, лишняя версия не подтягивается. dedupe-команды (npm dedupe, pnpm dedupe) — слипают совместимые версии. resolutions (yarn) или overrides (npm) — форсируют единую версию для конкретного пакета. Регулярные аудиты — npm ls react показывает все версии React в дереве. И monorepo (pnpm workspaces) сам по себе help-ит через hoisted node_modules."
+  }
+}

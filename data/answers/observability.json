@@ -1,0 +1,152 @@
+{
+  "observability__1": {
+    "hintEasy": "Логи, метрики и трейсы со стороны клиента — Sentry, Datadog RUM, Web Vitals.",
+    "hintFull": "Видимость того, что происходит в браузере у реальных юзеров: ошибки, performance, business-метрики. RUM-инструменты + custom telemetry.",
+    "answer": "Frontend observability — это сбор телеметрии с реальных пользователей: errors, performance-метрики, business-events, traces. Стандартные tools: Sentry/Bugsnag для errors, Datadog RUM/SpeedCurve для performance, custom analytics для business. Метрики Web Vitals (LCP, INP, CLS) — must-have. Дашборды показывают health приложения: error-rate per session, p75 INP, conversion-rates. Алерты на критичные изменения. Без observability команда узнаёт о проблемах от support, не от мониторинга — это часы или дни задержки. С observability — минуты от incident до alert."
+  },
+  "observability__2": {
+    "hintEasy": "Logs — что произошло. Metrics — сколько и насколько часто. Traces — как событие шло через систему.",
+    "hintFull": "Logs: текст-события (user clicked, error occurred). Metrics: числовые value-time series (req_count, p99). Traces: связанная цепочка spans (request → DB → cache → response).",
+    "answer": "Три pillar-а observability. Logs — текстовые события: 'user X clicked button', 'API call failed with 500'. Хороши для debug и audit, но дороги для агрегации. Metrics — числовые time-series: количество requests, p95 latency, error-rate. Дешёвые для агрегации и алертов. Traces — цепочки связанных spans: один request пошёл из фронта в backend, в DB, в cache, обратно. Показывают всю trajectory и где время теряется. На фронте они смешаны: error в Sentry — это log; INP — это metric; correlation_id связывает frontend-event с backend-trace. Полная observability использует все три."
+  },
+  "observability__3": {
+    "hintEasy": "Web Vitals, error-rate, API-fail-rate, route-load, business conversions.",
+    "hintFull": "Web Vitals (LCP/INP/CLS), JS-errors per session, API-error-rate per endpoint, route-load-time, bundle-load-success, conversion-rates на ключевых flow.",
+    "answer": "Базовый набор для frontend. Web Vitals — LCP, INP, CLS, FCP по 75-перцентилю. Errors — JS-errors per session, error-types breakdown, growth rate. Network — API-error-rate per endpoint, slow-request percentage, retry-rate. Routing — page-load time per route, hydration time. Bundle — load-success-rate, time-to-interactive. Business — conversion rates на ключевых сценариях (signup, login, checkout). Custom — domain-specific (для trading-UI: WebSocket reconnect rate, stale-data ratio, latency tick → render). Все разрезаны по country, device, browser, app version — для root-cause analysis."
+  },
+  "observability__4": {
+    "hintEasy": "Conversion на ключевых flow, drop-off в funnel, time-to-action.",
+    "hintFull": "Signup conversion, checkout success rate, time-to-first-action, drop-off rate в funnel-ах. Бизнес видит impact frontend-инцидентов.",
+    "answer": "Business metrics критичны для понимания impact-а технических проблем. Conversion rates на ключевых flow: signup-completion, checkout-success, first-deposit. Drop-off rate в funnels — где юзеры теряются. Time-to-first-action — насколько быстро юзер делает то, ради чего пришёл. Session-length и returning-rate. Для fintech — order-completion, withdrawal-success. Эти метрики связываются с performance: видно, что при p95 INP > 300ms падает conversion на 5%. Это даёт business-обоснование для performance-инвестиций. Без бизнес-метрик performance-improvements выглядят как technical-vanity, не как ROI."
+  },
+  "observability__5": {
+    "hintEasy": "LCP, INP, CLS — обязательны. Дополнительно FCP, TTFB.",
+    "hintFull": "LCP (загрузка), INP (отзывчивость), CLS (стабильность). Бонус — FCP (первая отрисовка), TTFB (бэк), TTI (interactive).",
+    "answer": "Core Web Vitals — три обязательных. LCP (Largest Contentful Paint) — за сколько отрисовался самый большой видимый блок, цель < 2.5с у 75% юзеров. INP (Interaction to Next Paint) — задержка между взаимодействием и реакцией UI, < 200мс. CLS (Cumulative Layout Shift) — насколько UI прыгает, < 0.1. Эти попадают в Google ranking и Lighthouse. Дополнительно — FCP (First Contentful Paint) — первая отрисовка, для perceived speed. TTFB (Time to First Byte) — server-response, для разделения backend-frontend проблем. TTI (Time to Interactive) — когда страница реально интерактивна. Library web-vitals.js собирает их."
+  },
+  "observability__6": {
+    "hintEasy": "Sentry / Bugsnag через global error handler.",
+    "hintFull": "Sentry SDK ловит uncaught errors, unhandled promise rejections, React error boundaries. Отправляет в backend с stack trace и breadcrumbs.",
+    "answer": "Стандартный инструмент — Sentry (или Bugsnag, Rollbar). На init установка: Sentry.init({dsn, environment, release}). SDK автоматически ловит uncaught errors через window.onerror, unhandled promise rejections через onunhandledrejection. Для React — Sentry.ErrorBoundary как wrapper, который ловит rendering errors и шлёт в Sentry с component stack. Каждый event содержит: error message, stack trace, breadcrumbs (последние actions: navigation, clicks, network), user context, browser/OS, app version. Source maps загружены в Sentry — stack-trace расшифровывается до исходных файлов. Frontend errors попадают в дашборд автоматически."
+  },
+  "observability__7": {
+    "hintEasy": "Sentry автоматически группирует по stack trace и error message.",
+    "hintFull": "Sentry fingerprinting: похожие errors склеиваются в одну issue. Можно настроить custom fingerprinting через beforeSend.",
+    "answer": "Sentry автоматически группирует errors по фингерпринту — комбинации stack trace и message. Похожие errors (например, 'Cannot read property X of undefined' с одного и того же места кода) склеиваются в одну issue с counter, не засоряют дашборд. Для разных типов errors при том же сообщении — fingerprinting можно кастомизировать через beforeSend hook: добавить контекст (URL, user-action), и Sentry начнёт группировать иначе. Для случаев, где default grouping слишком aggressive (или наоборот) — explicit fingerprinting в beforeSend. Хорошее grouping — критично, без него команда видит 1000 events вместо 5 issues."
+  },
+  "observability__8": {
+    "hintEasy": "BeforeSend hook чистит email, phone, токены из payload.",
+    "hintFull": "Sentry beforeSend — функция, через которую проходят все события. Чистим request body, headers, breadcrumbs, локальные переменные.",
+    "answer": "Sentry, Datadog и подобные предоставляют beforeSend hook — функцию, через которую проходит каждое событие перед отправкой. В ней scrubbим: пароли из form-полей в breadcrumbs, email/phone в request body, sensitive query params, банковские номера. Дополнительно — server-side data scrubbing rules в самой Sentry: regex-ы по маске email, credit cards, tokens. Лучше двойная защита: клиент чистит, сервер сверху. Регулярные аудиты sample-events — открыть случайные события и проверить, что чувствительных данных нет. Особенно важно для fintech, где утечка PII = крупный штраф (GDPR, CCPA). И не отключай SDK breadcrumbs полностью — это потеря context для debug."
+  },
+  "observability__9": {
+    "hintEasy": "Axios/fetch interceptor шлёт telemetry на каждый failed request.",
+    "hintFull": "Response interceptor: на 4xx/5xx → отправить event в Sentry/Datadog с endpoint, status, duration, request-id. Group-by по endpoint.",
+    "answer": "API failures отслеживаются через interceptor. На каждом failed response (4xx, 5xx, network error) шлётся telemetry-event с метаданными: endpoint, HTTP status, duration, response-id, user-agent, retry-count. Sentry группирует по endpoint+status. Дашборд показывает error-rate per endpoint, breakdown по status-codes, p99 latency. Алерт на резкий рост 5xx — обычно backend incident. Алерт на 4xx без рост 5xx — frontend bug (плохой payload, неправильный URL). Correlation-id из X-Request-ID-header связывает frontend-error с backend-trace для full picture. Это превращает 'API сломался' в actionable incident."
+  },
+  "observability__10": {
+    "hintEasy": "Performance API + send time в RUM на каждом route-change.",
+    "hintFull": "On route change — start timer. После first paint of new route — send latency. Group by route. Видно, какие страницы лагают.",
+    "answer": "Route-level latency — сколько занимает переход между страницами. Реализация: в router-handler для navigation — старт timer; на first paint новой страницы (через PerformanceObserver на 'paint') — send duration. Группировка по route-pattern (не по конкретному URL — иначе тысячи разных и шум). Дашборд показывает p75 latency per route. Видно: /dashboard загружается 3 секунды, /settings — 200мс, problem-route очевиден. Регрессия после deploy на конкретный route — focus для investigation. Для Next.js / React Router — events встроены, нужно только подцепить telemetry. Бизнес-перевод — slow routes снижают engagement."
+  },
+  "observability__11": {
+    "hintEasy": "Каждый reconnect шлёт metric event с reason. Дашборд показывает rate.",
+    "hintFull": "В WebSocket-handler на reconnect-event: отправить telemetry. RUM агрегирует: reconnects per session, reasons breakdown, alerts на спайки.",
+    "answer": "Reconnect rate — критичная метрика для real-time UI. На каждый reconnect клиент шлёт telemetry-event с метаданными: reason (close-code, network change, heartbeat fail), duration of session, attempt number, geography. Дашборд показывает reconnects per session по перцентилям, breakdown по причинам, тренды. Алерт на резкий рост — сигнал инфраструктурной проблемы (LB-rolling, CDN-issue, DNS) или клиентского бага (плохой backoff). Дополнительно — distribution времени до первого успешного connect-а после reconnect. Если оно растёт, что-то деградирует. Для trading-UI это критично — пользователь без актуальных цен может потерять деньги."
+  },
+  "observability__12": {
+    "hintEasy": "% сессии, когда last-update старше threshold-а — staleness ratio.",
+    "hintFull": "Каждые N секунд проверяем lastMessageTimestamp. Если > threshold (5с) — фиксируем stale-tick. Доля stale-time за сессию.",
+    "answer": "Stale data rate — насколько часто пользователи видят устаревшие данные. Метрика: на клиенте раз в N секунд проверяем разницу между now и lastMessageTimestamp; если больше threshold-а (например, 5 секунд для биржи), считаем эту секунду stale. В конце сессии шлём долю stale-времени в RUM. Дашборд — staleness ratio по перцентилям, разбивка по странам/сетям/символам, корреляция с reconnect-rate. Алерт на спайк — часто это первый сигнал, что инфра тормозит, ещё до того, как пользователи начнут жаловаться. Связана с reconnect-rate, но независима: стрим может молчать без формального дисконнекта."
+  },
+  "observability__13": {
+    "hintEasy": "PerformanceObserver на 'longtask' → send в RUM с длительностью и attribution.",
+    "hintFull": "longtask = JS > 50мс блокирует main thread. Observer ловит, шлёт в RUM. Атрибуция показывает виновника.",
+    "answer": "Long tasks — JS-исполнение > 50мс — основной враг отзывчивого UI. Tracking: PerformanceObserver({entryTypes:['longtask']}) ловит каждое такое событие, шлёт в RUM с длительностью, timestamp, attribution (если доступно — script source). Дашборд показывает rate (long tasks per session), p95 длительности, breakdown по route. Корреляция с INP — обычно много long tasks = плохой INP. Алерт на резкий рост — деградация после deploy. Для replay-debugging — если RUM tool записывает session (LogRocket, FullStory), можно посмотреть, что юзер делал в момент long task. Современный API — Long Animation Frames (LoAF) — точнее long task, учитывает layout/paint."
+  },
+  "observability__14": {
+    "hintEasy": "Performance Profiler в DevTools + benchmark в CI на ключевые сценарии.",
+    "hintFull": "RUM-метрики (LCP, INP, render-time) после deploy сравнить с baseline. Алерт при регрессии. Bundle-size budget в CI.",
+    "answer": "Render regression — это деградация performance после деплоя. Tracking в нескольких слоях. RUM показывает Web Vitals и custom-таймеры до и после deploy с release annotation; явно видно ухудшение по перцентилям. CI — Lighthouse runs на ключевых страницах с threshold-ами; fail при регрессии. Bundle-size budget — увеличение размера часто коррелирует с slow-down. Performance Profiler в DevTools — для глубокого debug-а конкретной просадки. Sentry Performance — interactions and pageloads с traces. Алерт при регрессии — Datadog/Grafana по custom RUM metrics. Для catch на dev-stage — perf-tests как часть PR review."
+  },
+  "observability__15": {
+    "hintEasy": "Bundle-analyzer в CI + threshold с алертом на превышение.",
+    "hintFull": "Plugin генерит bundle-stats. CI сравнивает с baseline (main branch). Превысил threshold — fail PR. Не дать тяжёлой зависимости проникнуть.",
+    "answer": "Bundle regression — рост размера bundle между builds. Tracking: на каждом build в CI генерируется bundle-stats (через webpack-bundle-analyzer, Vite plugin), сравнивается с baseline (предыдущий main-build). Различие — plus/minus в bytes per chunk. Превышение threshold-а — fail PR. Tools: size-limit, bundlesize, statoscope. Comment в PR с diff: 'main.js: +45KB, vendor.js: +0KB' — разработчик видит свой impact. Без этого bundle растёт тихо: каждый PR +10КБ, через год страница тормозит. Для serious-projects — публичный dashboard истории bundle size, тренды. Performance budget в CI — обязательная часть delivery."
+  },
+  "observability__16": {
+    "hintEasy": "Correlation-id из request: фронт генерит UUID, шлёт в header, сервер логирует с этим id.",
+    "hintFull": "Frontend генерит trace-id перед запросом, шлёт через X-Request-ID или traceparent header. Backend пишет в логи с этим id. В Sentry — клик ведёт в backend-trace.",
+    "answer": "Correlation между frontend и backend через trace-id. Frontend перед запросом генерирует UUID, шлёт через X-Request-ID или W3C traceparent header. Backend логирует с этим id, ставит в каждый log-message в trace. В Sentry frontend-event имеет request-id; click — переход в backend-trace в Datadog/Honeycomb с этим id. Для distributed tracing (OpenTelemetry) — frontend регистрирует span, бэк продолжает в том же trace. Это даёт unified view: пользователь увидел error на фронте → клик → видишь, что произошло в backend (DB-query 5 секунд). Дешевле без OTel — просто X-Request-ID в headers и dashboard-link по нему."
+  },
+  "observability__17": {
+    "hintEasy": "Когда нужен distributed tracing с backend для сложных flow.",
+    "hintFull": "OTel в браузере добавляет вес и сложность. Использовать когда есть зрелая backend OTel-инфра и реальная необходимость trace через всю систему.",
+    "answer": "OpenTelemetry в браузере оправдан, когда. Зрелая backend OTel-инфраструктура (Jaeger, Tempo, Honeycomb) — без неё трейсы не имеют смысла. Сложные flow с несколькими backend-сервисами — пользователь жмёт submit, в итоге 5 микросервисов отрабатывают; trace показывает весь путь. Performance investigation — где именно тормозит (frontend, network, конкретный backend-service). Сложные ошибки, требующие full context. Минусы — overhead bundle (OTel SDK ~50КБ+), runtime cost на span-creation, sampling-сложности. Для большинства приложений достаточно X-Request-ID + RUM, OTel — для крупных enterprise-систем."
+  },
+  "observability__18": {
+    "hintEasy": "Bundle-overhead, runtime cost, leak PII в spans, complexity.",
+    "hintFull": "OTel SDK +50KB. Каждый span — runtime work. Spans могут содержать PII (URL params, error messages). Sampling сложно настроить правильно.",
+    "answer": "Client-side tracing несёт риски. Bundle-overhead — OTel SDK +50КБ к initial load, заметно влияет на performance-критичные приложения. Runtime cost — создание span-а на каждый user-action, network-call дополнительно нагружает main thread. PII leak — span-ы автоматически собирают URL (с query params), error-messages, headers; легко включить sensitive data. Sampling — без правильной стратегии либо дорого (100% events), либо теряешь rare-events (1% sample). Setup complexity — конфигурация OTel collector, propagation, processor-ов сложнее, чем простой Sentry. И не каждый backend готов принимать client-spans. Альтернативы для большинства задач — RUM + correlation-id."
+  },
+  "observability__19": {
+    "hintEasy": "100% errors, X% обычных events, head-based или tail-based sampling.",
+    "hintFull": "Errors — всегда 100%, нельзя пропускать. Performance — sample 10-50% юзеров. Traces — tail-based (sample важные после факта), head-based (random при start).",
+    "answer": "Sampling нужен, чтобы не разориться на хранении, но видеть важное. Стратегии. Errors — 100%, ни один не пропускаем. Web Vitals и performance-метрики — обычно 100%, потому что объём приемлемый. Custom events — sample (10-50% юзеров) если объём огромный. Traces — head-based (random при start, простое) или tail-based (записать всё, sample retention по правилам — например, оставить slow и errored traces, остальные drop). Для serious систем — adaptive sampling: больше keep при низком трафике, меньше при пике. Sampling rate настраивается per-service. Главное — не sample errors и critical events, иначе теряешь incident-сигнал."
+  },
+  "observability__20": {
+    "hintEasy": "Health (errors, vitals) + Performance (latency, render) + Business (conversion).",
+    "hintFull": "Top-level: error-rate, p75 INP, conversion-rate. Drill-down: per-route, per-browser, per-version. Release annotations. Alerts связаны с дашбордом.",
+    "answer": "Дашборд для frontend-модуля строится в нескольких уровнях. Top-level — общий health: error-rate per session, p75 LCP/INP/CLS, conversion-rate на ключевых flow. Drill-down — per-route latency, per-browser/device breakdown, per-version (для catching регрессий). Network-section — API-error-rate per endpoint, slow-request percentage. Real-time секция (для applicable) — WS-reconnect-rate, stale-data-ratio. Release annotations — vertical lines на всех графиках для visual correlation. Alerts видны на дашборде с link на runbook. Структура — от top-level до конкретной просадки за 2-3 клика. Регулярный review: команда смотрит дашборд раз в спринт."
+  },
+  "observability__21": {
+    "hintEasy": "Critical: error-spike, performance regression, deploy-related issues.",
+    "hintFull": "Error-rate > N%, p75 INP > threshold, конверсия упала, bundle-load-fail. Не на каждый чих — иначе alert fatigue.",
+    "answer": "Frontend alerts должны быть actionable. Critical (page on-call): error-rate > 5% от baseline (резкий спайк), critical-conversion-rate упала более N%, key endpoint failure-rate > 50%, bundle-load-fail-rate > 5%. Warning (notify, not page): performance-regression (p75 INP вырос), stale-data-rate растёт, reconnect-rate растёт. Не на каждый чих — alert fatigue делает алерты бесполезными. Каждый alert — runbook: что делать, кому эскалировать. Auto-rollback на critical alerts (если архитектура позволяет). Cooldown между алертами по той же проблеме (не 100 пингов за минуту)."
+  },
+  "observability__22": {
+    "hintEasy": "Сравнить frontend-error-rate, network-error-rate, backend-incident-status.",
+    "hintFull": "Frontend bug = ошибки в JS-коде, не привязаны к API. Backend incident = network-errors на API + backend-status алерт. Sentry vs API-failure-dashboard.",
+    "answer": "Различие критично — фиксы разные. Frontend bug: JS-errors в Sentry с кодом из bundle, не зависят от backend. Specific эндпоинты не фейлятся, web-vitals в норме. Backend incident: network-errors на API (4xx, 5xx, timeout) на dashboard, frontend errors могут расти как secondary (от пустых ответов). Backend status-page показывает incident. Sequence: проверь Sentry — есть JS-stack? Если да и стек указывает на frontend-код — frontend bug. Если errors — это API-failures без JS-stack — backend. Корреляция release-time помогает: если frontend deploy недавний и errors в его коде — frontend regression. Если incident начался без deploy — backend."
+  },
+  "observability__23": {
+    "hintEasy": "Hypothesis → проверить в данных → fix → validate. Postmortem после.",
+    "hintFull": "Гипотеза о причине. Проверка в Sentry/RUM/logs. Fix или mitigation. Validation, что работает. Постмортем без blame.",
+    "answer": "Структурированный incident debugging. Шаг 1 — confirm impact: дашборды, RUM, support-tickets, насколько широко поражены. Шаг 2 — hypothesize: что недавно менялось (recent deploy, config change, dependency update); смотри release-annotations. Шаг 3 — verify: ищи в Sentry, RUM, logs, traces подтверждение или опровержение гипотезы. Шаг 4 — mitigation: rollback, kill-switch flag, или fix-forward. Шаг 5 — validate: метрики восстановились. Шаг 6 — postmortem: timeline, root-cause, action-items, без blame. Документировать в incident-channel и runbook. Learning — обновляются monitoring/alerts, чтобы следующий раз поймать раньше."
+  },
+  "observability__24": {
+    "hintEasy": "Сравни perfance-метрики до/после deploy, найди соответствующее изменение в коде.",
+    "hintFull": "RUM показывает регрессию post-deploy. Bisect через bundle-analyzer (что изменилось в bundle), Profiler на конкретный slow component. Чинить код или config.",
+    "answer": "Performance regression investigation. Шаг 1 — confirm на RUM: какая метрика регрессировала (LCP, INP, конкретный route), на сколько, в каких условиях (browser, device). Шаг 2 — correlate с deploy: release annotation показывает временную привязку. Шаг 3 — analyze diff: что изменилось между good и bad release-ами в bundle, dependencies, code. Bundle-analyzer показывает size growth. Шаг 4 — reproduce: загрузить bad-version локально, запустить Performance Profiler, найти slow-component. Шаг 5 — fix: оптимизация (memo, lazy-load, smaller deps) или revert. Шаг 6 — validate: после deploy RUM показывает восстановление."
+  },
+  "observability__25": {
+    "hintEasy": "Sentry показывает new errors после release. Group-by → найти источник.",
+    "hintFull": "Sentry sortирует errors по first-seen — новые после release видны сразу. Stack trace ведёт к коду. Bisect между good/bad release.",
+    "answer": "Investigation роста ошибок после релиза. Шаг 1 — Sentry с фильтром по release: new errors, появившиеся в этой версии. Шаг 2 — sort by frequency: топ-3-5 проблем. Шаг 3 — на каждую — stack trace ведёт к строке в коде, breadcrumbs показывают что юзер делал перед. Шаг 4 — reproduce: с теми же шагами в dev; если не воспроизводится — environment-specific (специфический browser, slow network, конкретный user-data). Шаг 5 — fix-forward или rollback (если impact высокий). Шаг 6 — Sentry release health metric — error-rate per session должен вернуться к baseline. Регулярный triage: новые errors не накапливаются."
+  },
+  "observability__26": {
+    "hintEasy": "Error-rate, Web Vitals, conversion-rates, comparison с pre-deploy baseline.",
+    "hintFull": "Pre-deploy snapshot метрик. Post-deploy 30-60 минут active monitoring. Сравнение по перцентилям. Алерты на резкие изменения.",
+    "answer": "Стандартный набор post-rollout. Error-rate: JS-errors per session, новые errors с release-tag, error-fingerprint diversity. Web Vitals: LCP/INP/CLS по перцентилям. Network: API-error-rate per endpoint, slow-request-rate. Conversion-rates на ключевых сценариях — главный business-индикатор. Bundle-load-success-rate. Custom-метрики, специфические для домена (для trading-UI: orders-per-second, latency tick → render). Comparison: pre-deploy 30-минутный snapshot vs post-deploy. Алерты на изменения > N% от baseline. Window — 30-60 минут active watch, потом 24 часа slow-burning issues. Release-channel в Slack с update-ами."
+  },
+  "observability__27": {
+    "hintEasy": "Связать perfomance-метрики с conversion и engagement.",
+    "hintFull": "Сегментировать пользователей по performance (быстрая vs медленная LCP) — сравнить conversion и engagement. Видно ROI оптимизаций.",
+    "answer": "UX-impact измеряется через корреляцию performance-метрик с business-результатами. Сегментация: пользователи с LCP < 2с vs > 4с; смотрим difference в conversion-rate, session-length, returning-rate. Обычно медленный LCP = меньше conversion на 5-15%. Это даёт ROI argument для оптимизаций: 'улучшение LCP с 4с до 2с = +N сделок в месяц'. Аналогично для INP, CLS. Также — A/B-tests перед-после рефакторинга. Tools — Datadog RUM, SpeedCurve, Looker — позволяют join-ить performance и business-метрики на user-level. Без этих метрик performance-инвестиции выглядят как technical-vanity, не как ROI."
+  },
+  "observability__28": {
+    "hintEasy": "Tag каждого telemetry-event с активным flag-name.",
+    "hintFull": "Когда юзер видит вариант, telemetry помечается тегом. Можно сравнить error-rate, conversion для разных вариантов в реальном времени.",
+    "answer": "Связь observability и feature flags позволяет видеть impact каждого варианта в реальном времени. Реализация: при загрузке flag-a у юзера — он добавляется в SDK-tags Sentry/Datadog. Каждый telemetry-event помечается активными flag-вариантами. Дашборд может разрезать метрики по flag — видно, что вариант A имеет conversion 5%, B — 7%. Errors разделены: вариант A — 2% session, B — 0.5% session. Это даёт data-driven decision-making: rollout продолжать или откатить. Для A/B tests — анализ statistical significance перед full rollout. Без такой связи feature-flags = «верить, что новая фича лучше», observability = «проверять»."
+  },
+  "observability__29": {
+    "hintEasy": "Vertical line на дашбордах при каждом deploy с release-info.",
+    "hintFull": "CI после deploy шлёт annotation в Datadog/Grafana с release-tag, commits, environment. Annotation видна как линия на всех графиках.",
+    "answer": "Release annotations — это маркеры на дашбордах, показывающие, когда был деплой. CI после успешного deploy шлёт annotation в Datadog/Grafana через API: timestamp, release-tag, commits, environment, deployer. Annotation отображается как vertical line на всех графиках с tooltip-ом. Это визуально связывает changes в метриках с deploys. При investigating spike: line показывает «deploy был 10 минут назад» — сразу гипотеза. Без annotations команда сравнивает metrics-time с git-log, дольше и ошибочнее. Implementation — обычно 5-10 строк CI-script-а после deploy. Стандартная практика для serious release process."
+  },
+  "observability__30": {
+    "hintEasy": "Чек: новая фича генерит relevant метрики, дашборд и алерты.",
+    "hintFull": "Каждый PR review проверяет: telemetry на key actions, error-handling logged, dashboard updated, алерт на новый critical metric. Без этого — merge не allowed.",
+    "answer": "Observability в code review — это организационное правило. PR review checklist включает: новая фича генерит соответствующий telemetry (events, errors, custom metrics); создан или обновлён dashboard; алерты на критичные метрики настроены; error-paths корректно обрабатывают и логируют (не silent fail); user-facing errors имеют actionable message; PII scrubbing работает. Это меняет культуру — observability часть разработки, не «потом добавим». Для критичных фич — post-deploy monitoring window прописан в release-plan. И снижает MTTR для incidents в новых фичах с часов до минут — observability готов с первого дня."
+  }
+}

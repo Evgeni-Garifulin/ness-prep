@@ -1,0 +1,152 @@
+{
+  "system-design__1": {
+    "hintEasy": "WebSocket-стрим, нормализованный store, виртуализация, render-bypass, observability.",
+    "hintFull": "Ingest (WS + парсер) → store (Map по symbol) → подписки селекторами → виртуализация. Render-bypass для high-freq. Reconnect, snapshot+delta, stale-detection.",
+    "answer": "Архитектура trading dashboard: один WebSocket-канал к gateway, ingest-слой парсит сообщения и кладёт в нормализованный store (Map<symbol, latestQuote>). Виджеты подписаны на свои slice-ы через селекторы (Zustand или useSyncExternalStore). Высокочастотные ячейки (price-cells) обновляются через render-bypass — ref на DOM-узел, прямой write в textContent, без React-render. Виртуализация для market-watch и order-book. Reconnect с exponential backoff + snapshot/delta-protocol для consistency после разрыва. Stale-detection алертит, если ticks не приходят. Observability — reconnect-rate, stale-ratio, INP под нагрузкой. Auth и refresh-token через HttpOnly cookie."
+  },
+  "system-design__2": {
+    "hintEasy": "Виртуализированный список инструментов с push-апдейтами и flash-эффектом.",
+    "hintFull": "Подписка на видимые символы. Memoized row-компонент. Селектор по конкретному symbol-у. Виртуализация. CSS-flash на изменение цены.",
+    "answer": "Market Watch — список инструментов с last price, change %, volume. Подписка на сервере по видимым символам, не на всё подряд (server-side filtering). Store — Map<symbol, quote>, нормализованный. Каждая строка — memo-компонент, подписан только на свой символ через селектор useStore(s => s.quotes[symbol]). Виртуализация для тысяч символов через react-virtual. Flash-эффект на изменение цены — CSS-анимация через короткий className-toggle, без перерендера React-дерева. Reorder через transform/translate, не через перестановку DOM. При потере связи — продолжаем показывать LKV с stale-индикатором."
+  },
+  "system-design__3": {
+    "hintEasy": "Виртуализированная таблица с per-row подписками. Render-bypass для PnL.",
+    "hintFull": "TanStack Table headless + virtualizer. Selectors per-row. Tick-driven PnL — через ref+textContent без React. Sort/filter — server-side для больших объёмов.",
+    "answer": "Positions Table с real-time updates. Headless table (TanStack Table) для логики sorting/filtering, своя вёрстка на DS-стилях. Виртуализация — react-virtual; рендерится только видимая часть. Каждая строка memo, селектор по position-id для изоляции рендеров. PnL — высокочастотное поле, обновляется через render-bypass: ref на ячейку, прямой write при tick. Sort/filter серверные для больших позиций. Изменения подсветить flash-эффектом через CSS, не перерендером. Total в footer — selector-агрегация по visible positions, useDeferredValue для тяжёлой суммы. Stale-state — если позиция давно не обновлялась, видимый индикатор."
+  },
+  "system-design__4": {
+    "hintEasy": "Snapshot + delta, Map<price, size>, виртуализация глубины, render-bypass на size.",
+    "hintFull": "Snapshot топ-N уровней при подписке. Дельты увеличивают/уменьшают/удаляют уровни. Виртуализация для глубокой книги. Render-bypass для high-freq apply.",
+    "answer": "Order Book UI — двусторонний список уровней цены (bid/ask). При подписке сервер шлёт snapshot (топ 20-50 уровней) с lastSeq. Дальше delta-сообщения с seq+1, +2... Клиент держит Map<price, size>, обновляет на дельте. Gap detection — если seq порвался, перезапрашиваем snapshot. UI: видимые уровни через ref+textContent (render-bypass) для tick-rate апдейтов. Глубокая книга (1000+ уровней) — виртуализация. Spread, mid-price — derived, считаются раз в N мс. Visual encoding: bar-длина пропорциональна size, цвет по side. Aggregation по price-step для удобства. Stable sort через CSS-grid с position по price."
+  },
+  "system-design__5": {
+    "hintEasy": "Push через WS + REST для unread-list. Bell с counter, virtualized list, mark-as-read.",
+    "hintFull": "Сервер хранит unread. Push через WS на онлайн-клиента. Pull-API при reconnect/первом mount. Bell с counter, lazy-load list, mark-as-read mutation.",
+    "answer": "Notification center — push + pull combination. Сервер хранит unread-список persistently. WS-канал push-ит новые notification-ы на онлайн-клиента. На mount или reconnect — REST-pull списка чтобы догнать пропущенное. UI: иконка bell в header с unread-counter, dropdown или drawer с lazy-load-ом. Каждое notification — id, type, title, body, timestamp, read-status. Mark-as-read mutation, optimistic update. Group-by по типу или сущности для удобства чтения. Дедупликация по id (push после reconnect не показывает дважды). Burst-handling — batch-push с агрегацией при глобальных событиях. Permissions — некоторые типы только для определённых ролей."
+  },
+  "system-design__6": {
+    "hintEasy": "Host-shell + Module Federation remotes. Auth, navigation, DS — shared.",
+    "hintFull": "Host владеет layout, auth, routing. Каждый отдел — свой remote (HR, finance, ops). DS как shared package. CI/CD на каждый remote.",
+    "answer": "Employee portal как microfrontend platform. Host-shell — общий layout (header, sidebar, footer), navigation, auth-context, routing top-level. Каждый отдел — свой remote (HR, finance, ops, IT) с независимым deploy и командой. Module Federation для runtime-композиции. Shared singleton dependencies: React, ReactDOM, дизайн-система, auth-context. Top-level routes (/hr, /finance) делегируются соответствующим remote-ам. Внутри remote — свой sub-router. Error boundaries вокруг каждого — изоляция. Telemetry per-remote. Ownership: каждый отдел владеет своим remote end-to-end. Migration с monolith через strangler-pattern."
+  },
+  "system-design__7": {
+    "hintEasy": "Tokens + headless primitives + composed components + Storybook + governance.",
+    "hintFull": "JSON tokens → CSS-vars. Radix headless как фундамент. Composed components в DS-package. Storybook + Chromatic. Changesets для версии. Governance: owner-team, intake process.",
+    "answer": "Дизайн-система для нескольких команд. Tokens — JSON в shared, генерация в CSS-переменные через style-dictionary. Headless primitives — Radix UI или react-aria для логики (Modal, Dialog, Combobox, Tabs). Composed components — наши компоненты на стилях DS, опубликованы в DS-package. Storybook с MDX-документацией, Chromatic для visual regression. Changesets для версии. Governance: dedicated DS-team, intake process для новых компонентов (RFC), regular office hours, beta-канал для major changes. Telemetry — usage компонентов в реальных приложениях, чтобы знать что используется. CI-checks на consumer-проекты, чтобы major bump не сломал."
+  },
+  "system-design__8": {
+    "hintEasy": "RUM + error tracking + custom metrics + dashboards + alerts.",
+    "hintFull": "Sentry/Datadog для errors. web-vitals для performance. Custom telemetry для domain. Дашборд per-product. Alerts с runbook.",
+    "answer": "Frontend observability platform — несколько слоёв. Errors — Sentry или Bugsnag, intergated с release-tagging и source maps. Performance — web-vitals.js + Datadog RUM или SpeedCurve, отправка в timing-warehouse. Custom telemetry — domain events (для trading: latency tick→render, reconnect-rate, stale-ratio). API — interceptor шлёт failed-requests с метаданными. Дашборды per-product team, release annotations на всех графиках. Alerts на критичные метрики с runbook ссылкой. Correlation-id для frontend↔backend. PII scrubbing в beforeSend. Architecture: SDK на клиенте → telemetry-endpoint → time-series DB → dashboard. Sampling для high-volume events."
+  },
+  "system-design__9": {
+    "hintEasy": "Multi-stage gates, canary, feature flags, observability, fast rollback.",
+    "hintFull": "PR-pipeline с full quality gates. Staging → smoke. Canary 5%→25%→100% с monitoring. Feature flags для kill-switch. GitOps для rollback в минуты. Compliance review.",
+    "answer": "High-risk fintech UI release pipeline. PR — все quality gates (TS, lint, unit, integration, build, bundle-size, security-audit, a11y) обязательны. Merge — auto-deploy на staging + smoke-suite. Production — manual approval gate, canary release: 5% трафика → monitoring 30 мин → 25% → 50% → 100%. На каждом stage — auto-rollback при degradation метрик (error-rate, conversion, p95 latency). Feature flags для kill-switch в случае late-discovered проблем. GitOps (Argo CD) для immutable releases с быстрым rollback. Compliance review для regulated changes (KYC, AML). Post-deploy monitoring 24 часа. Postmortem для любого significant incident."
+  },
+  "system-design__10": {
+    "hintEasy": "Permissions с user, hook useCan, серверная проверка обязательна.",
+    "hintFull": "При логине — user + permissions. Auth-store. useCan('action') hook. <Can> component. Server-side проверка для каждого action. CASL для сложных правил.",
+    "answer": "Frontend auth/permissions model. Auth — JWT access-token в memory (Zustand-store), refresh-token в HttpOnly cookie. Refresh-flow при 401. Permissions — массив actions, грузится с user при login (auth/me endpoint). В store: { user, permissions: ['order.view', 'order.delete', ...] }. Hook useCan('order.delete') возвращает boolean. Component <Can action='order.delete'>{...}</Can> для declarative-показа UI. Route-guards в Next.js middleware или React Router loaders — редирект на /login или /403. Сервер обязательно проверяет каждое action — фронт только для UX. Для сложных правил (по полю, по контексту) — CASL библиотека."
+  },
+  "system-design__11": {
+    "hintEasy": "Tenant-id из URL/subdomain в каждом запросе. Theming per tenant. Data-isolation на сервере.",
+    "hintFull": "tenant.app.com или /tenant/.../ Frontend читает tenant-id, шлёт в headers. Backend изолирует данные. CSS-tokens переключаются по tenant. Auth scope — per tenant.",
+    "answer": "Multi-tenant frontend. Tenant identification — субдомен (tenant.app.com), path (/tenant/...), или header. Frontend читает tenant-id при init, ставит в каждый API-запрос (X-Tenant-Id). Backend проверяет, что user принадлежит tenant-у, изолирует data. Theming — CSS-tokens per tenant (через data-attribute на html), config.json грузится с tenant-specific brand info. Auth scope — pre-tenant (юзер в tenant A не имеет доступа к tenant B). Logging tagged by tenant для observability. Edge cases: switch tenant, cross-tenant features (admin), tenant-scoped feature flags. White-label — каждый tenant может иметь brand-specific лого/цвета."
+  },
+  "system-design__12": {
+    "hintEasy": "Provider грузит флаги при старте, hook useFlag, kill-switch live update.",
+    "hintFull": "FlagProvider в корне. SDK грузит при init, кеш в memory. useFlag('checkout-v2') hook. Live-update через WS или polling. SaaS (LaunchDarkly) или own.",
+    "answer": "Feature flag system. FlagProvider в корне приложения, использует SDK (LaunchDarkly, GrowthBook, Unleash, или собственный). При init — fetch flags для current user (с targeting по userId, country, plan). Кеш в memory, optionally persist в localStorage для оффлайна. Hook useFlag('checkout-v2') возвращает boolean или variant. Component <Feature flag='x' fallback={<Old />}><New /></Feature>. Live-update для kill-switch — WS-push или periodic polling (каждые 30-60 секунд). Targeting — % rollout, user-segments, country-targeting. A/B test integration с analytics. SDK поддерживает offline-mode (defaults). Telemetry — какой % users получает каждый variant."
+  },
+  "system-design__13": {
+    "hintEasy": "Service Worker + Cache API + IndexedDB + manifest.json.",
+    "hintFull": "SW кеширует assets и API-responses. IndexedDB для big data. Background sync для offline-mutation. Manifest для install. UX — offline-indicators.",
+    "answer": "Offline-capable PWA. Service Worker регистрируется при первой загрузке. Strategy: cache-first для assets (с update в фоне), network-first для API с fallback на cache, stale-while-revalidate для часто-меняющихся данных. IndexedDB для большого objem-а данных (история сообщений, объекты). Background Sync API — мутации, начатые offline, отправляются при возвращении сети. Manifest.json — название, иконки, start_url, display mode для install-on-home-screen. UX — индикатор online/offline, банер 'changes will sync when back', очередь pending-mutations с retry. SW-update flow с user-prompt 'reload to update'. Edge-cases: token-expiration offline, conflict-resolution для concurrent edits."
+  },
+  "system-design__14": {
+    "hintEasy": "Server-side sort/filter/paginate. Виртуализация. Cursor-pagination. Lazy-load.",
+    "hintFull": "Server делает heavy lifting. TanStack Table headless. Виртуализация. Cursor-pagination для скрол-инфинити или offset для page-numbers.",
+    "answer": "Large data table. Server-side обязательно — sort/filter/paginate на бэке, не вытаскивать всё в JS. TanStack Table headless для логики sorting/filtering/state. Виртуализация (react-virtual) для рендера только видимой части. Cursor-pagination для скрол-инфинити (стабильный при insert-е), offset для классической paginate-с-кнопками. Каждая строка memo. Sticky-header через CSS. Сложные filter-ы — modal или sidebar с form. Search — debounced + server-side с full-text. Server-export для большого датасета (CSV-download через streaming). Performance budget — INP < 200ms даже на 10k visible. A11y — proper aria-rowcount, sortable th с aria-sort."
+  },
+  "system-design__15": {
+    "hintEasy": "Layout grid (drag-resize), widgets как plugin-компоненты, persist layout per-user.",
+    "hintFull": "react-grid-layout или dnd-kit. Каждый widget — pluggable component с config. Persist layout в БД per-user. Виджеты — independent data-fetch.",
+    "answer": "Dashboard builder. Layout — react-grid-layout или dnd-kit для drag/resize/reorder. Каждый widget — pluggable component с config (type, query, display-options). Registry виджетов: chart, table, metric-card, custom. Add-widget через modal с library. Layout persist в БД per-user. Виджеты независимы — каждый делает свой data-fetch (React Query) и обрабатывает свои loading/error/empty. Параллельные запросы. Edit-mode vs view-mode. Permissions: какие widgets доступны какой роли. Sharing dashboard — read-only link. Export — PNG snapshot или PDF. Performance — каждый widget memoized, refresh-rate настраиваемый. Storybook stories для каждого типа widget-а."
+  },
+  "system-design__16": {
+    "hintEasy": "Schema-driven engine рендерит fields по описанию. Validation через zod.",
+    "hintFull": "JSON-schema → render fields. RHF + zod для валидации. Plugin-fields. Conditional logic. Multi-step. Persistence draft.",
+    "answer": "Form engine. Schema — JSON-описание полей с типом, label, validation, conditional logic. Renderer пробегает schema и рендерит соответствующие компоненты (text, select, date, fileupload, group). Field-types pluggable — можно добавить custom. Validation через zod, генерируется из схемы или прикладывается. RHF для state-management — изолированные перерендеры. Conditional logic: 'if country == US, show state-field' — implementation через watch + dynamic visibility. Multi-step с persist draft. Server-rendered field-options (например, list of countries). Submission через configured mutation. Used cases: KYC-формы, surveys, configurable workflows. Edge-cases: dynamic arrays (useFieldArray), nested objects, file uploads с progress."
+  },
+  "system-design__17": {
+    "hintEasy": "Strangler-pattern: новое окружает старое, мигрируешь по фичам.",
+    "hintFull": "Старый SPA как один большой 'remote' под new shell. По одной фиче выносим в новый стек. Параллельные системы, постепенно старое уменьшается.",
+    "answer": "Migration с legacy SPA. Шаг 1 — добавить shell-приложение в новом стеке (Next.js, Vite). Старый SPA встраивается как iframe или один большой remote. Shell имеет общую navigation, auth. Шаг 2 — выбрать одну изолированную фичу (например, settings), переписать в новом стеке как новый remote или route. Shell-роутер направляет /settings туда вместо старого. Шаг 3 — повторять для следующих фич, по одной за раз, всегда с rollback-возможностью через flag. Параллельно — переход на новый DS, новые tooling. Через 12-18 месяцев старый SPA уменьшается до нуля. Никаких big-bang rewrite-ов — riskuet год работы без feature delivery."
+  },
+  "system-design__18": {
+    "hintEasy": "По slice-ам: server state — в React Query, client state остаётся в Redux пока не нужен.",
+    "hintFull": "Идентифицировать server-state в Redux. По одному slice мигрировать на React Query. Client-state (UI-state) оставить в Redux или мигрировать в Zustand/Context.",
+    "answer": "Migration с Redux на React Query + local state. Шаг 1 — audit current Redux usage, разделить на server-state (приходит с API, кешируется) и client-state (UI-state, локальные tab-ы, форма). Шаг 2 — мигрировать server-state по slice-у: ordersSlice → useOrdersQuery с React Query. Старый код уведомляется (deprecation warning), новые компоненты используют hook. Шаг 3 — постепенно удалять server-state из Redux. Шаг 4 — client-state можно оставить в Redux или мигрировать в Zustand/Context (часто проще). Это занимает месяцы, но без feature-freeze. Tools: codemod для миграции конкретного slice-а. Tests на каждом этапе."
+  },
+  "system-design__19": {
+    "hintEasy": "Allow JS, постепенно конвертить файлы, strict mode по частям.",
+    "hintFull": "tsconfig allowJs+checkJs. Конвертация по файлам, начиная с low-risk leaf-modules. strict-mode переключается флагами по одному (noImplicitAny, strictNullChecks).",
+    "answer": "Migration JS → TS. Шаг 1 — tsconfig с allowJs: true, checkJs: false. .js остаются работать, .ts добавляются постепенно. Шаг 2 — конвертация файла за файлом, начиная с leaf-modules (utility, types). Сначала .js → .ts с минимальными типами и any-marker-ами. Шаг 3 — постепенно убирать any, добавлять real-types. Шаг 4 — включить strict-flags по одному: noImplicitAny → strictNullChecks → strictFunctionTypes. Каждый flag — отдельный milestone, потенциально месяцы для большого codebase. Tools: ts-migrate (Airbnb) автоматизирует базовые трансформации. Tests должны зелёные на каждом этапе. Не делать big-bang — затянется и block-нет delivery."
+  },
+  "system-design__20": {
+    "hintEasy": "Запустить параллельно, мигрировать по chunk-ам, переключиться когда стабильно.",
+    "hintFull": "Vite-config рядом с Webpack. Запустить оба, сравнить outputs. Постепенно migrate features, проверять. Когда parity — switch dev/prod.",
+    "answer": "Migration Webpack → Vite. Шаг 1 — vite.config.ts рядом с webpack.config.js. Запускать оба параллельно. Vite в dev-mode, Webpack для prod. Сравнить outputs (bundle-size, structure). Шаг 2 — поправить incompatibilities — Vite по-другому handles некоторые loaders, env-vars (import.meta.env vs process.env). Использовать @vitejs/plugin-legacy для legacy-browser. Шаг 3 — переключить dev на Vite (instant feedback motivation для команды). Prod пока на Webpack. Шаг 4 — переключить prod на Vite после thorough testing. Webpack удалить. Tests на каждом этапе. Build-выход должен быть идентичным или лучше. CI-pipeline мониторит regressions."
+  },
+  "system-design__21": {
+    "hintEasy": "Strangler: shell сверху, выносить фичи в remote по очереди.",
+    "hintFull": "Shell-host → старый monolith как один remote. Постепенно отрезать куски в новые remotes. CI/CD на каждый. DS-package shared. Auth в shell.",
+    "answer": "Migration monolith → microfrontends. Шаг 1 — host-shell приложение, монолит встраивается как один большой remote через Module Federation. Shell владеет общим navigation, auth, layout. Шаг 2 — выбрать первый отдел/фичу (например, HR), создать отдельный remote, перенести соответствующие routes. Shell-роутер делегирует /hr туда вместо монолита. Independent CI/CD для нового remote. Шаг 3 — повторить для следующих фич по одной. Каждый extracted remote — собственная команда с ownership. Параллельно — DS как shared package для consistency. Auth-context в shell, exposed через shared module. Через 12-18 месяцев monolith уменьшается до нуля."
+  },
+  "system-design__22": {
+    "hintEasy": "Workspaces, чёткая иерархия, peer deps, changesets, affected-build.",
+    "hintFull": "pnpm workspaces. Hierarchy: shared/utils → shared/ui → entities → features → apps. peer deps для React в shared. Changesets. Nx/Turbo для affected-build.",
+    "answer": "Shared package strategy в monorepo. Tooling — pnpm workspaces или yarn workspaces. Hierarchy строгая, no cycles: shared/utils (most generic) → shared/ui (DS) → entities/* (domain models) → features/* → apps/*. Все зависимости направлены вверх. peer-dependencies для React в shared (потребитель приносит). Каждый package имеет свой package.json, build-config, tests. CI с Nx/Turbo для affected-builds — изменил один package, прогоняется только он + dependents. Versioning через changesets. Documentation в README каждого package. Lint-rules forbidding cross-feature imports. Onboarding-doc описывает где что лежит."
+  },
+  "system-design__23": {
+    "hintEasy": "Многоуровневые error boundaries + global handler + observability.",
+    "hintFull": "Boundaries на router, widget, critical components. Global window.onerror для uncaught. Sentry SDK. Graceful degradation — кусок упал, остальное живёт.",
+    "answer": "Frontend error handling strategy. Multi-level Error Boundaries: глобальная (root, fallback на «что-то пошло не так»), на каждом route, на критичных widgets. Global handler — window.onerror и unhandledrejection для uncaught errors. Sentry SDK ловит всё, отправляет с context (release, user, breadcrumbs). API-errors — typed ApiError в interceptor, user-friendly messages в toast. Graceful degradation — упавший виджет не валит страницу, упавшая network не валит UI с cache. Critical errors (payment failed) — обязательное модальное окно, не toast. Retry-mechanism там, где уместно. PII scrubbing в Sentry beforeSend. Runbook on-call для типичных error-pattern-ов."
+  },
+  "system-design__24": {
+    "hintEasy": "React Query с разными staleTime, HTTP-cache, browser cache, CDN.",
+    "hintFull": "Слои: HTTP-cache (Cache-Control), React Query (memory), service worker (Cache API для offline), localStorage для persistent. Каждый со своими invalidation rules.",
+    "answer": "Frontend caching strategy в нескольких слоях. HTTP-cache — Cache-Control headers от сервера, ETag для conditional requests; CDN-edge кеширует static. React Query (memory cache) — кеш по queryKey с настроенным staleTime per-query (короткий для критичных, длинный для редко-меняющихся). На invalidate — refetch. Service Worker — Cache API для offline (assets + critical API responses). LocalStorage — для user-preferences и draft-форм. Каждый слой со своими invalidation rules: HTTP cache по time, React Query по mutation events, SW по version. Strategy per-data-type: real-time → no cache, semi-static → 5 min, static → 24h."
+  },
+  "system-design__25": {
+    "hintEasy": "i18n-библиотека, namespace по фичам, lazy-load локалей, CMS source.",
+    "hintFull": "react-i18next или lingui. Namespace по фичам. Lazy-load локалей по требованию. Source — английский, переводы в Crowdin/Lokalise.",
+    "answer": "i18n architecture. Library — react-i18next или lingui. Ключи именуются по namespace: checkout.confirmButton.label. Языковые файлы лежат в /locales/<lang>/<namespace>.json и грузятся по требованию (per-page lazy-load). ICU-формат для plurals, gender, interpolation — переводчики могут корректно работать с числами и переменными. Source of truth — английский (или базовый язык), переводы поступают из CMS вроде Crowdin/Lokalise. Даты и числа — через Intl, не руками. RTL — продумывается с этапа CSS (logical properties, dir-aware иконки). SEO — отдельные URL per language (/en, /fr). Detect language по browser-settings + cookie."
+  },
+  "system-design__26": {
+    "hintEasy": "Bucket по userId хешем, разные variants, метрика per-variant, statistical analysis.",
+    "hintFull": "Hash userId → bucket. Frontend получает variant. Каждый telemetry event тегирован variant-ом. Дашборд показывает conversion per variant. Stop test когда significant.",
+    "answer": "A/B testing architecture. Bucketing — hash(userId) % 100 → bucket; стабильно для одного пользователя. Frontend получает variant через flag-service (LaunchDarkly, GrowthBook) или собственный endpoint. Variant передаётся как prop в компонент или через flag-context. Каждый telemetry event помечен variant-ом. Dashboard показывает conversion-rate per variant с confidence-intervals. Statistical-tools (Bayesian или frequentist) определяют significance. Минимальная sample size — pre-calculated. Stop test при значимом результате или после достаточного volume. Edge cases: cross-device user (sticky bucketing), interaction между tests (orthogonal design), guardrail metrics (не ухудшать другое)."
+  },
+  "system-design__27": {
+    "hintEasy": "Type-safe events, schema-validation, batch отправка, fallback queue.",
+    "hintFull": "TS-types для каждого event. Zod-validation на send. Batch (раз в N мс или N events). Queue offline. Retry с backoff. Sample при overflow.",
+    "answer": "Analytics event tracking. TypeScript-types для каждого event с required и optional fields. Zod-validation в analytics-client при отправке — invalid events не уходят. Batch — события собираются в очередь, отправляются раз в N мс или при достижении N events (снижает количество network-call-ов). Offline queue — при отсутствии сети события копятся в localStorage, отправляются при возвращении. Retry с exponential backoff на failure. Sampling при overflow для high-volume events. PII scrubbing перед отправкой. Standard tools: Segment, Amplitude, Mixpanel, или собственный endpoint. Schema versioning — изменения через major-bump. Tests на каждый event-flow в e2e."
+  },
+  "system-design__28": {
+    "hintEasy": "Access в memory, refresh в HttpOnly cookie, refresh-flow при 401.",
+    "hintFull": "Access-token в Zustand-store (memory). Refresh-token в HttpOnly Secure SameSite cookie. Interceptor: 401 → /refresh → retry. Logout инвалидирует серверную сессию.",
+    "answer": "Secure token handling flow. Login — POST /auth/login c credentials, server возвращает access-token в response body (фронт кладёт в memory store) и refresh-token в HttpOnly Secure SameSite cookie. Access-token (5-15 мин) используется для каждого API-call в Authorization header. Refresh-token (дни/недели) браузер автоматически шлёт на /auth/refresh — JS его не видит. На 401 — interceptor триггерит /refresh, получает новый access-token, retry-ит оригинальный запрос. Refresh-token rotation — каждый refresh выдаёт новый, старый инвалидируется (защита от кражи). Logout — POST /auth/logout инвалидирует серверную сессию + clear cookies + clear in-memory state. Никаких токенов в localStorage."
+  },
+  "system-design__29": {
+    "hintEasy": "Reconnect с backoff, heartbeat, snapshot+delta, sequence numbers, observability.",
+    "hintFull": "Auto-reconnect, exponential backoff + jitter. Heartbeat для stale-detection. Snapshot+delta protocol. Sequence numbers для gap detection. RUM-метрики reconnects.",
+    "answer": "Resilient WebSocket client. Auto-reconnect — onclose без code 1000 (явное закрытие) триггерит reconnect с exponential backoff (1, 2, 4, 8с, cap 30) + jitter (±25%). Heartbeat ping/pong каждые 30 секунд для stale-connection detection. Snapshot+delta protocol — при connect получаешь snapshot с lastSeq, дальше дельты с возрастающим seq. Gap detection — если seq порвался, перезапрашиваешь snapshot. Subscribe-management — после reconnect восстанавливаешь подписки. Backpressure — буфер с лимитом, drop oldest при overflow. UI — индикатор соединения (online/reconnecting/offline). RUM-метрики: reconnect-rate, reasons, time-to-reconnect, stale-data-ratio."
+  },
+  "system-design__30": {
+    "hintEasy": "Manifest указывает на конкретную version-folder; revert manifest = rollback.",
+    "hintFull": "Каждый remote-deploy в своей папке /v1.2.3/. Manifest указывает текущую. Rollback — atomic update manifest на предыдущую. Auto-rollback при degradation.",
+    "answer": "Rollback strategy для federated frontend. Каждый remote build лежит в immutable папке /releases/v1.2.3/, никогда не overwrite. Manifest (remoteEntry.js или config.json) — единственная mutable точка, указывает на текущую версию. Cache-policy: manifest короткий TTL (1-5 минут), bundle long-term immutable. Rollback — обновить manifest на предыдущий tag, занимает секунды. Никаких redeploy host-а. Auto-rollback при degradation: monitoring следит за critical-метриками (error-rate, latency), при превышении threshold-а automated revert. Per-remote rollback — один сломавшийся остров откатывается без affecting other-ов. Audit-log изменений manifest-а. Runbook on-call с командами rollback."
+  }
+}
