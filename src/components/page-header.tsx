@@ -42,8 +42,7 @@ export function PageHeader({
             {title}
           </h1>
           <div className="col-span-12 md:col-span-4">
-            <div className="flex items-baseline gap-3 md:justify-end">
-              <span className="yzy-label text-muted-foreground">PROGRESS</span>
+            <div className="flex items-baseline md:justify-end">
               <span className="text-3xl sm:text-4xl font-medium tabular-nums leading-none">
                 {progress.percent}%
               </span>

@@ -92,30 +92,21 @@ export default async function HomePage() {
               >
                 <Link
                   href={track.href}
-                  className="block h-full p-6 sm:p-8 hover:bg-muted transition-colors"
+                  className="flex flex-col h-full p-6 sm:p-8 hover:bg-muted transition-colors"
                 >
-                  <div className="flex items-start justify-between">
-                    <p className="yzy-label text-muted-foreground">
-                      {String(idx + 1).padStart(2, "0")} / {String(stats.length).padStart(2, "0")}
-                    </p>
-                    <p className="yzy-meta tabular-nums text-muted-foreground">
-                      {track.answered}/{track.total}
-                    </p>
-                  </div>
-                  <h2 className="mt-8 text-2xl sm:text-3xl font-medium leading-tight uppercase tracking-tight">
+                  <h2 className="text-2xl sm:text-3xl font-medium leading-tight uppercase tracking-tight">
                     {track.title}
                   </h2>
                   <p className="mt-3 text-sm text-muted-foreground max-w-md">
                     {track.subtitle}
                   </p>
 
-                  <div className="mt-10 flex items-center justify-between">
+                  <div className="mt-auto pt-10 flex items-center justify-between">
                     <span className="yzy-label">ENTER</span>
                     <span className="yzy-meta tabular-nums text-muted-foreground">
                       {pct}%
                     </span>
                   </div>
-
                   <div className="mt-3 h-px w-full bg-foreground/20" />
                   <div
                     className="-mt-px h-px bg-foreground"

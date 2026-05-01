@@ -7,8 +7,18 @@ import { SiteHeader } from "@/components/site-header";
 import { PageHeader } from "@/components/page-header";
 import { QuestionCard } from "@/components/question-card";
 import { ResetButton } from "@/components/reset-button";
+import { SubsectionNav } from "@/components/subsection-nav";
 import { categoryFor, sortKey } from "@/lib/categories";
 import { stripSectionPrefix } from "@/lib/utils";
+
+// Стабильный id для h2 подсекции — нужен для якорной навигации.
+function subsectionId(name: string, idx: number): string {
+  const slug = name
+    .toLowerCase()
+    .replace(/[^a-zа-я0-9]+/gi, "-")
+    .replace(/^-+|-+$/g, "");
+  return slug || `subsection-${idx}`;
+}
 
 export const dynamic = "force-dynamic";
 
@@ -90,7 +100,7 @@ export default async function SectionPage({ params }: { params: Params }) {
   return (
     <>
       <SiteHeader username={username} />
-      <main className="mx-auto max-w-3xl px-4 sm:px-8 py-8 sm:py-12">
+      <main className="mx-auto max-w-6xl px-4 sm:px-8 py-8 sm:py-12">
         <PageHeader
           topLeft={
             <Link
@@ -116,11 +126,23 @@ export default async function SectionPage({ params }: { params: Params }) {
           progress={{ percent: pct }}
         />
 
+        <SubsectionNav
+          anchors={groups
+            .filter((g) => g.subsection)
+            .map((g, gi) => ({
+              id: subsectionId(g.subsection ?? "", gi),
+              label: g.subsection ?? "",
+            }))}
+        />
+
         <div className="mt-10 space-y-12">
           {groups.map((g, gi) => (
-            <section key={gi} className="space-y-4">
+            <section key={gi} className="space-y-4 scroll-mt-24">
               {g.subsection && (
-                <h2 className="text-xl sm:text-2xl font-medium uppercase tracking-tight text-foreground">
+                <h2
+                  id={subsectionId(g.subsection, gi)}
+                  className="text-xl sm:text-2xl font-medium uppercase tracking-tight text-foreground scroll-mt-24"
+                >
                   {g.subsection}
                 </h2>
               )}
