@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { SiteHeader } from "@/components/site-header";
 import { PageHeader } from "@/components/page-header";
 import { TrackGrid } from "@/components/track-grid";
+import { LayoutSwitcher, LayoutGrid } from "@/components/layout-switcher";
 import { categoryFor, sortKey } from "@/lib/categories";
 
 export const dynamic = "force-dynamic";
@@ -74,7 +75,11 @@ export default async function SocialPage() {
           progress={{ percent: pct }}
         />
         <div className="mt-10">
-          <TrackGrid sections={sections} />
+          <LayoutSwitcher storageKey="layout:tracks">
+            <LayoutGrid className="mt-4">
+              <TrackGrid sections={sections} />
+            </LayoutGrid>
+          </LayoutSwitcher>
         </div>
       </main>
     </>

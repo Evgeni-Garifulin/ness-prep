@@ -8,6 +8,7 @@ import { PageHeader } from "@/components/page-header";
 import { QuestionCard } from "@/components/question-card";
 import { ResetButton } from "@/components/reset-button";
 import { SubsectionNav } from "@/components/subsection-nav";
+import { LayoutSwitcher, LayoutGrid } from "@/components/layout-switcher";
 import { categoryFor, sortKey } from "@/lib/categories";
 import { stripSectionPrefix } from "@/lib/utils";
 
@@ -135,43 +136,59 @@ export default async function SectionPage({ params }: { params: Params }) {
             }))}
         />
 
-        <div className="mt-10 space-y-12">
-          {groups.map((g, gi) => (
-            <section key={gi} className="space-y-4 scroll-mt-24">
-              {g.subsection && (
+        <div className="mt-10">
+          <LayoutSwitcher
+            storageKey="layout:section-cards"
+            header={
+              groups[0]?.subsection ? (
                 <h2
-                  id={subsectionId(g.subsection, gi)}
+                  id={subsectionId(groups[0].subsection, 0)}
                   className="text-xl sm:text-2xl font-medium uppercase tracking-tight text-foreground scroll-mt-24"
                 >
-                  {g.subsection}
+                  {groups[0].subsection}
                 </h2>
-              )}
-              <div className="space-y-3">
-                {g.items.map((q) => (
-                  <QuestionCard
-                    key={q.id}
-                    mode={category === "social" ? "social" : "tech"}
-                    questionId={q.id}
-                    number={q.number}
-                    text={q.text}
-                    initialAnswer={byQuestionId.get(q.id) ?? ""}
-                    initialConfirmed={confirmedByQuestionId.get(q.id) ?? false}
-                    initialNote={noteByQuestionId.get(q.id) ?? ""}
-                    hintEasy={q.hintEasy}
-                    hintFull={q.hintFull}
-                    correctAnswer={q.answer}
-                  />
-                ))}
-              </div>
-            </section>
-          ))}
+              ) : null
+            }
+          >
+            <div className="mt-4 space-y-12">
+              {groups.map((g, gi) => (
+                <section key={gi} className="space-y-4 scroll-mt-24">
+                  {gi > 0 && g.subsection && (
+                    <h2
+                      id={subsectionId(g.subsection, gi)}
+                      className="text-xl sm:text-2xl font-medium uppercase tracking-tight text-foreground scroll-mt-24"
+                    >
+                      {g.subsection}
+                    </h2>
+                  )}
+                  <LayoutGrid>
+                    {g.items.map((q) => (
+                      <QuestionCard
+                        key={q.id}
+                        mode={category === "social" ? "social" : "tech"}
+                        questionId={q.id}
+                        number={q.number}
+                        text={q.text}
+                        initialAnswer={byQuestionId.get(q.id) ?? ""}
+                        initialConfirmed={confirmedByQuestionId.get(q.id) ?? false}
+                        initialNote={noteByQuestionId.get(q.id) ?? ""}
+                        hintEasy={q.hintEasy}
+                        hintFull={q.hintFull}
+                        correctAnswer={q.answer}
+                      />
+                    ))}
+                  </LayoutGrid>
+                </section>
+              ))}
+            </div>
+          </LayoutSwitcher>
         </div>
 
-        <nav className="mt-16 grid grid-cols-2 gap-px border border-foreground bg-foreground">
+        <nav className="mt-16 grid grid-cols-2 gap-6">
           {prev ? (
             <Link
               href={`/sections/${prev.slug}`}
-              className="block bg-background hover:bg-muted transition-colors px-4 py-4"
+              className="group block hover:opacity-60 transition-opacity"
             >
               <div className="yzy-label text-muted-foreground">PREVIOUS</div>
               <div className="mt-2 text-sm font-medium uppercase tracking-tight truncate">
@@ -179,12 +196,12 @@ export default async function SectionPage({ params }: { params: Params }) {
               </div>
             </Link>
           ) : (
-            <span className="bg-background" />
+            <span />
           )}
           {next ? (
             <Link
               href={`/sections/${next.slug}`}
-              className="block bg-background hover:bg-muted transition-colors px-4 py-4 text-right"
+              className="group block hover:opacity-60 transition-opacity text-right"
             >
               <div className="yzy-label text-muted-foreground">NEXT</div>
               <div className="mt-2 text-sm font-medium uppercase tracking-tight truncate">
@@ -192,7 +209,7 @@ export default async function SectionPage({ params }: { params: Params }) {
               </div>
             </Link>
           ) : (
-            <span className="bg-background" />
+            <span />
           )}
         </nav>
       </main>
