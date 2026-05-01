@@ -63,7 +63,7 @@ export function LayoutSwitcher({
             aria-label="Одна колонка"
             aria-pressed={cols === 1}
             className={cn(
-              "h-5 w-5 border border-foreground transition-colors",
+              "h-3 w-3 border border-foreground transition-colors",
               cols === 1 ? "bg-foreground" : "bg-transparent hover:bg-muted",
             )}
           />
@@ -77,7 +77,7 @@ export function LayoutSwitcher({
           >
             <span
               className={cn(
-                "h-5 w-5 border border-foreground transition-colors",
+                "h-3 w-3 border border-foreground transition-colors",
                 cols === 2
                   ? "bg-foreground"
                   : "bg-transparent group-hover:bg-muted",
@@ -85,7 +85,7 @@ export function LayoutSwitcher({
             />
             <span
               className={cn(
-                "h-5 w-5 border border-foreground transition-colors",
+                "h-3 w-3 border border-foreground transition-colors",
                 cols === 2
                   ? "bg-foreground"
                   : "bg-transparent group-hover:bg-muted",
