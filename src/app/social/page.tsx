@@ -65,7 +65,7 @@ export default async function SocialPage() {
               href="/"
               className="yzy-label text-muted-foreground hover:text-foreground transition-colors"
             >
-              INDEX
+              MAIN
             </Link>
           }
           title="Social"

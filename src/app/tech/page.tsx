@@ -64,7 +64,7 @@ export default async function TechPage() {
               href="/"
               className="yzy-label text-muted-foreground hover:text-foreground transition-colors"
             >
-              INDEX
+              MAIN
             </Link>
           }
           topRight={<ResetButton scope="all" label="RESET PROGRESS" />}

@@ -5,7 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 
 const NAV = [
-  { href: "/", label: "INDEX", exact: true as const },
+  { href: "/", label: "MAIN", exact: true as const },
   { href: "/tech", label: "TECH" },
   { href: "/social", label: "SOCIAL" },
   { href: "/trainer", label: "TRAINER" },

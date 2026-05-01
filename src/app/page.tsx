@@ -11,7 +11,7 @@ import { TRACKS, categoryFor } from "@/lib/categories";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "INDEX",
+  title: "MAIN",
   description: "DRILL THE INSTINCT    TWO TRACKS    ONE GOAL",
 };
 
