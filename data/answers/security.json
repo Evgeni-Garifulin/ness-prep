@@ -1,0 +1,177 @@
+{
+  "security__1": {
+    "hintEasy": "Внедрение чужого JS в страницу — атакующий выполняет код от имени пользователя.",
+    "hintFull": "Cross-Site Scripting: страница вставляет user-input как HTML/JS без экранирования. Атакующий получает session, может действовать от лица юзера.",
+    "answer": "XSS — это инъекция произвольного JavaScript на страницу. Атакующий через какое-то поле ввода вставляет скрипт, страница рендерит его, и в браузере жертвы исполняется чужой код. От имени пользователя можно: украсть cookies (если не HttpOnly), отправить запросы к API, переписать UI и фишить, прочитать локальное хранилище. Это самая частая и опасная фронтовая уязвимость. Защита — экранировать любой user-input, использовать CSP, не использовать innerHTML/dangerouslySetInnerHTML без санитайзера. React по умолчанию экранирует — поэтому современные приложения подвержены XSS реже, но не неуязвимы."
+  },
+  "security__2": {
+    "hintEasy": "Stored — на сервере, Reflected — в URL/параметре, DOM — внутри клиентского JS.",
+    "hintFull": "Stored: чужой контент хранится в БД и рендерится. Reflected: вредонос в URL, страница его эхом отдаёт. DOM-based: страница сама конструирует HTML из location.hash и т.п.",
+    "answer": "Три классических вида. Stored XSS: атакующий пишет вредоносный скрипт в БД (комментарий, профиль), и каждый посетитель страницы выполняет его. Самый опасный, влияет на множество жертв. Reflected XSS: вредонос передаётся в URL/query, сервер эхом возвращает, страница рендерит. Жертва кликает по подсунутой ссылке. DOM-based XSS: сервер не виноват, фронт сам конструирует HTML из location.hash, document.referrer, и user-input через innerHTML. Защита у всех общая — экранирование, sanitization, CSP, не использовать innerHTML без причины."
+  },
+  "security__3": {
+    "hintEasy": "Любой текст в JSX экранируется автоматически — даже если содержит <script>.",
+    "hintFull": "{userInput} в JSX превратится в текстовый узел, не в HTML. Спец-символы (<, >, &) экранируются. Атрибуты тоже escape-ятся.",
+    "answer": "React по умолчанию экранирует всё, что вставляется через JSX: {userInput} в тексте превращается в текстовый узел, не парсится как HTML. Спец-символы (<, >, &, ') заменяются на entities. То же касается атрибутов — вставка в href, title, data-* безопасна. Это покрывает 90%+ типичных XSS-кейсов. Но не все: dangerouslySetInnerHTML, href='javascript:...', script-теги в src/srcdoc, eval-подобные конструкции. Поэтому модерн-React не убивает XSS, а резко снижает поверхность атаки. Дополнительно — CSP с strict source list, чтобы даже при уязвимости вредоносный inline-скрипт не запустился."
+  },
+  "security__4": {
+    "hintEasy": "dangerouslySetInnerHTML, javascript: URL-ы, рендер raw HTML из стороннего источника.",
+    "hintFull": "dangerouslySetInnerHTML вставляет HTML как есть. href='javascript:...' выполнит код. iframe/object src без проверки — тоже уязвимо.",
+    "answer": "React защищает от XSS не везде. Дыры: dangerouslySetInnerHTML вставляет HTML напрямую, без экранирования — это явный opt-out. href='javascript:...' выполняет код при клике (React 16.9+ предупреждает, но не блокирует). iframe srcdoc/src, object data, embed src с user-input — то же самое. eval, new Function, setTimeout(string) — вообще классика. И сторонние библиотеки, рендерящие HTML (например, markdown-парсеры) могут пропустить вредонос внутрь. Лечение — sanitize всё, что приходит снаружи, через DOMPurify; не использовать innerHTML без причины; запрещать javascript: URL валидацией."
+  },
+  "security__5": {
+    "hintEasy": "Вставляет HTML как есть, без экранирования. Любой <script> внутри сработает.",
+    "hintFull": "dangerouslySetInnerHTML={{__html: x}} вставляет x как HTML. Если x — user-input или ответ API без санитайзинга, это прямой XSS-vector.",
+    "answer": "dangerouslySetInnerHTML — явный opt-out из защиты React-а. Передаёшь объект с полем __html, React вставляет его как сырой HTML, не экранируя. Если этот HTML пришёл от пользователя или из API, и не был санитизирован, любой <script> или onerror=... внутри сработает в браузере жертвы. Имя нарочно «опасное», чтобы при code-review это бросалось в глаза. Использовать только с доверенным контентом или после DOMPurify.sanitize. Типичный кейс — рендер user-generated markdown или rich text editor: всегда через санитайзер, никогда сырой HTML."
+  },
+  "security__6": {
+    "hintEasy": "DOMPurify санитизирует HTML, оставляет только безопасные теги/атрибуты.",
+    "hintFull": "DOMPurify.sanitize(rawHtml) удаляет <script>, on* event handlers, javascript: URL. Whitelist разрешённых тегов и атрибутов.",
+    "answer": "Стандартный инструмент — DOMPurify (или sanitize-html). Принимает raw HTML, возвращает очищенный: удалены script-теги, inline-event-handler-ы (onclick, onerror), javascript:-URL, потенциально опасные атрибуты. Поддерживает кастомные whitelist-ы тегов и атрибутов. Использование: <div dangerouslySetInnerHTML={{__html: DOMPurify.sanitize(userHtml)}} />. Для markdown-парсеров — выбирать те, что safe by default (например, marked в strict-mode). Не пытаться написать sanitization самому регулярками — это классическая ошибка, всегда есть обход. Дополнительно — CSP как defence-in-depth."
+  },
+  "security__7": {
+    "hintEasy": "Очистить HTML от опасного — оставить только разрешённые теги и атрибуты.",
+    "hintFull": "Берётся raw HTML, парсится, нежелательные элементы удаляются, остальное возвращается. DOMPurify, sanitize-html.",
+    "answer": "Sanitization — процесс очистки HTML/SVG от потенциально опасного содержимого. Раньше HTML парсится в DOM, потом удаляются disallowed теги (script, iframe, object), event-handler-атрибуты (onclick, onerror), javascript:-URL и т.п. На выходе — безопасный HTML, который можно вставить через innerHTML или dangerouslySetInnerHTML. Whitelist (что разрешено) безопаснее blacklist (что запрещено), потому что новые векторы атак появляются. Правильные инструменты — DOMPurify, sanitize-html. Применяется к user-generated content: комментарии, статьи, rich text-результаты редактора."
+  },
+  "security__8": {
+    "hintEasy": "Замена спец-символов на entities — < становится &lt;.",
+    "hintFull": "HTML-escape: <, >, &, ', \" → entities. Превращает текст в безопасный для вставки в HTML без интерпретации.",
+    "answer": "Escaping — это замена символов, имеющих специальное значение в HTML, на их безопасные эквиваленты (entities). <, >, &, ', \" заменяются на &lt;, &gt;, &amp;, &#39;, &quot;. После escaping строка вставляется в HTML как текст, не как разметка. React делает это автоматически для всего, что в JSX через {x}. Используется когда нужно вывести именно текст, без HTML-разметки. Если нужно сохранить какую-то разметку (жирный шрифт, ссылки), escaping не подходит — нужна sanitization, которая разрешит safe-теги."
+  },
+  "security__9": {
+    "hintEasy": "Escape — текст не интерпретируется как HTML. Sanitize — разрешает HTML, но безопасный.",
+    "hintFull": "Escape для plain text. Sanitize когда нужна разметка (markdown, rich-text), с whitelist-ом безопасных тегов.",
+    "answer": "Escaping и sanitization решают разные задачи. Escaping превращает текст в безопасный для HTML — спец-символы становятся entities, строка отображается как текст. Используется, когда HTML-разметка не нужна (имя пользователя, сообщение чата без форматирования). Sanitization сохраняет HTML-разметку, но удаляет опасное — оставляет <b>, <i>, <a>, удаляет <script>, on* handlers. Используется для rich content: статьи, комментарии с форматированием, результаты markdown-парсеров. Правило — escape if you can, sanitize if you must."
+  },
+  "security__10": {
+    "hintEasy": "HTTP-заголовок, который запрещает выполнение скриптов из неразрешённых источников.",
+    "hintFull": "Content-Security-Policy: default-src 'self'; script-src 'self' cdn.com. Браузер блокирует всё, что не из whitelist-а.",
+    "answer": "Content Security Policy — HTTP-заголовок (или meta-тег), описывающий, откуда страница может загружать ресурсы. Например: script-src 'self' cdn.example.com — разрешено грузить скрипты только с своего домена и указанного CDN; всё остальное блокируется браузером. Аналогично style-src, img-src, connect-src (для fetch/WS), frame-src. Дополнительно — запрет inline-скриптов (без 'unsafe-inline'), eval (без 'unsafe-eval'), base-tag injection. Это defence-in-depth: даже если в HTML просочился вредоносный <script src='evil.com/...'>, он не загрузится. Современный фронт обязан настраивать CSP."
+  },
+  "security__11": {
+    "hintEasy": "Даже если XSS-вектор просочился — CSP не даст вредоносу выполниться.",
+    "hintFull": "script-src 'self' блокирует внешние скрипты. Без 'unsafe-inline' блокирует inline <script>. nonce/hash для нужных inline-скриптов.",
+    "answer": "CSP — это вторая линия защиты: даже если XSS-вектор просочился через bug-у, вредонос не выполнится. script-src 'self' блокирует загрузку внешних скриптов, поэтому <script src='evil.com'> не сработает. Без 'unsafe-inline' блокируется inline <script>, поэтому injected <script>alert(1)</script> просто не выполнится. Для нужных inline-скриптов используют nonce (random токен в каждой странице) или hash (SHA-256 контента). Также blockируется eval по дефолту. Современный strict CSP (strict-dynamic, nonce-based) — рекомендованный подход для serious-приложений."
+  },
+  "security__12": {
+    "hintEasy": "Атакующий заставляет браузер жертвы отправить запрос к твоему API — браузер прикрепит cookies.",
+    "hintFull": "Cross-Site Request Forgery: жертва открывает evil.com, та делает POST на bank.com. Cookie сессии прикрепляются автоматически — действие исполняется.",
+    "answer": "CSRF — атака, использующая то, что браузер автоматически прикрепляет cookies к запросам на свой origin. Жертва залогинена в bank.com, открывает evil.com, та отправляет POST на bank.com/transfer. Браузер прикрепляет session-cookie — сервер думает, что это легитимный запрос пользователя, и выполняет перевод. Защита — CSRF-токены (сервер выдаёт уникальный токен, фронт вкладывает в каждый mutating-запрос; cookie сами по себе токен не дают), SameSite cookies (Strict/Lax — cookie не отправляется на cross-site requests), проверка Origin/Referer заголовков на сервере. Современные SameSite=Lax по умолчанию закрывают большинство кейсов."
+  },
+  "security__13": {
+    "hintEasy": "Когда auth — через cookies, и эндпоинты делают мутации без custom-токена.",
+    "hintFull": "Если используете cookie-based session и API не проверяет CSRF-токен или Origin — вы уязвимы. Bearer-token в Authorization заголовке от CSRF не страдает.",
+    "answer": "CSRF актуален, когда auth построен на cookies (session-cookie, JWT-cookie). Браузер автоматически прикрепляет cookies, и сервер не отличает легитимный запрос от cross-site. Если же auth через Authorization: Bearer токен, который фронт вручную прикрепляет в каждый запрос, CSRF не работает — атакующий не может прочитать токен из chrome-domain. Защита для cookie-based: SameSite=Lax/Strict, CSRF-токен в каждом mutating-request-е (через double-submit или server-managed), проверка Origin на сервере. Token-based auth исключает CSRF, но открывает другие риски (XSS может украсть токен из localStorage)."
+  },
+  "security__14": {
+    "hintEasy": "Браузерное правило: страница с одного origin может запрашивать другой только если тот разрешил.",
+    "hintFull": "Same-origin policy запрещает cross-origin запросы по умолчанию. CORS-заголовки от сервера разрешают конкретные origin-ы.",
+    "answer": "CORS (Cross-Origin Resource Sharing) — это механизм, который позволяет server-у разрешить браузеру выполнять cross-origin запросы. По умолчанию same-origin policy запрещает страницам читать ответы от других origin-ов (защита от XSS-атаки на чужие сайты). Сервер указывает в Access-Control-Allow-Origin, какие origin-ы могут читать ответ. Дополнительные заголовки (Allow-Methods, Allow-Headers, Allow-Credentials) уточняют. CORS не защищает сервер от запросов — он защищает браузер от чтения ответов в неавторизованном origin-е. Это часто путают: «отключить CORS на сервере» = разрешить любому сайту читать ваш API."
+  },
+  "security__15": {
+    "hintEasy": "CORS не проверяет личность пользователя — только разрешает или нет браузеру читать ответ.",
+    "hintFull": "CORS — это про разрешения для браузера. Auth — про идентификацию пользователя. Запрос всё равно дойдёт до сервера, CORS просто скажет, может ли клиент его прочитать.",
+    "answer": "Распространённое заблуждение — что CORS обеспечивает auth. На самом деле он не имеет к auth никакого отношения. CORS — это механизм, говорящий браузеру: «можно ли странице с origin X читать ответ от моего сервера». Если CORS не разрешает, браузер выкидывает ошибку, но запрос-то на сервер уже ушёл, и всё, что не требует чтения ответа (например, side-effect мутаций без чтения), работает. Любой инструмент без браузера (curl, Postman, серверный код) полностью игнорирует CORS. Auth обеспечивается отдельно — через cookies, токены, OAuth. CORS защищает только клиентскую сторону браузера от чтения чужих ответов."
+  },
+  "security__16": {
+    "hintEasy": "Перед сложным cross-origin запросом браузер шлёт OPTIONS — спросить разрешения.",
+    "hintFull": "Для не-simple запросов (custom headers, не-простой content-type) браузер сначала OPTIONS с Origin, Method, Headers. Сервер отвечает Allow-* — браузер потом шлёт основной.",
+    "answer": "Preflight — это OPTIONS-запрос, который браузер шлёт автоматически перед сложным cross-origin запросом, чтобы узнать разрешения. Срабатывает при не-simple запросах: custom-headers (Authorization, X-Custom), методы кроме GET/POST/HEAD, не-стандартный content-type (application/json вместо form-urlencoded). В preflight-е браузер посылает Access-Control-Request-Method и -Headers, сервер отвечает Allow-Methods/Headers/Origin. Если разрешено — идёт основной запрос. Кешируется (Access-Control-Max-Age) на N секунд, чтобы не делать OPTIONS перед каждым. Иногда preflight удваивает latency — оптимизация через max-age и упрощение запросов."
+  },
+  "security__17": {
+    "hintEasy": "Wildcard *, эхо Origin без проверки, Allow-Credentials с открытым списком.",
+    "hintFull": "Allow-Origin: * + Allow-Credentials: true — невалидно, но если эхо origin вместо *, сайт пропускает любые куки. Whitelist должен быть чётким.",
+    "answer": "Опасные настройки. Allow-Origin: * + Allow-Credentials: true — формально невалидно, браузер не пропустит. Но если сервер «эхо» Origin (отдаёт обратно тот origin, что пришёл, без проверки) и одновременно ставит Allow-Credentials: true — атакующий с своего домена получит доступ к API с куками жертвы. Whitelist должен быть чётким и регулярно проверяться. Не разрешать null-origin (для file:// и sandboxed iframe). Не использовать regex без strict-anchors — atacker.example.com.evil.com может пройти. Allow-Headers: * с credentials — то же самое опасное сочетание."
+  },
+  "security__18": {
+    "hintEasy": "В памяти JS (state, переменная) — короткоживущий, не persisted.",
+    "hintFull": "Access token живёт коротко (5-15 мин). Хранится в JS memory: useState, in-memory store. Не localStorage (XSS-уязвимо), не cookie (CSRF, нужен HttpOnly).",
+    "answer": "Access token — короткоживущий токен (5-15 минут), нужен только в памяти JS на текущей сессии. Лучшее хранение — обычная переменная в auth-store (Zustand, useState в Provider): после reload токен пропадает, refresh-токен берёт новый. localStorage уязвим к XSS — любой инжект вытащит токен. Cookie без HttpOnly то же самое; с HttpOnly недоступен из JS, но тогда нужно отправлять через cookie (CSRF-риск). На практике — access-token в JS memory, и стандартный flow refresh при истечении. После закрытия вкладки — пользователь логинится заново или авто-refresh-ом из refresh-токена."
+  },
+  "security__19": {
+    "hintEasy": "В HttpOnly Secure SameSite cookie. Не виден из JS — защита от XSS.",
+    "hintFull": "Cookie с HttpOnly + Secure + SameSite=Strict (или Lax). Браузер сам отправит при refresh-эндпоинте. Никогда не в localStorage.",
+    "answer": "Refresh token — длинный токен (дни/недели), нужен для обновления access-токена. Должен жить в HttpOnly Secure SameSite cookie: HttpOnly — недоступен из JS, защита от XSS-кражи; Secure — только HTTPS; SameSite=Strict — не уходит на cross-site, защита от CSRF. Endpoint /auth/refresh принимает запрос с этой cookie и возвращает новый access-токен. Никогда не класть refresh в localStorage или JS-доступную cookie — XSS заберёт его и атакующий получит постоянный доступ. Refresh-токен также должен ротироваться при каждом использовании (refresh token rotation), чтобы кража быстро становилась бесполезной."
+  },
+  "security__20": {
+    "hintEasy": "Доступен любому JS на странице — XSS получает его сразу.",
+    "hintFull": "Любой скрипт (свой, сторонний, вредоносный) читает localStorage. XSS = немедленная кража токена. Даже доверенные библиотеки могут случайно засветить.",
+    "answer": "localStorage доступен любому JS на странице — своему, сторонним библиотекам, рекламному коду, и в случае XSS вредоносному. Чтобы прочитать токен, не нужны никакие хитрости — localStorage.getItem('token'). Это значит, что если хоть одна XSS-уязвимость где-то в приложении или в зависимости — токены утекают. Дополнительно — нет HttpOnly/Secure/SameSite-флагов как у cookies, нельзя ограничить scope. Поэтому правило — не хранить sensitive data в localStorage. Безопасные кейсы — не-чувствительные настройки: тема, язык, dismiss-flag для баннера."
+  },
+  "security__21": {
+    "hintEasy": "Авто-отправляются с каждым запросом — CSRF-уязвимы. Без HttpOnly — XSS-уязвимы.",
+    "hintFull": "Cookies автоматически прикрепляются к запросам — отсюда CSRF. Без HttpOnly доступны из JS — XSS-уязвимы. Без Secure ходят по HTTP. Без SameSite — кросс-сайт.",
+    "answer": "Cookies имеют свои риски. Без HttpOnly — JS их читает, XSS забирает. Без Secure — отправляются по HTTP, MITM перехватывает. Без SameSite — отправляются на cross-site запросы, открыты CSRF. Auto-attach к запросам означает, что CSRF атакует именно их. Также cookies имеют path и domain ограничения, не encrypted в браузере (только при HTTPS на проводе), есть лимит на количество и размер. Правильный выбор — HttpOnly + Secure + SameSite=Lax/Strict для session-id и refresh-token. Не использовать cookies для не-сессионных данных."
+  },
+  "security__22": {
+    "hintEasy": "Cookie с флагом HttpOnly недоступен из JavaScript — браузер отправляет его автоматически.",
+    "hintFull": "Set-Cookie: session=...; HttpOnly. document.cookie не вернёт. Браузер прикрепляет в HTTP-запросах. Защита от XSS-кражи.",
+    "answer": "HttpOnly — флаг cookie, который запрещает доступ к нему из JavaScript. document.cookie не вернёт его, fetch не прочитает. Браузер всё равно автоматически отправляет в HTTP-запросах на тот же domain/path. Это главная защита от XSS-кражи: даже если в страницу инжектнут вредоносный скрипт, токен в HttpOnly-cookie он не вытащит. Используется для session-id, refresh-token и любых auth-данных. В сочетании с Secure (только HTTPS) и SameSite (защита от CSRF) — это «золотой стандарт» для auth-cookies. Single-page apps часто хранят access-token в JS, refresh-token — в HttpOnly cookie."
+  },
+  "security__23": {
+    "hintEasy": "SameSite контролирует, отправляется ли cookie на cross-site запросы.",
+    "hintFull": "Strict — никогда. Lax — только на top-level navigation (клик по ссылке). None — всегда (требует Secure). Защита от CSRF.",
+    "answer": "SameSite — флаг cookie, контролирующий отправку на cross-site запросы. Три значения. Strict — cookie вообще не отправляется на cross-site, даже при клике по ссылке с другого сайта; максимальная защита, но ломает UX (пользователь приходит по ссылке и видит «не залогинен»). Lax (дефолт в современных браузерах) — отправляется при top-level navigation (клик по ссылке), не отправляется на subresource-запросы (image, fetch, form POST). Покрывает большинство CSRF-атак при разумном UX. None — отправляется всегда, требует Secure-флаг; используется для embed-сценариев (iframe, third-party widget). Lax — золотая середина для большинства случаев."
+  },
+  "security__24": {
+    "hintEasy": "Серверный invalidate сессии + удалить cookies/токены на клиенте.",
+    "hintFull": "POST /logout инвалидирует session/refresh на сервере. Сервер шлёт Set-Cookie с истёкшим временем. Клиент чистит in-memory state, переходит на /login.",
+    "answer": "Logout — это серверная операция, не клиентская. Клиент шлёт POST /logout, сервер инвалидирует session-id или refresh-token в БД, отправляет Set-Cookie с прошедшим Expires (стирает cookie из браузера). Клиент чистит in-memory state (Zustand-store, React Query cache), редиректит на /login. Опционально — broadcast logout по другим вкладкам через storage-event или BroadcastChannel. Не достаточно просто очистить локальный state — сервер должен инвалидировать токен. Иначе атакующий, укравший токен раньше, продолжит им пользоваться."
+  },
+  "security__25": {
+    "hintEasy": "На сервере проверять auth для каждого запроса. На клиенте — просто guard для UX.",
+    "hintFull": "Guard на роуте — если нет валидного токена, редирект на /login. Но реальная защита — на сервере: каждый запрос проверяется, отказ при невалидном.",
+    "answer": "Защита sensitive route — двухслойная. Клиент: guard на роуте (Next.js middleware, React Router loader), который проверяет наличие валидного токена и редиректит на /login. Это для UX, чтобы не показывать частично-залогиненный интерфейс. Сервер: каждый запрос проверяется заново — токен валидный, юзер имеет права, ресурс ему принадлежит. Серверная проверка обязательна, клиентская не достаточна, потому что атакующий обойдёт фронт DevTools-ом или curl-ом. Никогда не доверять клиенту в вопросах безопасности — он только подсказчик для UX."
+  },
+  "security__26": {
+    "hintEasy": "DevTools / Postman обходят его. Сервер обязан проверять заново.",
+    "hintFull": "Frontend guard — это про UX, чтобы пользователь видел /login вместо ломанной страницы. Реальная безопасность — сервер: каждый запрос проверяется.",
+    "answer": "Frontend auth guard — это middleware на route-уровне, который проверяет наличие токена и редиректит на /login если его нет. Но любой пользователь может открыть DevTools и заменить state, или вообще зайти на API через curl/Postman, минуя фронт. Поэтому фронт-guard — только про UX (не показывать сломанный UI), не про security. Реальная защита всегда на сервере: каждый эндпоинт проверяет валидность токена, авторизует на конкретный ресурс (этот юзер может читать ЭТОТ заказ). Frontend guard без серверной проверки — это «дверь без замка»: смотрится как защита, но любой может пройти."
+  },
+  "security__27": {
+    "hintEasy": "Permissions грузятся вместе с user-ом, hook can() для UI, серверная проверка для actions.",
+    "hintFull": "Сервер шлёт permissions при логине. Frontend hook useCan('order.delete') скрывает UI. Сервер проверяет права на каждое action.",
+    "answer": "Permissions на фронте — это про UI: показать или скрыть кнопку, открыть или редиректнуть страницу, активировать или disable-нуть форму. Грузятся при логине вместе с профилем, лежат в auth-store. Hook useCan('order.delete') или компонент <Can permission='order.delete'> для удобства. Главный момент — фронтовая проверка только для UX, серверная обязательна. Для сложных правил (по полям, по контексту) — библиотека CASL или собственная abilities-модель. Ролевая проверка `if (user.role === 'admin')` — anti-pattern: при изменении правил нужно править UI везде, лучше конкретные actions."
+  },
+  "security__28": {
+    "hintEasy": "Не класть API-keys, secrets, env-переменные в клиентский код.",
+    "hintFull": "Bundle открыт всем — view-source видит. Никаких API-keys, AWS-creds, encryption-keys в JS. Только публичные конфиги (NEXT_PUBLIC_*).",
+    "answer": "Клиентский bundle полностью открыт пользователю — он видит и DevTools, и view-source, и сетевые запросы. Поэтому в bundle-е не должно быть никаких секретов: API-keys приватных сервисов, AWS-credentials, encryption-keys, internal endpoints, debug-flags. Использовать только переменные с публичным префиксом (NEXT_PUBLIC_ в Next.js, VITE_ в Vite). Серверные секреты — в server-only коде или в API-routes. Если случайно засветили — ротация ключа обязательна, потому что bundle уже залит на CDN и проксях. Помогают аудиты — bundle-analyzer проверяет, что не попало лишнее."
+  },
+  "security__29": {
+    "hintEasy": "PII, токены, пароли, банковские данные. Что юзер не хочет видеть в логах третьих лиц.",
+    "hintFull": "ФИО, email, телефон, адрес, payment-info, токены, пароли. GDPR/CCPA требует удаления. Логи попадают в Sentry/Datadog — третьи лица.",
+    "answer": "Категории, которые нельзя логировать. PII — имя, email, телефон, адрес, идентификаторы документов; GDPR/CCPA требует возможности удалить. Auth-данные — токены, пароли (даже hashed), session-id. Финансовые данные — номера карт, CVV, банковский счёт; PCI-DSS строго запрещает. Health и medical info. И всё, что относится к sensitive личной жизни (ориентация, политические взгляды). Логи попадают в Sentry/Datadog/CloudWatch — третьи лица или другая инфра. Стандартный подход — scrubbing на клиенте перед отправкой и серверный фильтр поверх. Лучше логировать ID, не значение."
+  },
+  "security__30": {
+    "hintEasy": "BeforeSend hook у Sentry — фильтровать поля. Server-side scrubbing поверх.",
+    "hintFull": "Sentry beforeSend — функция, через которую проходят все события. Из неё чистим request body, headers, локальные переменные, breadcrumbs.",
+    "answer": "Sentry, Datadog и подобные предоставляют beforeSend hook — функцию, через которую проходит каждое событие перед отправкой. В ней мы scrubbим: удаляем пароли из form-полей в breadcrumbs, маскируем email/phone в request body, очищаем sensitive query params. Дополнительно — server-side data scrubbing rules в самой Sentry: regex-ы по маске email, credit cards, kohle-tokens. Лучше двойная защита: клиент чистит, сервер сверху. И регулярные аудиты sample-events: открыть случайные события и проверить, что чувствительных данных нет. Особенно важно для fintech, где утечка PII = крупный штраф."
+  },
+  "security__31": {
+    "hintEasy": "Атака через зависимости: вредонос попал в npm-пакет, ты его установил, он внутри твоего bundle.",
+    "hintFull": "Maintainer пакета залил malicious-update, или сам пакет тайно куплен/похищен. У тебя в bundle 600 транзитивных зависимостей — любая может быть вектором.",
+    "answer": "Supply chain attack — атака не на твой код, а на зависимости. Вредонос попадает в npm-пакет, который ты используешь напрямую или транзитивно. У среднего React-проекта 600+ транзитивных зависимостей — поверхность огромная. Кейсы: hijacked-аккаунт maintainer-а (event-stream), tay-pо-typosquatting (paасkage с похожим именем), malicious update (ua-parser-js), стопка от государства (Russian Ural-team in npm-пакеты). Защита — pin версии в lockfile, аудит при добавлении новой зависимости, npm audit / Snyk в CI, уменьшение количества зависимостей, allowlist-только-для-prod-зависимостей."
+  },
+  "security__32": {
+    "hintEasy": "npm audit, Snyk, GitHub Dependabot — автоматический скан на известные уязвимости.",
+    "hintFull": "Автомат: npm audit, GitHub Dependabot, Snyk, Socket.dev. Ручка: смотреть популярность, maintained-status, контрибьюторов, security-history.",
+    "answer": "Автоматические инструменты. npm audit / yarn audit показывают известные CVE в зависимостях; в CI с --audit-level=high. GitHub Dependabot создаёт PR с обновлениями. Snyk и Socket.dev — продвинутые сервисы, ловят даже unpublished малвари. Ручная проверка при добавлении новой зависимости: сколько у пакета eженедельных downloads, как давно maintained, есть ли security history, кто контрибьюторы. Бонус — Socket.dev показывает, какие APIs пакет реально использует (если util-функция дёргает eval или fetch — повод задуматься). Главное — не add-ить зависимость на «один раз поюзать»."
+  },
+  "security__33": {
+    "hintEasy": "Регулярный npm audit с фильтром по severity, упавший audit фейлит CI.",
+    "hintFull": "npm audit --audit-level=high в CI. Critical/high — фейл сборки. Auto-fix через npm audit fix, ручная проверка breaking changes.",
+    "answer": "Стандартный flow. В CI после install запускается npm audit (или yarn audit, pnpm audit) с порогом severity. Critical и high — фейл сборки, не пускаем PR в main. Moderate — лог-варнинг, чинить в течение спринта. Low — игнор или ежемесячный аудит. Для известных false-positive — npm audit с overrides или explicit ignore. Регулярный (раз в неделю) автоматический PR от Dependabot. После аудит-fix — ручная проверка, что breaking changes не сломали приложение, тесты прогоняются. Никаких \"audit fix --force\" без проверки — может откатить версии и сломать продакшен."
+  },
+  "security__34": {
+    "hintEasy": "Безопасные значения по умолчанию — нужно специально включить опасное, не наоборот.",
+    "hintFull": "Cookie-helper по дефолту делает HttpOnly/Secure/SameSite=Lax. Sanitize по дефолту жёсткий. Permissive — opt-in с обоснованием.",
+    "answer": "Secure defaults — это принцип, что библиотека или утилита по умолчанию ведёт себя безопасно, и нужно специально opt-in-уть в опасное поведение. Например, helper для cookie по дефолту ставит HttpOnly + Secure + SameSite=Lax; чтобы сделать иначе, надо явно передать опции. Sanitize-функция по дефолту использует жёсткий whitelist; чтобы разрешить кастом, нужно явно передать config. CSP-конфиг по дефолту strict; чтобы разрешить inline-script, нужно явно. Это снижает количество багов из-за «забыл выставить флаг». Применяется на всех уровнях — от mock-фабрик в тестах до продакшен-конфигов."
+  },
+  "security__35": {
+    "hintEasy": "PCI/PII-сканы, threat model, dependency audit, pen-test критичных сценариев.",
+    "hintFull": "Code review с security-focus, threat modeling нового flow, проверка scrubbing-а PII, audit зависимостей, pen-test (manual или auto), CSP-проверка, secrets-scan.",
+    "answer": "Перед релизом fintech-фичи стандартный список. Threat modeling — что может пойти не так, какие активы атакуют, какие impact-ы. Code review с security-focus — отдельный второй ревью только под этим углом. Сканеры: dependency audit (Snyk), secrets scan (gitleaks), SAST для clientside (semgrep), CSP audit, headers audit (securityheaders.com). Penetration testing на критичных эндпоинтах (deposit, withdraw, KYC). Проверка PII scrubbing в логах. Compliance: PCI-DSS для платежных, GDPR для EU-юзеров, AML-flow на трансфер-фичи. И обязательно — incident-response план: кто отвечает, как ротировать ключи, как делать rollback. Без этого release-чек-лист fintech-фичи не закрыт."
+  }
+}

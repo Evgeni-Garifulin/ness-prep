@@ -1,0 +1,152 @@
+{
+  "accessibility__1": {
+    "hintEasy": "HTML, где теги отражают смысл: button — кнопка, nav — навигация, main — основной контент.",
+    "hintFull": "Использование правильных тегов вместо div-ов. Дает accessibility, SEO, дефолтное поведение и стили из коробки.",
+    "answer": "Semantic HTML — это использование тегов по их смысловому назначению: button для кнопок, nav для навигации, main для основного контента, header/footer для шапки/подвала, article для самодостаточных кусков. Это даёт три вещи бесплатно. Первая — accessibility: screen reader знает структуру, клавиатура работает корректно, role-ы выставляются автоматически. Вторая — SEO: поисковик понимает иерархию страницы. Третья — поведение из коробки: button даёт фокус, click по Enter, форму submit-ит. Замена тегов на div-ы означает, что всё это надо имитировать руками — и почти всегда плохо."
+  },
+  "accessibility__2": {
+    "hintEasy": "Native button фокусируется, реагирует на Enter/Space, объявляется screen reader-у — div нет.",
+    "hintFull": "div нужно ручное tabindex, key handling, role, aria. Любая забытая мелочь — сломанный UX для клавиатурника или незрячего.",
+    "answer": "Native button получает кучу поведения автоматически. Он фокусируется по Tab, активируется по Enter и Space, объявляется как «button» screen reader-у, корректно работает в форме, имеет дефолтные стили disabled. Div с role=button требует ручного tabindex=0, ручных onKeyDown для Enter и Space, ручного aria-disabled, и любая забытая мелочь сразу ломает UX. Кроме того, у button есть behavior внутри form (submit/reset/button), у div нет. Поэтому правило простое — использовать button везде, где это семантически кнопка. Кастомизация через CSS — без проблем."
+  },
+  "accessibility__3": {
+    "hintEasy": "Когда нативного семантического HTML недостаточно для описания поведения.",
+    "hintFull": "Сложные виджеты — combobox, accordion, tablist, tree. Динамические сообщения через aria-live. Когда нет нативного аналога.",
+    "answer": "ARIA нужна, когда нативного HTML недостаточно для описания поведения виджета. Это сложные интерактивные элементы — combobox, accordion, tablist, tree, slider — для которых нет нативного тега, и приходится строить из div-ов и button-ов с ARIA-атрибутами, описывающими роль и состояние. Также для динамических сообщений — aria-live делает асинхронные нотификации читаемыми screen reader-у. Правило first rule of ARIA — если есть нативный тег с нужным поведением, используй его, ARIA только когда нативного нет."
+  },
+  "accessibility__4": {
+    "hintEasy": "Когда дублирует нативное или применена неправильно — вредит больше, чем помогает.",
+    "hintFull": "<button role='button'> — лишнее. role='button' на ссылку — конфликтует. Незаполненный aria-label — сломанный announce.",
+    "answer": "ARIA вредит, когда дублирует или конфликтует. <button role='button'> — лишнее. <a role='button'> — конфликт: ссылка уже имеет роль link, переопределение ломает привычную семантику для screen reader-а. aria-label='' или с copy-паст ошибкой — компонент представляется как «empty» или с неправильным именем. aria-hidden=true на интерактивном элементе — он становится неприступным для screen reader-а, но всё ещё фокусируемым по Tab — пользователь застревает. Правило — добавлять ARIA только для конкретной нужды, проверяя поведение в screen reader-е, а не на глаз."
+  },
+  "accessibility__5": {
+    "hintEasy": "Текстовое имя, по которому screen reader идентифицирует элемент.",
+    "hintFull": "Берётся из aria-label, aria-labelledby, label, или содержимого. Кнопка-икона без accessible name = «button» без объяснения.",
+    "answer": "Accessible name — это текстовая идентификация элемента для screen reader-а. Браузер берёт его из набора источников по приоритету: aria-labelledby, aria-label, нативный label (для form-полей), title-атрибут, текстовое содержимое. Если accessible name пустой, элемент представляется как «button» или «edit» без подсказки, и пользователь не знает, для чего он. Самая частая ошибка — кнопка-иконка без aria-label: visual UI понятен, незрячему — нет. Проверяется в DevTools → Accessibility tab или axe DevTools."
+  },
+  "accessibility__6": {
+    "hintEasy": "По role=button (явная или из тега button) и accessible name из текста или aria-label.",
+    "hintFull": "Screen reader объявляет: «<accessible name>, button, <state>». Имя — от текста кнопки или aria-label. State — disabled/pressed.",
+    "answer": "Screen reader для кнопки объявляет три части. Роль — «button», берётся из тега button или role=button. Имя — accessible name: текст внутри кнопки, aria-label или aria-labelledby. Состояние — disabled, aria-pressed для toggle, aria-expanded для меню/аккордеона. Полная объявка примерно: «Submit, button» или «Settings, button, expanded». Если кнопка-иконка — нужен явный aria-label, иначе SR не знает имени. И если состояние динамическое (нажата, открыта) — обновлять соответствующий ARIA-атрибут, иначе SR будет говорить про устаревшее состояние."
+  },
+  "accessibility__7": {
+    "hintEasy": "Используй <button>. Если приходится div — tabindex=0, role=button, onClick + onKeyDown для Enter/Space.",
+    "hintFull": "Лучшее — нативный button. Если нельзя (legacy CSS-каскад) — div tabindex=0, role=button, accessible name, onKeyDown для Enter/Space, aria-disabled.",
+    "answer": "Лучший custom-button — это нативный <button>, стилизованный под нужный дизайн. Если по какой-то причине нельзя (редко, обычно из-за CSS legacy), нужно эмулировать: tabindex=0 для попадания в Tab-порядок, role='button' для роли, accessible name через aria-label или текст, onKeyDown для Enter и Space (preventDefault на Space, иначе скроллит страницу), aria-disabled для disabled-состояния, focus-стили. И всё равно теряются мелочи: behavior внутри form, корректная работа screen reader-а в особых режимах. Поэтому почти всегда лучше — переписать стили на button."
+  },
+  "accessibility__8": {
+    "hintEasy": "Focus trap, focus на первом элементе, return focus на trigger, role=dialog с aria-labelledby.",
+    "hintFull": "<div role='dialog' aria-modal='true' aria-labelledby='title'>. Focus trap внутри. Esc закрывает. Return focus на кнопку, открывшую модалку.",
+    "answer": "Accessible modal требует нескольких вещей. Контейнер — role='dialog' aria-modal='true' с aria-labelledby на заголовок. При открытии — focus переводится на первый интерактивный элемент или сам диалог. Tab крутится внутри диалога (focus trap), не уходит на background. Esc закрывает. Background — aria-hidden=true или inert, чтобы screen reader не читал контент за модалкой. После закрытия — focus возвращается на trigger-кнопку. Готовые библиотеки (Radix, Headless UI, react-aria) делают всё это. Своими руками — много граблей: dynamic content, vshadow DOM, iframes."
+  },
+  "accessibility__9": {
+    "hintEasy": "Trigger с aria-haspopup и aria-expanded, listbox/menu с роли option/menuitem, навигация стрелками.",
+    "hintFull": "Менять aria-expanded при открытии. Стрелки вверх/вниз по items, Enter выбирает, Esc закрывает. Корректные роли container и item.",
+    "answer": "Dropdown паттерн зависит от типа: menu (действия) или select (выбор значения). Для меню — trigger button с aria-haspopup='menu' aria-expanded='true|false', контейнер role='menu', items role='menuitem'. Стрелки вверх/вниз навигируют, Enter активирует, Esc закрывает, фокус возвращается на trigger. Для select-а — role='listbox', items role='option', aria-selected на активном. Tab выходит из dropdown-а (не закрывает). Готовые компоненты (Radix DropdownMenu, Headless UI Listbox) реализуют WAI-ARIA Authoring Practices правильно. Своими руками — обычно теряется хотя бы один аспект."
+  },
+  "accessibility__10": {
+    "hintEasy": "Сложный паттерн: input + listbox с подсказками, aria-controls, aria-activedescendant.",
+    "hintFull": "<input role='combobox' aria-controls='listbox-id' aria-expanded aria-activedescendant='option-id'>. Listbox с options. Стрелки навигируют, Enter выбирает.",
+    "answer": "Combobox — сложный паттерн (input с подсказками). Container или input — role='combobox' с aria-controls на listbox, aria-expanded на состояние открытия, aria-activedescendant на id текущего варианта. Listbox role='listbox' с options role='option'. Стрелки вверх/вниз меняют activedescendant без потери фокуса с input-а, Enter применяет, Esc закрывает. Тип combobox-а (autocomplete=list/inline/both) описан в WAI-ARIA APG 1.2. Это один из самых частых паттернов и один из самых сложных в правильной реализации; настоятельно использовать react-aria или Downshift, а не писать с нуля."
+  },
+  "accessibility__11": {
+    "hintEasy": "tablist → tab → tabpanel. Стрелки между табами, Tab выходит на panel.",
+    "hintFull": "<div role='tablist'> <button role='tab' aria-selected aria-controls='panel-id'> ... <div role='tabpanel'>. Стрелки лево/право меняют tab. Tab уходит в active panel.",
+    "answer": "Tabs паттерн прямой. Container — role='tablist'. Каждый tab — role='tab' с aria-selected, aria-controls на panel-id. Активный tab имеет tabindex=0, остальные — -1 (single tab in tab order). Стрелки лево/право переключают tab, Home/End — на крайние. Tab выводит фокус из tablist на содержимое активной panel. Tabpanel — role='tabpanel' с aria-labelledby на tab-id. Можно с активацией по фокусу (automatic activation) или по Enter (manual activation) — для сложных tab-ов с тяжёлым контентом manual лучше. Готовые решения: Radix Tabs, Headless UI."
+  },
+  "accessibility__12": {
+    "hintEasy": "role=tooltip + aria-describedby на цели; показывается на focus и hover.",
+    "hintFull": "Tooltip-element role='tooltip', id. Цель имеет aria-describedby=id. Показывается на focus + hover, скрывается на blur + mouseleave + Esc.",
+    "answer": "Tooltip — это вспомогательный текст, описывающий элемент. Контейнер tooltip — role='tooltip' с id. Цель имеет aria-describedby с этим id, чтобы SR прочитал описание после имени. Показывается на focus (для клавиатуры) и mouseenter, скрывается на blur, mouseleave, Esc. Содержимое — только текст; интерактивные элементы внутри tooltip не работают (если нужно — это уже popover, не tooltip). И не использовать tooltip как единственный способ передать важную информацию: пользователи мобильных и медленных читателей могут пропустить. Готовые библиотеки (Radix Tooltip) обрабатывают focus, hover, delay-логику."
+  },
+  "accessibility__13": {
+    "hintEasy": "Реальный <table> с <thead>, <th>, <tr>, <td>. Caption для имени.",
+    "hintFull": "Не div-ы с display:grid под видом таблицы. Native table, scope='col' на th, caption или aria-label, role='row' если кастомизация.",
+    "answer": "Самое важное — использовать настоящий <table> с <thead>, <th>, <tbody>, <tr>, <td>. Имитация через div-ы с display: grid ломает screen reader: он не понимает, что это таблица, не объявляет «table with N rows», не даёт навигацию по ячейкам. У <th> ставить scope='col' или 'row', чтобы SR ассоциировал ячейки с заголовками. Имя таблицы — через <caption> или aria-label. Если данных много — пагинация или виртуализация, но виртуализация ломает скрин-ридерскую навигацию по rowcount; на этот случай aria-rowcount/rowindex. И никогда не использовать table для layout — только для табличных данных."
+  },
+  "accessibility__14": {
+    "hintEasy": "th с button и aria-sort на текущей колонке (ascending/descending/none).",
+    "hintFull": "<th aria-sort='ascending|descending|none'> с <button> внутри для клика. Один th может иметь sort, остальные — none.",
+    "answer": "Sortable column — это th с интерактивным элементом (button) и атрибутом aria-sort. Значения: 'ascending', 'descending' для текущей сортировки, 'none' для остальных колонок. Только один th в одной таблице может иметь sort != none. Внутри th — кнопка (так как сортировка — действие), не просто кликабельный заголовок. SR объявляет «column sorted ascending» и пользователь понимает текущее состояние. На смену сортировки — обновляется aria-sort, и SR проговаривает изменение. Альтернатива для больших таблиц — комбинация с aria-live, чтобы анонсировать «sorted by Name ascending»."
+  },
+  "accessibility__15": {
+    "hintEasy": "ARIA-атрибут, говорящий о направлении сортировки в столбце таблицы.",
+    "hintFull": "aria-sort='ascending' или 'descending' или 'none'. Ставится на th. Один на таблицу, остальные — none.",
+    "answer": "aria-sort — это атрибут, описывающий состояние сортировки колонки таблицы. Принимает значения: 'ascending' (сортировка от меньшего к большему), 'descending' (наоборот), 'none' (не сортируется), 'other' (custom-сортировка). Ставится на <th> заголовка колонки. Только один заголовок в таблице может иметь не-none значение — иначе SR объявит конфликтующее состояние. Screen reader анонсирует «column sorted ascending», что критично для пользователя, который не видит визуальный индикатор стрелки. При смене сортировки — обновляется атрибут, SR воспроизводит изменение."
+  },
+  "accessibility__16": {
+    "hintEasy": "Регион, контент которого SR озвучивает при изменении — без перевода фокуса.",
+    "hintFull": "<div aria-live='polite'> или 'assertive'. Менял текст — SR озвучит. Используется для toast-ов, статусов, ошибок.",
+    "answer": "aria-live — это атрибут на контейнере, делающий его «живым» для screen reader-а. Когда текст внутри контейнера меняется, SR озвучивает новое содержимое, не переключая фокус. Значения: 'polite' — дождаться паузы и озвучить, 'assertive' — прервать текущее сообщение. Используется для toast-нотификаций, статусов («Saved», «Connection lost»), ошибок валидации. Ставится в самом начале на пустой контейнер; не вешать на разовое сообщение, так как на момент рендера content уже есть, и SR его не объявит. Для обычной валидации полей чаще используются aria-describedby."
+  },
+  "accessibility__17": {
+    "hintEasy": "Срочные ошибки — assertive по умолчанию, прерывает SR.",
+    "hintFull": "role='alert' = aria-live='assertive' aria-atomic='true'. Для ошибок, которые нельзя пропустить: «Платёж отклонён», «Соединение потеряно».",
+    "answer": "role='alert' — это shorthand для aria-live='assertive' aria-atomic='true'. Используется для срочных сообщений, которые нельзя пропустить: «Payment failed», «Session expired», «Order rejected». SR прерывает текущее сообщение и читает alert немедленно. Не использовать для второстепенных нотификаций — это раздражает (как escape-prompt каждые 5 секунд). Для информационных и не-критичных сообщений — role='status' (= polite). Контейнер должен существовать при mount-е страницы, текст внутри добавляется динамически — иначе SR не заметит."
+  },
+  "accessibility__18": {
+    "hintEasy": "Для информационных сообщений: success-toast, прогресс. Polite, не прерывает.",
+    "hintFull": "role='status' = aria-live='polite' aria-atomic='true'. «Saved», «Connecting», «3 results found». SR озвучит после паузы.",
+    "answer": "role='status' — это shorthand для aria-live='polite' aria-atomic='true'. Используется для информационных сообщений: «Saved», «3 results found», «Connecting...». SR анонсирует, дождавшись паузы в текущем сообщении, не прерывая. Это правильный выбор для большинства live-обновлений UI: загрузка завершилась, пришла нотификация, изменился счётчик. Контейнер с role=status должен существовать при mount-е, текст добавляется динамически. Если контейнер появляется уже с текстом — SR его не объявит, потому что не было «изменения»."
+  },
+  "accessibility__19": {
+    "hintEasy": "Поставить focus на сам диалог или первый интерактивный элемент.",
+    "hintFull": "При open: dialog.focus() или firstButton.focus(). Иначе фокус останется на background и Tab уйдёт за пределы модалки.",
+    "answer": "Когда модалка открывается, фокус нужно явно перевести внутрь. Иначе он остаётся на background, и пользователь клавиатурой не понимает, где он. Стандартные варианты: focus на сам диалог (если у него tabindex=-1 и aria-label) — SR прочитает заголовок и описание; или focus на первый интерактивный элемент (input, button) — удобно для форм. Для confirm-диалогов «вы уверены?» лучше focus на безопасный default (Cancel), не на destructive (Delete). И сохранить activeElement до открытия, чтобы потом вернуть. Готовые библиотеки делают это автоматически."
+  },
+  "accessibility__20": {
+    "hintEasy": "Сохранить activeElement до открытия, восстановить после закрытия.",
+    "hintFull": "const triggerEl = document.activeElement при open. На close: triggerEl?.focus(). Иначе фокус упадёт на body — клавиатурник теряется.",
+    "answer": "Перед открытием модалки сохраняешь document.activeElement (это та кнопка, которая открыла) в ref. После закрытия — вызываешь .focus() на этом элементе. Без этого фокус падает на body, и пользователь клавиатуры или screen reader-а оказывается «нигде» — ему придётся вручную искать себя на странице. Edge-кейс — кнопка, открывшая модалку, удалилась во время её работы (например, юзер отредактировал список и вернулся): тогда нужен fallback на разумный элемент рядом. Готовые библиотеки делают это автоматически и обрабатывают edge-кейсы."
+  },
+  "accessibility__21": {
+    "hintEasy": "Все интерактивы доступны через Tab, Enter/Space активирует, стрелки внутри сложных виджетов.",
+    "hintFull": "Tab по интерактивам в логичном порядке. Enter/Space на button/link. Стрелки в combobox/menu/tabs. Esc закрывает модалки и popover-ы.",
+    "answer": "Базовые правила. Все интерактивные элементы доступны через Tab в логичном визуальном порядке (DOM-порядок должен совпадать с визуальным). Не использовать tabindex > 0 — он ломает естественный порядок. Enter и Space активируют button и link. Внутри сложных виджетов (combobox, menu, tabs, tree, slider) — стрелки навигируют по items, Enter активирует, Esc выходит. В диалогах Tab крутится внутри. Skip-link «к основному контенту» в начале страницы помогает обойти длинную навигацию. Visible focus indicator — обязательно (никогда outline:none без замены). Тестируется простым прохождением по странице с клавиатуры."
+  },
+  "accessibility__22": {
+    "hintEasy": "axe-core / Lighthouse автомат + ручная проверка с клавиатурой и SR.",
+    "hintFull": "axe DevTools для статических нарушений. Ручная клавиатурная навигация. Проверка с реальным SR (NVDA/VoiceOver) на ключевых сценариях.",
+    "answer": "Автомат и ручка комбинируются. Автомат — axe DevTools или Lighthouse в CI: они ловят отсутствие alt, контраст, label, aria-атрибуты. Покрывают где-то 40% реальных проблем. Остальное — ручная проверка. Клавиатурная: пройти ключевые сценарии без мыши, проверить focus order, что все интерактивы достижимы, что modal trap работает. Screen reader: реально открыть NVDA на Windows или VoiceOver на Mac/iOS, пройти сценарий. Это самое точное, что есть, и единственный способ найти настоящие баги. Дополнительно — авто-тесты: jest-axe для unit, axe-core/playwright для e2e."
+  },
+  "accessibility__23": {
+    "hintEasy": "axe DevTools, Lighthouse, jest-axe, axe-core/playwright. Реальные SR — NVDA, VoiceOver.",
+    "hintFull": "Browser-extension axe DevTools. CI: jest-axe для unit, @axe-core/playwright для e2e. Lighthouse для overall. NVDA/VoiceOver для ручной проверки.",
+    "answer": "Стандартный набор. Для разработки — axe DevTools браузерное расширение, кликнул и видишь нарушения с объяснением. Lighthouse в DevTools даёт общую оценку и интегрируется с CI. Для тестов — jest-axe (axe-core внутри jest) для компонентного уровня, @axe-core/playwright для e2e. На CI запускаешь и фейлишь PR с регрессиями. Для глубокой проверки — реальные screen reader: NVDA на Windows (бесплатный), VoiceOver на Mac/iOS (встроенный), JAWS в корпоратах. И вспомогательно — color contrast checker, focus visible inspector. Без реального SR-теста любой статический инструмент проверяет только верхушку."
+  },
+  "accessibility__24": {
+    "hintEasy": "Селекторы по роли и accessible name — как SR видит страницу.",
+    "hintFull": "page.getByRole('button', {name: 'Save'}) вместо .css('.btn-save'). Если selector не находит — баг доступности или вёрстки.",
+    "answer": "getByRole — это локатор Playwright, который ищет элемент по ARIA-роли и accessible name, как screen reader. Например page.getByRole('button', { name: 'Save' }) находит кнопку с текстом или aria-label «Save». Это даёт два преимущества. Первое — устойчивость к рефакторингу: меняешь CSS-классы или вёрстку, но роль и имя остаются. Второе — accessibility-проверка бесплатно: если getByRole не находит элемент, вероятно, у него отсутствует accessible name или неправильная роль — это сразу баг доступности. Альтернативные локаторы (CSS, testid) хуже отражают пользовательское поведение."
+  },
+  "accessibility__25": {
+    "hintEasy": "WCAG: 4.5:1 для обычного текста, 3:1 для крупного. axe / contrast-ratio.com / DevTools.",
+    "hintFull": "AA-уровень: text 4.5:1, large text 3:1, UI-components 3:1. Инструменты — axe DevTools, Chrome contrast-checker в Inspect, contrast-ratio.com.",
+    "answer": "WCAG задаёт пороги контраста между текстом и фоном. Для AA-уровня (стандартный): обычный текст — 4.5:1, крупный (>=18pt или >=14pt bold) — 3:1, UI-компоненты и графика — 3:1. AAA-уровень требует 7:1 для текста, но это редко достижимо. Проверка: axe DevTools показывает все нарушения, Chrome DevTools в Inspect → Computed → Color подсвечивает отношение, contrast-ratio.com или WebAIM Contrast Checker — для пары цветов. И обязательно проверять не только нормальное состояние, но и hover, focus, disabled. Disabled-кнопки часто тёмно-серые на сером фоне с контрастом 2.5 — формально нарушение."
+  },
+  "accessibility__26": {
+    "hintEasy": "@media (prefers-reduced-motion: reduce) — отключить или упростить анимации.",
+    "hintFull": "Пользователи с вестибулярными расстройствами просят не анимировать. CSS-медиа prefers-reduced-motion: reduce — заменяешь анимацию на мгновенный переход.",
+    "answer": "Часть пользователей просит уменьшить движение в системных настройках — у них вестибулярные расстройства, мигрень, некоторые формы аутизма. Нарушение этого делает приложение непригодным. CSS-медиа @media (prefers-reduced-motion: reduce) детектирует настройку. Внутри убираешь или упрощаешь анимации: transform-движения заменяешь на opacity-fade, parallax выключаешь, auto-play видео ставишь на pause. Не отключай ВСЁ — простые transition между состояниями обычно ок. И декоративные иллюстрации (Lottie на героев, parallax-секции) — главные нарушители. В JS — window.matchMedia('(prefers-reduced-motion: reduce)') для логики."
+  },
+  "accessibility__27": {
+    "hintEasy": "WCAG требует, чтобы UI оставался usable при zoom 200%. Не ломать layout, не обрезать контент.",
+    "hintFull": "Тестировать в браузере на 200%. Использовать relative units (em, rem, %), flex/grid, не position-absolute с фиксами в px.",
+    "answer": "WCAG требует, чтобы при zoom 200% весь UI оставался usable: контент не обрезается, текст не накладывается, интерактивы доступны. Тестируется в браузере: Cmd/Ctrl + + до 200% и проход по ключевым страницам. Что обычно ломает — фиксированные размеры в px (виджет шириной 320px не помещается в 200% вьюпорт), position: absolute с фикс-координатами, overflow: hidden на контейнерах, шрифты в px вместо rem. Лечение — relative units (rem, em, %), flex/grid вместо абсолютных позиций, max-width вместо width, тестовый проход. На мобильных meta viewport не должен запрещать zoom (user-scalable=no — нарушение)."
+  },
+  "accessibility__28": {
+    "hintEasy": "Текст ошибки рядом с полем + связь через aria-describedby + aria-invalid.",
+    "hintFull": "<input aria-invalid='true' aria-describedby='err-id'> + <span id='err-id'>Error text</span>. SR прочитает поле + ошибку.",
+    "answer": "Error message связывается с полем через aria-describedby: <span id='err-1'>Email is invalid</span>, <input aria-describedby='err-1' aria-invalid='true'>. SR при фокусе на input объявит «email, edit, invalid, Email is invalid». aria-invalid помечает поле как сломанное; убирается при успешной валидации. Ошибки также должны быть видимы — текст рядом, иконка, цвет (не только цвет — для дальтоников). Для разовых ошибок (form submit failed) можно использовать role='alert', чтобы SR озвучил мгновенно. Для inline-валидации лучше aria-describedby + aria-invalid."
+  },
+  "accessibility__29": {
+    "hintEasy": "Связать ошибки с полями через aria-describedby/aria-invalid + summary вверху.",
+    "hintFull": "Каждое поле — label, aria-describedby для error, aria-invalid. После submit — error summary вверху с фокусом и ссылками на поля.",
+    "answer": "Полная схема для формы: каждое поле имеет связанный label (label-for или aria-labelledby). При ошибке — aria-invalid='true', aria-describedby на error-message. После submit с ошибками — error summary в начале формы (ul со ссылками на поля), фокус переводится на summary, role='alert' или h2 с tabindex=-1. SR прочитает summary, пользователь по ссылкам перейдёт к проблемным полям. Не использовать только цвет для индикации ошибки. Inline-валидация по blur, не по input — иначе SR прерывается на каждый символ. Для сложных форм — react-hook-form + готовые a11y-helper-ы."
+  },
+  "accessibility__30": {
+    "hintEasy": "Это требование, а не «опция» — затрагивает 15-20% пользователей и часто легально обязательно.",
+    "hintFull": "Накладывается законодательством (ADA, EU Accessibility Act). Помогает всем: keyboard-power-users, пожилые, временные ограничения. SEO-плюс.",
+    "answer": "A11y — не «опция», а часть базового качества. Объяснения по нескольким векторам. Юридический: WCAG 2.1 AA — стандарт, требуемый ADA в США, EU Accessibility Act с 2025 года для коммерческих сайтов. Несоблюдение = иски и штрафы. Демографический: 15-20% людей имеют постоянные нарушения, ещё больше — временные (травма, окружение). Расширенный UX: keyboard-power-users, screen reader не только незрячих, но и людей с дислексией. SEO: семантичный HTML повышает рейтинг. Стоимость: включить с самого начала — почти бесплатно; чинить пост-фактум — переписывать виджеты. Поэтому в quality bar a11y — обязательная позиция, не «когда будет время»."
+  }
+}

@@ -1,0 +1,277 @@
+{
+  "testing__unit-integration__1": {
+    "hintEasy": "Чистую логику — функции, reducer-ы, селекторы. Без сети, без рендера.",
+    "hintFull": "Pure-функции, reducer-ы, утилиты, бизнес-правила. Быстро, изолированно, без I/O. Не для UI-поведения.",
+    "answer": "Юнит-тестами тестируется чистая логика: функции форматирования, валидаторы, reducer-ы, селекторы, бизнес-правила. То, что принимает input и возвращает output без I/O. Запускаются мгновенно, не требуют setup-а БД или сети, изолированы. Их много, и они дают точечную обратную связь — упал тест calcDiscount → проблема в этой функции, а не где-то в дереве. Не подходят для UI-поведения (это integration-уровень) и для проверки cross-modules-поведения. Хорошие юнит-тесты описывают контракт: какой input → какой output, какие edge-cases."
+  },
+  "testing__unit-integration__2": {
+    "hintEasy": "Implementation details, тривиальные геттеры, чужой код, getter/setter.",
+    "hintFull": "Не тестируй приватные методы, что вызывается через что, тривиальные геттеры. Тесты на чужой код (библиотеку) — пустая трата.",
+    "answer": "Не стоит тестировать несколько вещей. Implementation details — какие функции вызываются и в каком порядке: ломаются при любом рефакторинге, не дают пользы. Тривиальные геттеры — return this.x не нуждается в тесте. Чужой код — если ты тестируешь, что lodash.debounce работает, ты тестируешь lodash, а не свой код. Mock-and-verify chains — когда тест полностью повторяет implementation. И простые конфиги, состоящие из констант. Правило — тест должен ломаться, когда меняется поведение, а не когда меняется реализация."
+  },
+  "testing__unit-integration__3": {
+    "hintEasy": "Несколько модулей вместе — компонент с своими хуками, хук с store-ом.",
+    "hintFull": "Поведение системы из двух-трёх частей: компонент + хук + mock API; форма + валидация + submit. Близко к user-experience, но без e2e-цены.",
+    "answer": "Integration-тесты проверяют поведение нескольких связанных частей вместе. В React это часто компонент + его хуки + mock API: рендеришь компонент через React Testing Library, мокаешь сеть через MSW, выполняешь действия, проверяешь результат. Например, форма валидации: ввёл невалидный email, нажал submit, видишь ошибку. Это близко к реальному UX, но дешевле e2e — нет браузера, нет polling-а UI. Покрывает 80% реальных багов: интеграция компонентов с API, обработка состояний, валидация, optimistic updates. Тестовая пирамида сейчас часто переходит в trophy с упором на этот уровень."
+  },
+  "testing__unit-integration__4": {
+    "hintEasy": "Критичные user-flow в реальном браузере: логин, чекаут, ключевые конверсии.",
+    "hintFull": "Сценарии, которые должны работать end-to-end: логин, оформление заказа, оплата. Не каждое поле формы — а смысловые маршруты.",
+    "answer": "E2E-тесты покрывают критичные user-flow в реальном браузере. Запуск Playwright/Cypress, реальный browser, реальный backend (или близкий к продакшену staging). Тестируются смысловые маршруты: пользователь логинится → переходит на dashboard → оформляет заказ → видит подтверждение. Не каждое мелкое поле или edge-case — это стоит дорого по времени и хрупкое. Что покрывают: integration на уровне всей системы (фронт + бэк + БД), реальные сетевые запросы, поведение в браузере, а не jsdom. Запускаются медленнее, поэтому в CI — отдельный stage, smoke-suite на каждом PR, full-suite на main."
+  },
+  "testing__unit-integration__5": {
+    "hintEasy": "Много unit, поменьше integration, мало e2e.",
+    "hintFull": "Классическая пирамида: unit как фундамент (быстрые, дешёвые), integration в середине, e2e на вершине (медленные, ценные). Соотношение примерно 70/20/10.",
+    "answer": "Классическая testing pyramid — много юнит-тестов как фундамент (быстрые, дешёвые), меньше integration-тестов, ещё меньше e2e на вершине (медленные, дорогие). Соотношение примерно 70/20/10. Логика: чем выше уровень, тем дольше выполнение, сложнее дебаг, чувствительнее к flaky. Юнит даёт точечную обратную связь по логике. Integration — за реальное поведение. E2E — за критичные сценарии. Эта модель родом из бэкенд-мира, где integration без CDN/UI/гонок проще. На фронте часто переходят к testing trophy — больше integration, меньше unit."
+  },
+  "testing__unit-integration__6": {
+    "hintEasy": "Когда unit-тесты ломают рефакторинг, а реальные баги — это интеграция компонентов.",
+    "hintFull": "Testing trophy: статика (TS) + интеграция в основе. Юнит — для чистой логики. На UI-фронте integration часто ловит больше реальных багов, чем mock-heavy unit.",
+    "answer": "Testing trophy (Кент Доддс) переставляет акценты для UI-приложений. Основа — статический анализ (TypeScript, ESLint), потом интеграция как самый большой слой, потом юнит, и e2e-кончик сверху. Логика: на фронте «юнит-тест» компонента почти всегда мокает много — store, router, API. Получается тест-имплементации, ломается при рефакторинге, не ловит реальных багов. Integration через RTL + MSW рендерит компоненты в реальном дереве, мокает только сеть — даёт уверенность, что страница работает, и устойчив к рефакторингу. Unit оставляют для чистой логики (валидаторы, утилиты)."
+  },
+  "testing__unit-integration__7": {
+    "hintEasy": "Input → output. expect(fn(x)).toBe(y).",
+    "hintFull": "Прямой тест: даёшь аргументы, проверяешь return-value. Edge-cases (null, undefined, граничные значения), error-paths, разные ветки.",
+    "answer": "Pure functions — это самый простой тест-кейс. Даёшь input — проверяешь output. expect(formatPrice(1234.5)).toBe('$1,234.50'). Покрываешь edge-cases: null, undefined, пустая строка, отрицательные числа, граничные значения. Error-paths: какие ошибки кидаются на невалидный input. Разные ветки логики: каждая if-ветка должна иметь покрывающий тест. Можно использовать table-driven подход: массив [{input, expected}], itEach или test.each. Это самые ценные тесты — быстрые, стабильные, описывают контракт. Если функция чистая, тест пишется за минуту."
+  },
+  "testing__unit-integration__8": {
+    "hintEasy": "Reducer = pure(state, action) → newState. Простейший тест в мире.",
+    "hintFull": "expect(reducer(prevState, action)).toEqual(nextState). Каждое action — отдельный тест. Edge-cases: unknown action возвращает старый state, immutability проверяется.",
+    "answer": "Reducer — это просто чистая функция (state, action) → newState. Тест — expect(reducer(prevState, action)).toEqual(expectedState). Каждое action имеет свой тест: для type=ADD_ITEM проверяешь, что в state добавилось; для REMOVE — что удалилось. Edge-cases: unknown action возвращает state без изменений, начальный state корректный, immutability не нарушена (prevState не мутируется). Если reducer сложный с computed-полями, проверяешь и эти производные. Это один из самых дешёвых и полезных юнит-тестов — пишутся быстро, не требуют моков, ловят реальные баги."
+  },
+  "testing__unit-integration__9": {
+    "hintEasy": "renderHook из @testing-library/react, проверять result.current после act-action.",
+    "hintFull": "renderHook(() => useCounter()). result.current = текущее значение. act(() => result.current.increment()). Проверяешь новое значение.",
+    "answer": "Стандартный инструмент — renderHook из @testing-library/react. Он создаёт мини-компонент, рендерит твой hook и даёт доступ к result.current — то, что hook возвращает. Любые мутации (setState внутри hook-а) оборачиваются в act. После — проверяешь новое result.current. Для сложных hook-ов с context-зависимостями — wrapper option, где ставишь нужные Provider-ы. Для async — waitFor для дожидания эффектов. Альтернатива — написать тестовый компонент-обёртку и тестировать через UI (RTL render); ближе к реальности, но многословнее."
+  },
+  "testing__unit-integration__10": {
+    "hintEasy": "renderHook + waitFor для проверки результата после async-эффекта.",
+    "hintFull": "renderHook(() => useUser(id)). await waitFor(() => expect(result.current.data).toBeDefined()). Mock fetch через MSW.",
+    "answer": "Async hook-и (useQuery, useFetch) тестируются с waitFor. Сначала рендеришь hook, ловишь начальное состояние (loading: true). Потом await waitFor(() => expect(result.current.isSuccess).toBe(true)) — Testing Library пробует assertion по таймеру до match-а или timeout-а. Сеть мокается через MSW (мок на уровне network, реалистично) или через jest.mock. Тестируешь happy path, error path, loading-state, refetch behavior. Race conditions — отдельные тесты с двумя последовательными вызовами и проверкой, что виден результат последнего. Cleanup — unmount + verify, что нет state-update warning."
+  },
+  "testing__unit-integration__11": {
+    "hintEasy": "React Testing Library: рендеришь, взаимодействуешь как пользователь, проверяешь то, что видно.",
+    "hintFull": "render + screen.getByRole + userEvent.click. Никаких enzyme-style state-tests. Тестируешь поведение, не имплементацию.",
+    "answer": "Стандарт — React Testing Library. render(<Component />) монтирует компонент в jsdom. Через screen.getByRole / getByText / getByLabelText находишь элементы как пользователь — по роли, тексту, метке. Через userEvent.click / type / hover симулируешь действия. Проверяешь, что отобразилось — текст, элементы, состояние формы. Никаких state-проверок изнутри (как в enzyme): тестируешь как пользователь. Это даёт устойчивость к рефакторингу — переписал hook на reducer, тест работает, потому что UI не изменился."
+  },
+  "testing__unit-integration__12": {
+    "hintEasy": "Тест должен ломаться при изменении поведения, не при изменении кода.",
+    "hintFull": "Если тест проверяет, что вызывается setState, он сломается при рефакторинге на useReducer — даже если UI работает. RTL заставляет тестировать видимое.",
+    "answer": "Тестирование изнутри — какие хуки используются, какие state-переменные есть, какие функции вызываются — даёт хрупкие тесты. Любой рефакторинг ломает их, даже если поведение не изменилось. Тестирование как пользователь — что видно на экране, что произошло после клика — стабильно: пока внешнее поведение то же, тест зеленый. Это даёт два больших плюса: безопасный рефакторинг (тесты сторожат behavior) и реалистичные баги (если тест не проходит, реальный пользователь увидит проблему). RTL философски заставляет писать такие тесты — getByRole / userEvent работают как сам пользователь."
+  },
+  "testing__unit-integration__13": {
+    "hintEasy": "Implementation меняется часто, контракт — редко. Тесты на implementation = боль при рефакторинге.",
+    "hintFull": "Тестируя how, а не what, ты подписываешься на боль каждый раз, когда меняешь how. И не ловишь баги, потому что implementation может работать, а behavior — нет.",
+    "answer": "Implementation details — это how: какие функции вызываются, какие state-переменные используются, какой алгоритм внутри. Меняется часто — рефакторинг, оптимизация, обновление зависимости. Если тесты завязаны на этом, они ломаются на каждом рефакторинге, и команда устаёт от поддержки тестов. Behavior (контракт) меняется редко — пользователь делает A, видит B. Тесты на behavior стабильны, рефакторинг проходит без правки. И самое главное — implementation может работать, а behavior — нет: моки врут, что-то теряется на стыке. Тест на behavior ловит реальные баги."
+  },
+  "testing__unit-integration__14": {
+    "hintEasy": "Когда нет нативного role/label, и переписать вёрстку под семантичный — нет смысла.",
+    "hintFull": "Скрытые элементы без интерактива (контейнер для drag-target), когда getByRole не даёт уникального match-а, для специфической логики тестов. Не как первый выбор.",
+    "answer": "data-testid — это последний резерв в Testing Library. Используется, когда element семантически не имеет роли (контейнер, разделитель, скрытый элемент) или когда нескольких элементов с одинаковой ролью разделить иначе сложно. Не для интерактивных элементов — там предпочитать getByRole с name. Также допустим в специфической тест-логике: data-testid='user-row-{{id}}' помогает уверенно обращаться к строке таблицы. Главное правило — getByRole / getByLabelText / getByText сначала, data-testid когда они не подходят. Аккуратно, чтобы не превратить тесты в data-testid spaghetti."
+  },
+  "testing__unit-integration__15": {
+    "hintEasy": "MSW — мокает на уровне network. Не jest.mock на fetch.",
+    "hintFull": "MSW (Mock Service Worker) перехватывает реальные fetch/XHR. Тесты не знают, что моки. Реалистично и переиспользуется в Storybook.",
+    "answer": "Современный стандарт — MSW (Mock Service Worker). Он перехватывает реальные fetch/XHR на уровне network через service worker (в браузере) или через node-перехват (в jest/vitest). Тестируемый код не знает, что моки — он просто делает fetch. Описываешь handlers: rest.get('/api/users', (req, res, ctx) => res(ctx.json([...]))). Это в разы лучше jest.mock('axios'), потому что не зависит от способа запроса, переиспользуется в Storybook и e2e, реалистично воспроизводит сетевое поведение. Альтернатива — nock для bare-bone Node-моков, но MSW популярнее и удобнее."
+  },
+  "testing__unit-integration__16": {
+    "hintEasy": "Когда мокаешь реальные API endpoints — не библиотеку, а сетевой слой.",
+    "hintFull": "MSW для интеграционных тестов с RTL: мокаешь GET /api/users, тестируешь компонент целиком. Также для e2e и Storybook — те же handlers.",
+    "answer": "MSW использовать для всех тестов, где нужен мок API: integration-тесты компонентов с RTL, тесты hook-ов через renderHook, e2e через Playwright. Бонус — те же handlers переиспользуются в Storybook и dev-environment, единый источник истины. Описываешь mocks один раз в setup.ts, переиспользуешь в jest.setup для тестов и в browser для dev. Edge-кейсы (error response, slow network) задаёшь через ctx.delay, ctx.status. Делегация handlers по test-suite-у через server.use(...). Не использовать MSW для совсем мелких юнитов — там jest.mock проще, но для всего, что выше — MSW лучший выбор."
+  },
+  "testing__unit-integration__17": {
+    "hintEasy": "jest.useFakeTimers + jest.setSystemTime(date) — фиксированный момент.",
+    "hintFull": "vi.setSystemTime / jest.setSystemTime замораживают Date.now. Удобно для тестов, зависящих от текущего времени (срок действия токена, относительная дата).",
+    "answer": "Для тестов, зависящих от текущего времени, используются fake timers: jest.useFakeTimers() / vi.useFakeTimers(). Дополнительно jest.setSystemTime(new Date('2024-01-01T00:00:00Z')) фиксирует Date.now(). Все вызовы new Date(), Date.now() возвращают этот момент, тест стабилен. После теста — vi.useRealTimers() / jest.useRealTimers(). Полезно для тестов формат-функций («2 hours ago»), expiration-логики (token истёк или нет), любых time-based условий. Без fake timers тесты, зависящие от времени, флакают на медленных машинах."
+  },
+  "testing__unit-integration__18": {
+    "hintEasy": "vi.useFakeTimers + vi.advanceTimersByTime — продвигаешь время вручную.",
+    "hintFull": "useFakeTimers заменяет setTimeout/setInterval. Тест продвигает время через advanceTimersByTime(N), вызывает callback-и в нужный момент, синхронно.",
+    "answer": "Те же fake timers покрывают setTimeout/setInterval. После jest.useFakeTimers() все таймеры не выполняются автоматически — тест продвигает время через jest.advanceTimersByTime(1000) или jest.runAllTimers(). Это синхронно и предсказуемо. Удобно для debounce/throttle: ввёл текст, advance на 300 мс, проверил, что callback вызвался один раз. Для async-логики, использующей таймеры, нужно сочетать с act/waitFor. Edge-кейс — fake timers могут влиять на microtasks; современные fake timers конфигурируются (legacy vs modern), и часто нужно явно прокидывать setTimeout в обход. Для setInterval — runOnlyPendingTimers, чтобы не зациклиться."
+  },
+  "testing__unit-integration__19": {
+    "hintEasy": "mock-socket подменяет глобальный WebSocket — fake-server в тесте.",
+    "hintFull": "import { Server } from 'mock-socket'; Server заменяет реальный сервер. Тест отправляет messages в fake-server, клиент ловит их обычным WebSocket.",
+    "answer": "Стандарт — mock-socket (npm-пакет). Заменяет глобальный WebSocket в jest, тест создаёт fake-server, клиент в коде делает new WebSocket(url) и подключается к подменённому. Сервер шлёт сообщения через server.emit, клиент ловит обычным onmessage. Тестируешь логику обработки: пришло сообщение → state обновился. Edge-cases: разрыв соединения через server.close, reconnect-логика. Альтернатива — поднять реальный WS-сервер на ws (Node.js пакет) в beforeAll и подключаться по реальному URL — медленнее, но реалистичнее для интеграционных тестов. В Playwright e2e — обычно реальный mock-server поднимается в test-fixture."
+  },
+  "testing__unit-integration__20": {
+    "hintEasy": "Создать controller, передать signal в fetch, abort, проверить что reject с AbortError.",
+    "hintFull": "Test: controller.abort() во время pending request. Mock fetch может игнорировать abort, тогда AbortController тестируется через MSW с delay.",
+    "answer": "AbortController тестируется через сценарий: вызвал async-функцию, abort() во время выполнения, проверил, что reject с AbortError. С MSW делаешь handler с ctx.delay(1000), запускаешь fetch, через минимальное время вызываешь abort, ждёшь rejection. Альтернатива — мок fetch напрямую с поддержкой signal: handler проверяет signal.aborted и rejects. Для compound-сценариев — компонент делает запрос, размонтируешь, проверяешь, что fetch abort-нулся (не setState на размонтированном). Test, что AbortController correctly chains: parent abort отменяет child fetch."
+  },
+  "testing__unit-integration__21": {
+    "hintEasy": "Запускаешь два запроса последовательно, проверяешь, что виден результат последнего.",
+    "hintFull": "Mock medlennoe slow-response, запускаешь request-A, потом request-B. B завершается быстрее, A приходит позже — UI должен показать B, не A.",
+    "answer": "Race condition в UI часто случается так: пользователь печатает в search input, два запроса в полёте, первый медленный, второй быстрый. В тесте имитируешь: MSW handler с ctx.delay для первого запроса, без delay для второго. Запускаешь оба последовательно, дожидаешься обоих, проверяешь, что отображается результат второго (последнего). Если код корректный — он использует AbortController или ignore-флаг, и результат первого отбрасывается. Если нет — первый перетёр второй, тест падает. Этот тип теста — самый ценный для async-UI, потому что сам сценарий часто пропускают в дев-режиме на быстрой сети."
+  },
+  "testing__unit-integration__22": {
+    "hintEasy": "Render → проверяешь, что виден skeleton/spinner до завершения запроса.",
+    "hintFull": "Mock slow API через MSW. Render. Проверяешь screen.getByRole('progressbar') или getByText('Loading...'). Потом await waitFor → result.",
+    "answer": "Loading state тестируется через медленный mock API. С MSW добавляешь ctx.delay(100). Рендеришь компонент, мгновенно проверяешь — на экране skeleton, spinner или 'Loading...'. Дальше await waitFor — данные подгрузились, проверяешь финальный UI. Альтернатива — fake timers с предсказуемой задержкой. Важно — проверять не только наличие loading-индикатора, но и что content скрыт (на пустом контейнере не должно быть прежних данных). Также тестируется skeleton-разметка для accessibility: aria-busy, aria-live. И UX-аспект: skeleton имеет правильную структуру, не «один spinner на всё»."
+  },
+  "testing__unit-integration__23": {
+    "hintEasy": "Mock API возвращает 500, проверяешь, что виден error-message и retry-кнопка.",
+    "hintFull": "MSW handler с ctx.status(500). Render → waitFor → screen.getByText('Failed to load'). Click retry → handler шлёт success, проверяешь восстановление.",
+    "answer": "Error state тестируется через mock-ответ с error-status. С MSW — ctx.status(500) или ctx.networkError(). Рендеришь, ждёшь error-state: проверяешь сообщение, кнопку retry. Если есть retry — мокаешь handler-once и кликаешь retry, дожидаешься success, проверяешь UI. Тестировать разные коды (404 → not found, 401 → redirect to login, 500 → generic error). Edge-cases: timeout, network error без response, malformed JSON. Aria-проверка — error message связан с focused element через aria-describedby или role='alert'. И обязательно — что error не «застывает», следующий retry/refetch чистит его."
+  },
+  "testing__unit-integration__24": {
+    "hintEasy": "Mock возвращает [], проверяешь empty-illustration и CTA вместо данных.",
+    "hintFull": "MSW handler с ctx.json([]). Render → waitFor → screen.getByText('No items yet') и CTA-кнопка. Не показывает skeleton после resolve-а.",
+    "answer": "Empty state — частый недотестированный сценарий. Mock-handler возвращает пустой массив или объект с нулевым набором. Рендеришь, ждёшь — проверяешь, что виден empty-illustration, объяснительный текст, CTA-кнопка для начала действия. Не должно быть skeleton после resolve-а (это путаница), не должно быть ошибки (это не error). Идеально — отдельная state-машина с loading/empty/error/success, и тесты под каждую ветку. Edge-case — переход между empty и success: добавил элемент → empty уходит, появляется список. Тестировать также CTA: click работает, открывает модалку или другой flow."
+  },
+  "testing__unit-integration__25": {
+    "hintEasy": "Mutation вызывает мгновенный UI-апдейт, потом mock сервер отвечает или падает.",
+    "hintFull": "userEvent.click на like → счётчик сразу +1. Потом MSW handler reject — проверяешь rollback и error-toast. Это тестирует optimistic + revert логику.",
+    "answer": "Optimistic update тестируется в два сценария: success path и error rollback. Success: клик по «лайк», счётчик мгновенно +1 (до сетевого ответа), потом mock резолвится, состояние подтверждается. Error rollback: тот же клик → счётчик +1, mock с ctx.status(500), счётчик откатывается обратно, появляется error-toast. Тест позволяет проверить, что rollback логика реально работает (часто эту ветку забывают). Если несколько mutations подряд — отдельный сценарий с stack-ом prev-значений, чтобы убедиться, что они не затирают друг друга. Race-condition между mutation-ами — отдельная нагрузка на тесты."
+  },
+  "testing__unit-integration__26": {
+    "hintEasy": "jest-axe прогоняет axe-core на отрендеренном компоненте — фейлится при нарушении.",
+    "hintFull": "import { axe, toHaveNoViolations } from 'jest-axe'. const { container } = render(<X />); expect(await axe(container)).toHaveNoViolations().",
+    "answer": "На юнит/integration уровне используется jest-axe. После render(<Component />) запускается axe-core на DOM-фрагменте, и если есть нарушения (отсутствие label, плохой контраст, неправильная роль), тест фейлится. Это закрывает 30-40% реальных a11y-багов автоматически. Дополнительно — RTL сам поощряет accessibility: getByRole, getByLabelText не находят элемент с плохим accessible name. Поэтому хорошо написанный RTL-тест уже косвенно проверяет a11y. Реальные SR-тесты на этом уровне не делаются — это уже e2e или ручка."
+  },
+  "testing__unit-integration__27": {
+    "hintEasy": "userEvent.tab() и userEvent.keyboard для проверки Tab order и keyboard shortcut-ов.",
+    "hintFull": "userEvent.tab() двигает focus, проверяешь document.activeElement. userEvent.keyboard('{Enter}') / '{Escape}' — keyboard навигация и shortcut-ы.",
+    "answer": "Keyboard navigation тестируется через userEvent. await userEvent.tab() двигает focus вперёд по Tab-порядку, expect(document.activeElement).toBe(...). Shift+Tab — userEvent.tab({shift: true}). Активация — userEvent.keyboard('{Enter}') или '{Space}'. Закрытие — '{Escape}'. Стрелки — '{ArrowDown}' для combobox/menu. Тестируешь, что Tab проходит интерактивы в правильном порядке, focus trap в модалках работает (Tab крутится внутри), Esc закрывает, return focus на trigger после закрытия. Это покрывает значительную часть a11y, которую ручкой уставшая команда забудет проверить."
+  },
+  "testing__unit-integration__28": {
+    "hintEasy": "Заполнить поля, отправить, проверить результат или ошибки валидации.",
+    "hintFull": "userEvent.type на input-ы, click на submit. Проверяешь либо success-state, либо появление error-сообщений рядом с полями. MSW мокает submit endpoint.",
+    "answer": "Стандартный flow. Рендеришь форму, через userEvent.type заполняешь поля (await userEvent.type(screen.getByLabelText('Email'), 'test@x.com')), click на submit. Проверяешь либо success — переход на следующий экран, появление success-toast — либо ошибки валидации возле полей. MSW мокает submit-endpoint: для success возвращает 200, для server-error — 500. Edge-cases: невалидный input (показ ошибок без submit для inline-валидации), disabled-кнопка при невалидной форме, multiple submit (debounce/disable), keyboard submission (Enter в input). Для сложных форм — отдельный test-suite с table-driven сценариями."
+  },
+  "testing__unit-integration__29": {
+    "hintEasy": "Ввёл невалидное → видишь ошибку. Ввёл валидное → ошибка пропадает.",
+    "hintFull": "userEvent.type → blur → проверяешь error. Type valid → error gone. На submit с невалидной формой — error summary вверху, focus на первой ошибке.",
+    "answer": "Validation тестируется по flow ввода. Type невалидное значение, blur поле, проверяешь error-message появился. Type валидное — error исчез. Если validation срабатывает on-submit, попытка submit показывает все errors сразу, фокус идёт на первое invalid-поле. С react-hook-form все эти переходы автоматизированы, но тестировать всё равно нужно. Особое внимание — corner cases: пустое поле required, превышение max-length, async validation (email already taken через mock API). И a11y-аспект: aria-invalid='true', error связан с полем через aria-describedby."
+  },
+  "testing__unit-integration__30": {
+    "hintEasy": "Не sleep, не проверки на implementation, изоляция данных между тестами.",
+    "hintFull": "Замена sleep на waitFor с конкретным условием. Cleanup БД/storage перед каждым тестом. Не зависеть от времени и порядка тестов. fake-timers вместо реального setTimeout.",
+    "answer": "Flaky-тесты — те, что иногда зеленые, иногда красные. Главные источники. Race conditions: используй waitFor с конкретным condition, не sleep. Shared state между тестами: cleanup в afterEach (clear localStorage, reset MSW handlers, очистка БД). Зависимость от времени: jest.setSystemTime для фиксации, fake timers для контролируемого продвижения. Зависимость от порядка тестов: каждый тест должен быть независимым, beforeEach setup. Сетевые завязки: MSW вместо реальных API. Animation/transition: отключай в тестах (CSS-rule transitions: none). И при flaky — не игнорировать, а фиксить, иначе со временем suite станет бесполезен."
+  },
+  "testing__e2e-playwright__1": {
+    "hintEasy": "Критичные user-flow в реальном браузере с реальным backend (или близким).",
+    "hintFull": "Login, checkout, payment, ключевые конверсионные сценарии. Не каждое поле — а смысловые маршруты от старта до завершения.",
+    "answer": "В Playwright тестируются критичные end-to-end сценарии в реальном браузере. Это пользовательские flow от начала до конца: логин → переход на dashboard → создание заказа → оплата → подтверждение. Тестируется сразу всё — фронт, реальные сетевые запросы, бэкенд (либо реальный staging, либо высокого качества mock). Покрывает то, что не ловит integration: реальные браузерные API, поведение под реальной нагрузкой, мультистраничные flow. Не для каждого поля или edge-case формы — это дорого и хрупко. Задача e2e — уверенность в критичных сценариях, остальное покрывает unit/integration."
+  },
+  "testing__e2e-playwright__2": {
+    "hintEasy": "Бизнес-логику, edge-cases форм, всё, что тестируется быстрее на нижних уровнях.",
+    "hintFull": "Не тестируй валидацию формы в e2e (это integration). Не тестируй каждый edge-case (часами идёт). E2E — для уверенности в маршрутах, не покрытие.",
+    "answer": "Не стоит тестировать в Playwright. Бизнес-логику чистых функций — это юнит. Каждый edge-case формы — integration ловит дешевле. Полное покрытие компонент по рендерингу — слишком дорого, лучше unit/integration. Сложные сценарии с десятками шагов — превратятся в flaky-монстров. Тесты сторонних библиотек (как работает axios) — никогда. Вместо этого e2e фокусируется на 5-15 критичных user-flow, которые должны работать всегда: signup, login, основной use-case продукта, checkout/payment. Маленькое количество, высокое качество, стабильность."
+  },
+  "testing__e2e-playwright__3": {
+    "hintEasy": "getByRole с name — как пользователь и screen reader.",
+    "hintFull": "page.getByRole('button', {name: 'Save'}) предпочтительнее page.locator('.btn-save'). Устойчив к рефакторингу + проверка a11y.",
+    "answer": "Иерархия предпочтений по локаторам. Первый — getByRole с accessible name: page.getByRole('button', {name: 'Save'}). Так пользователь видит элемент через screen reader. Второй — getByLabel для form-полей: getByLabel('Email'). Третий — getByText для уникального текста. Четвёртый — getByTestId как resort, когда невозможно по семантике. Избегать CSS-селекторов, особенно классов: они ломаются на рефакторинге, и не описывают user-intent. Преимущество role/label-based — тест фейлится одновременно если accessibility сломалась, что часто полезный сигнал."
+  },
+  "testing__e2e-playwright__4": {
+    "hintEasy": "Class-name меняется на каждом рефакторинге CSS. Role/name — стабильны.",
+    "hintFull": "CSS-классы — implementation. Role и accessible name — это контракт UI. Рефакторинг CSS не должен ломать тесты, рефакторинг семантики — должен.",
+    "answer": "CSS-селекторы — это implementation: классы, иерархия, структура DOM. Любой рефакторинг (Tailwind переписали, BEM на CSS-modules мигрировали, поменяли вёрстку) ломает их. getByRole с name работает на семантическом уровне: пока кнопка остаётся кнопкой с текстом «Save», она находится. Это и устойчивость к рефакторингу, и accessibility-проверка бесплатно: если getByRole не находит элемент, скорее всего у него нет accessible name — баг для пользователя SR. CSS-селекторы остаются последним резервом для случаев, где никакой семантической альтернативы нет."
+  },
+  "testing__e2e-playwright__5": {
+    "hintEasy": "Playwright сам ждёт, пока элемент станет actionable перед действием.",
+    "hintFull": "page.click() ждёт элемент стать видимым, enabled, без overlay. await locator.fill() ждёт пока input принимает ввод. Без явных sleep.",
+    "answer": "Auto-waiting — встроенный механизм Playwright, делающий тесты стабильными. Перед click он ждёт: элемент существует, видимый (visible), стабильный (не движется), enabled, не перекрыт другим элементом. Перед fill — что input принимает ввод. Перед expect(...).toBeVisible() — что условие выполнится в течение timeout-а. Это убирает 90% причин flaky. Никаких sleep(2000), никаких проверок «элемент уже здесь?». Тест читается линейно, как user-action. Если действительно нужно дождаться чего-то нестандартного — page.waitForFunction или waitForResponse, не sleep."
+  },
+  "testing__e2e-playwright__6": {
+    "hintEasy": "Sleep — гарантия flaky: на быстрой машине лишний, на медленной — не хватает.",
+    "hintFull": "sleep ждёт ровно N мс, не зависит от состояния. Быстрый CI — пустая трата. Медленный CI — недостаточно. Используй waitFor с условием.",
+    "answer": "sleep(N) — анти-паттерн. Он ждёт фиксированное время независимо от реального состояния системы. На быстрой машине ты теряешь время впустую (тест запускается дольше). На медленной/нагруженной — N не хватает, тест флакает. Замена — auto-waiting (встроен в Playwright actions) или явные waitFor с условием: page.waitForResponse(url), page.waitForFunction(() => done), expect(...).toBeVisible({timeout: 10000}). Они ждут ровно столько, сколько нужно, и фейлят с понятной ошибкой при таймауте. sleep остаётся только в редчайших случаях, когда нет наблюдаемого побочного эффекта (анимация без callback-а)."
+  },
+  "testing__e2e-playwright__7": {
+    "hintEasy": "1-2 retry для известно-flaky тестов в CI; 0 локально для честной обратной связи.",
+    "hintFull": "В playwright.config: retries: process.env.CI ? 2 : 0. Локально без retry — ловишь реальные баги. В CI с retry — компенсируешь сетевую/инфраструктурную нестабильность.",
+    "answer": "Retries — компромисс. Без них один flaky-тест блокирует merge всех PR-ов. С большим количеством — настоящие баги маскируются. Стандарт: 0 локально (видишь реальное поведение), 1-2 в CI (компенсируешь network jitter, slow runner-ы). В playwright.config: retries: process.env.CI ? 2 : 0. Дополнительно — Playwright помечает тесты как flaky, если они проходят при retry; такие надо видеть в репорте и исправлять. Не превращай retry в подушку: если тест retry-ит ВСЕГДА, он либо broken, либо плохо написан. Хороший индикатор — flaky-rate в CI-дашборде, watch если растёт."
+  },
+  "testing__e2e-playwright__8": {
+    "hintEasy": "Запусти тест 100 раз. Стабильно красный = bug. Иногда красный = flaky.",
+    "hintFull": "playwright test --repeat-each=100. Если 100/100 fail — это product bug. Если 95/100 pass — flaky-тест (проблема в тесте или окружении).",
+    "answer": "Запуск тестам с --repeat-each=100 (или 50) даёт быструю классификацию. 100% fail — реальный баг продукта, чинить там, не в тесте. 100% pass — стабильный тест. Между ними — flaky, проблема в самом тесте или окружении. Типичные причины flaky: race conditions без waitFor, sleep вместо ожидания, shared state между тестами (БД, localStorage), временные зависимости, animations с непредсказуемой длительностью, network jitter в реальных запросах. Лечить надо тест, а не глушить retry-ями. CI-дашборды (Currents, Trunk) показывают flaky-rate по тестам — отличный фильтр для проблем."
+  },
+  "testing__e2e-playwright__9": {
+    "hintEasy": "Сохранить storage state после реального login, переиспользовать в тестах.",
+    "hintFull": "globalSetup: реальный логин в UI или через API → context.storageState() → сохранить в файл → reuse в каждом тесте через storageState option.",
+    "answer": "Прямой login через UI в каждом тесте — медленно и хрупко. Стандартный паттерн: один раз в globalSetup делаешь реальный логин (либо через UI, либо через API), сохраняешь storage state в файл (cookies + localStorage). Потом каждый тест использует storageState: 'auth.json' в test config — стартует уже залогиненным. Для разных ролей (admin, user, guest) — несколько storage state файлов и projects в playwright.config с разными storageState. Если auth-state может протухать (refresh-token expired), периодически обновляется. Для прямой проверки login-flow — отдельные тесты без storageState."
+  },
+  "testing__e2e-playwright__10": {
+    "hintEasy": "Один setup, один auth.json, переиспользуется в desyatkах тестов.",
+    "hintFull": "globalSetup делает login один раз, сохраняет state в файл. Каждый тест читает: use: { storageState: 'auth.json' }. Многократное логинение убрано.",
+    "answer": "Storage state — это снимок cookies и localStorage из browser context. После логина сохраняешь: await context.storageState({path: 'auth.json'}). Любой тест может стартовать с этим state-ом: use: { storageState: 'auth.json' } в test config или test.use({...}) внутри. Это даёт огромный speedup — десятки тестов больше не повторяют login flow. Multi-role: разные storage state files для admin/user/guest, projects в config с условным test-набором для каждой роли. Для CI важна изоляция тестов: каждый получает свежий context из storage, мутации не текут между тестами."
+  },
+  "testing__e2e-playwright__11": {
+    "hintEasy": "Каждый тест в свежем browser context. Test data уникальный — не пересекается.",
+    "hintFull": "Browser context per test (Playwright делает по умолчанию). Test data с UUID или timestamp — не конфликтует. Cleanup в afterAll или через TTL.",
+    "answer": "Изоляция — основа стабильного e2e-suite. Browser context per test (по умолчанию в Playwright) — куки, storage, истории не текут между тестами. Test data — уникальные значения для каждого теста: UUID в email-ах, timestamp в названиях; создавать через API в beforeEach, удалять в afterEach или через TTL на бэке. Если используется shared БД — каждый тест в своём namespace (поле company_id или tenant). Параллельный запуск (Playwright делает workers) усиливает требования: два теста одновременно не должны менять одну сущность. Без изоляции тесты становятся непредсказуемыми, особенно в CI."
+  },
+  "testing__e2e-playwright__12": {
+    "hintEasy": "page.route с handler, возвращающим error-status. Проверить error-handling в UI.",
+    "hintFull": "page.route('**/api/data', route => route.fulfill({status: 500})). Проверить, что виден error-message и retry работает.",
+    "answer": "Network failures в Playwright тестируются через page.route — перехват сетевых запросов. Можно ответить error-кодом: route.fulfill({status: 500, body: 'Server Error'}). Прервать запрос: route.abort(). Симулировать timeout: route.fulfill через ctx.delay в подходящем виде. Тест: загружаешь страницу, при запросе срабатывает наш mock с error → проверяешь UI: error-message, retry-кнопка, fallback-state. Click на retry → меняешь route на success → проверяешь восстановление. Это даёт уверенность в graceful degradation: пользователь не видит «белый экран» при сетевом сбое."
+  },
+  "testing__e2e-playwright__13": {
+    "hintEasy": "page.route + delay в handler — тестируешь loading-states и timeout.",
+    "hintFull": "page.route('**/api/data', async route => { await new Promise(r => setTimeout(r, 3000)); route.continue(); }). Проверяешь, что виден skeleton 3 секунды.",
+    "answer": "Slow network тестируется через page.route с искусственной задержкой. await new Promise(resolve => setTimeout(resolve, 3000)) перед route.continue() даёт фиксированную задержку. Тестируешь, что во время загрузки виден skeleton/spinner, что timeout-логика срабатывает (если есть), что cancel-кнопка работает. Альтернатива — context.route с маршрутами и emulator slow 3G. Также Playwright поддерживает CDP-команду Network.emulateNetworkConditions для глобальной эмуляции типа 3G slow. Это полезно для проверки реалистичной мобильной картины."
+  },
+  "testing__e2e-playwright__14": {
+    "hintEasy": "Logged-in storage state с разными ролями — отдельный test-suite на каждую роль.",
+    "hintFull": "Setup: admin.json и user.json. Тесты с use({storageState: 'admin.json'}) проверяют admin-features, без них fail для user.",
+    "answer": "Permissions тестируются через разные logged-in storage states. Setup создаёт user-ов с разными ролями через API, логинит каждого, сохраняет storageState (admin.json, user.json, guest.json). Тесты декларируют, какой state использовать, и проверяют доступные/недоступные элементы. Ключевое: тестируешь и happy path (admin видит admin-кнопку), и negative (user не видит). Для второго — проверка отсутствия элемента (toBeHidden или not.toBeVisible с timeout). Также проверять прямой URL-доступ: user идёт на /admin/users — редирект на /403 или /home, не показ страницы."
+  },
+  "testing__e2e-playwright__15": {
+    "hintEasy": "Прямо в setup-те флаг flag через env или query param, проверяешь обе ветки.",
+    "hintFull": "Use storage state с feature flag в localStorage / cookie, или query param ?ff=new-checkout. Запускаешь два test-suite на старый и новый.",
+    "answer": "Feature flags задаются разными способами. Самый прямой — query param: page.goto('/checkout?ff=new-checkout'), фронт читает и активирует. Или в localStorage через page.evaluate перед началом теста. Или через storage state с уже выставленным флагом. Для сложных flag-сервисов (LaunchDarkly, GrowthBook) — мокаешь через page.route на их API. Test-suite для каждой ветки: один с включённым флагом, второй с выключенным. В CI можно запускать оба или только релевантный к проверяемому изменению. После полного rollout — старая ветка удаляется."
+  },
+  "testing__e2e-playwright__16": {
+    "hintEasy": "Скриншот после рендера, сравнение с baseline. Diff > threshold = fail.",
+    "hintFull": "await expect(page).toHaveScreenshot('checkout.png'). Первый запуск — baseline, последующие — diff. Учитывает шрифты, animations, динамические данные.",
+    "answer": "Visual regression в Playwright — встроенно. await expect(page).toHaveScreenshot('checkout.png') делает скриншот и сравнивает с baseline. Первый запуск создаёт baseline, последующие проверяют diff. Threshold настраивается. Динамические данные (timestamps, user names) маскируются через mask или фиксируются seed-данными. Animations отключаются (CSS transitions: none) или замораживаются. Шрифты загружаются полностью перед снимком. Альтернативные сервисы — Percy, Chromatic — имеют более удобные дашборды и review-flow для команд. Для каждого PR — diff в UI, человек апрувит изменение или отклоняет."
+  },
+  "testing__e2e-playwright__17": {
+    "hintEasy": "playwright projects с разными viewport-ами — desktop, tablet, mobile.",
+    "hintFull": "В config — projects: [{name: 'desktop', viewport: {width: 1280}}, {name: 'mobile', viewport: {width: 375}}]. Один тест прогоняется на всех.",
+    "answer": "Responsive UI тестируется через playwright projects с разными viewport-ами. В playwright.config объявляешь несколько projects: chromium-desktop (1280×800), webkit-mobile (375×667), tablet-portrait (768×1024). Каждый тест прогоняется на всех проектах автоматически. Это покрывает базовые сценарии — что layout не сломан, ключевые элементы доступны на mobile, нет horizontal-overflow. Для глубокой проверки responsive — отдельные тесты, проверяющие конкретные media-query поведение: drawer-меню вместо горизонтального на mobile, грид перестраивается."
+  },
+  "testing__e2e-playwright__18": {
+    "hintEasy": "Поднять mock WebSocket-server в test-fixture, проверить UI на push-сообщения.",
+    "hintFull": "В globalSetup поднимается ws-server. Тесты используют его URL. Тест шлёт сообщение → проверяет, что UI отреагировал.",
+    "answer": "Real-time UI тестируется через настоящий mock WebSocket-сервер, поднятый в test-fixture. Используется ws (Node.js пакет) или socket.io-server. В globalSetup — поднимается на свободном порту, URL передаётся фронту через env или config. В тесте: открываешь страницу, ждёшь подключения, отправляешь сообщение от server-а, проверяешь, что UI отреагировал (новая запись появилась, счётчик обновился). Edge-кейсы: разрыв соединения через server.close() — проверить reconnect UI; out-of-order messages, stale data, backpressure-сценарии. После теста — server закрывается."
+  },
+  "testing__e2e-playwright__19": {
+    "hintEasy": "GitHub Actions / GitLab CI — параллельно по shards, headless, retries=2, артефакты в случае fail.",
+    "hintFull": "playwright test --shard=1/4 для параллелизации. Хранить traces, screenshots, videos на fail. Slack/email-нотификации.",
+    "answer": "В CI Playwright обычно настроен так. Headless mode (по умолчанию). Параллельный запуск через --shard для разделения на параллельные runner-ы. retries=2 в CI для компенсации flaky. Артефакты при fail: screenshot, video recording, trace.zip — Playwright Trace Viewer показывает каждый шаг, network, console, DOM-snapshots. Это самое мощное middlebrow дебагать упавшие e2e. Run на каждом PR — smoke-suite (быстрый набор критичных), на main/release — full-suite. Notification в Slack при fail. Caching browser binaries для ускорения setup."
+  },
+  "testing__e2e-playwright__20": {
+    "hintEasy": "Sharding, тесты независимы (parallel), shared auth, минимум UI-логина.",
+    "hintFull": "--shard 1/4 параллелит. workers по CPU. Auth через API + storageState. Не делать sleep. Использовать page.waitForResponse вместо UI-ожиданий.",
+    "answer": "Главные техники. Sharding: --shard=1/N разбивает suite на куски, каждый запускается параллельно на своём CI-runner-е. Workers: тесты в шарде распараллеливаются на N процессов (по CPU). Independent tests: каждый тест в своём context-е, без shared state. Auth через API: storageState вместо UI-логина. Минимизация sleep / explicit waits через waitForResponse, waitForFunction. Mock тяжёлых API через page.route, чтобы не ждать реальный staging. Только важные снимки (visual regression) для критичных страниц. И в первую очередь — фокус на критичных flow, не покрытие. Большой suite от 30 минут до часа — нормально для серьёзного приложения."
+  },
+  "testing__e2e-playwright__21": {
+    "hintEasy": "Login, главный happy path, основные API-доступности.",
+    "hintFull": "Smoke = «не сломано до уровня неработоспособности». Login, открытие dashboard, базовый CRUD, оплата (если есть). 10-20 тестов, < 5 минут.",
+    "answer": "Smoke-tests — это минимальный набор для подтверждения, что приложение в принципе работает. Объём — 10-20 тестов, время — до 5 минут. Что включается: login (любая форма auth), открытие главного экрана, базовая навигация, главный конверсионный flow (создание заказа, регистрация, оплата). Запускается на каждом PR (быстро) и обязательно перед deploy в production (gate). Полный e2e-suite — отдельно, после merge в main или ночью. Smoke не претендует на покрытие, но покрывает «приложение поднимается и базово работает»."
+  },
+  "testing__e2e-playwright__22": {
+    "hintEasy": "Уникальные данные на каждый тест через UUID/timestamp, изолированные namespace-ы.",
+    "hintFull": "Email: test-${uuid}@example.com. Order: внутри test-tenant-а. Создаётся в beforeEach через API, удаляется в afterEach или через TTL на бэке.",
+    "answer": "Test data строится на изоляции. Email-адреса с UUID или timestamp: test-${nanoid()}@example.com — не конфликтуют между параллельными тестами. Сущности (заказы, юзеры) создаются через API в beforeEach, не через UI — быстрее и стабильнее. Используется test-tenant или test-namespace на бэке, чтобы данные не пересекались с реальными. Cleanup в afterEach — удаляешь созданное; либо TTL на бэке (записи старше N часов автоматически удаляются). Для seed-данных, не меняющихся (фикстуры) — глобальный setup, переиспользуется. Никогда не использовать жёстко зашитые id из staging БД — flaky гарантирован."
+  },
+  "testing__e2e-playwright__23": {
+    "hintEasy": "afterEach удаляет созданное; TTL на бэке на запасной случай.",
+    "hintFull": "Каждый тест трекает созданные сущности. afterEach пробегает по списку и delete-ит через API. Бэк дополнительно удаляет старые test-данные по TTL.",
+    "answer": "Cleanup строится в два слоя. Активный — каждый тест трекает созданные id-шки в test-context, в afterEach пробегается и удаляет через API. Это держит test-окружение чистым и предсказуемым. Пассивный — на бэке настроена политика удаления test-данных (по namespace, prefix, или TTL). Это страховка для случаев, когда afterEach упал или тест вылетел: ничего не накапливается. Для shared БД — отдельная test-namespace или test-tenant для изоляции. Без cleanup-а через несколько недель staging превращается в мусорку, и тесты начинают падать на лимитах БД, ограничениях api и плохой производительности."
+  },
+  "testing__e2e-playwright__24": {
+    "hintEasy": "page.route на analytics endpoint, проверяешь payload отправленных событий.",
+    "hintFull": "Перехватываешь /analytics/track через page.route, копишь events в массив, проверяешь, что пользовательский flow отправил правильные с правильными payload-ами.",
+    "answer": "Analytics events тестируются через перехват сетевых запросов к analytics-endpoint. page.route('**/track', route => { events.push(route.request().postDataJSON()); route.fulfill({status: 200}); }). После выполнения user-flow проверяешь массив events: правильные events отправлены, в правильном порядке, с правильным payload (eventName, userId, properties). Это закрывает класс багов «фича работает, но мы её не трекаем». Для type-safe analytics (segment, mixpanel) можно использовать схему — TypeScript-типы для payload + zod-валидация при отправке. Тесты гарантируют, что схема не нарушена."
+  },
+  "testing__e2e-playwright__25": {
+    "hintEasy": "Перехватывать Sentry/RUM endpoints, проверять что error-event отправлен с правильным payload.",
+    "hintFull": "page.route на sentry-ingest. Force-error в UI (нажатие кнопки, провоцирующей exception). Проверяешь, что Sentry получил event, scrubbing PII работает.",
+    "answer": "Frontend observability тестируется аналогично analytics — перехват endpoint-ов observability tools (Sentry, Datadog, LogRocket) и проверка отправленных payload-ов. Force-провокация ошибки (намеренно ломаешь UI через page.evaluate или дёргая обработчик с невалидным input), проверяешь, что Sentry-event отправлен. Дополнительно — что PII scrubbing работает: payload не содержит email-адресов, паролей, токенов. Что breadcrumbs корректные, тags заполнены, environment='production' (для prod), release tag правильный. Это дешёвая страховка от того, чтобы случайно не сломать observability при следующем рефакторинге."
+  }
+}
