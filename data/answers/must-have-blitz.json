@@ -1,0 +1,252 @@
+{
+  "must-have-blitz__1": {
+    "hintEasy": "Цикл, который чередует выполнение JS и обработку очередей задач.",
+    "hintFull": "Single-threaded runtime: пока стек пуст — берёт следующую задачу. После каждой задачи дренирует ВСЮ microtask queue, потом даёт браузеру шанс на render, потом следующая macrotask.",
+    "answer": "Event loop — механизм, который держит JS однопоточным, но неблокирующим. Пока call stack не пуст — выполняет; когда пустеет, дренирует microtasks (Promise, queueMicrotask), потом render-фаза (если пора), потом одна следующая macrotask (setTimeout/IO/postMessage). Ключевое: microtasks выполняются полностью перед каждым следующим шагом, поэтому они могут блокировать render если плодят сами себя."
+  },
+  "must-have-blitz__2": {
+    "hintEasy": "Microtasks дренируются полностью между macrotasks; macrotasks — по одной за итерацию.",
+    "hintFull": "Microtasks: Promise.then, queueMicrotask, MutationObserver. Macrotasks: setTimeout, setInterval, message-events, IO. Все microtasks обработаются ДО следующей macrotask и до render.",
+    "answer": "Microtasks выполняются сразу после текущей задачи и ДО следующей macrotask и render-фазы — Promise.then, queueMicrotask, MutationObserver. Macrotasks отбираются по одной за итерацию loop'а — setTimeout, setInterval, IO, postMessage. Поэтому Promise.then(...) выполнится раньше setTimeout(0), даже если поставлен позже. Бесконечный цикл microtasks может полностью заморозить UI — render не получит шанса."
+  },
+  "must-have-blitz__3": {
+    "hintEasy": "Функция + её lexical environment, которое она помнит после возврата из родителя.",
+    "hintFull": "Когда внутренняя функция ссылается на переменную внешнего scope, после return из родителя эти переменные не уничтожаются — внутренняя держит ссылку через scope chain.",
+    "answer": "Closure — функция, которая помнит переменные из своего lexical scope, даже когда внешняя функция уже завершилась. Используется для encapsulation (приватные поля), partial application, фабрик, и hooks (по сути каждый useState — closure над setState). Цена: closure держит references на захваченные переменные, GC не уберёт их пока функция жива — поэтому забытые closures это типичный источник memory leak'ов."
+  },
+  "must-have-blitz__4": {
+    "hintEasy": "Closure захватил старое значение переменной, продолжает на него ссылаться когда уже нерелевантно.",
+    "hintFull": "В React-hooks возникает когда useEffect/useCallback/event handler захватывают state из старого render'а. После update этот closure продолжает видеть старое значение — отсюда баги типа «handler видит state каким он был секунду назад».",
+    "answer": "Stale closure — функция всё ещё держит ссылку на старое значение переменной из прошлого render'а. В React это типично с useEffect без правильного deps массива, setInterval без cleanup, event listener'ом, навешанным один раз и помнящим первоначальный state. Лечится: правильные dependencies, functional setState (`setX(prev => …)`), useRef для значения которое нужно «всегда свежим», или useEvent/useEffectEvent для стабильного callback."
+  },
+  "must-have-blitz__5": {
+    "hintEasy": "all = ждать всех / allSettled = всех с результатами / race = первого / any = первого успешного.",
+    "hintFull": "all reject'ит на первой ошибке. allSettled всегда resolve'ит массивом {status, value|reason}. race — первый settled (любой). any — первый fulfilled, reject'ит AggregateError только если ВСЕ упали.",
+    "answer": "Promise.all — резолвит массивом результатов когда все исполнились; reject'ит сразу на первой ошибке. allSettled — всегда резолвит массивом {status, value|reason}, без коротких замыканий, удобно для batch-операций где нужно дождаться всех. race — резолвит/реджектит первым изменившимся promise. any — резолвит первым успешным; reject'ит AggregateError только если все упали — полезно для fallback-стратегий (CDN с несколькими endpoints)."
+  },
+  "must-have-blitz__6": {
+    "hintEasy": "Стандартный механизм отмены async-операций: AbortSignal передаётся в fetch и подобные.",
+    "hintFull": "AbortController.signal даёшь в fetch, addEventListener, observer. Вызов controller.abort() кидает AbortError в pending fetch, чистит listener. Можно линковать несколько (AbortSignal.any), таймауты (AbortSignal.timeout).",
+    "answer": "AbortController — стандартный API для отмены async-операций. Создаёшь controller, передаёшь controller.signal в fetch (или другой API, который его поддерживает), на вызове controller.abort() запрос reject'ится с AbortError. Используется для отмены устаревших fetch'ей при смене страницы/параметров поиска (race condition guard), для таймаутов (`AbortSignal.timeout(5000)`), для удаления event-listener'ов одной строкой через `addEventListener(..., { signal })`. Современный фронтендный must-have."
+  },
+  "must-have-blitz__7": {
+    "hintEasy": "Debounce — ждёт паузы после последнего вызова. Throttle — пропускает не чаще раза в N мс.",
+    "hintFull": "Debounce: каждый новый вызов сбрасывает таймер — финальный вызов произойдёт через N мс тишины. Throttle: первый вызов проходит, следующие N мс блокируются. Debounce для search-input, throttle для scroll/resize/mousemove.",
+    "answer": "Debounce откладывает выполнение пока поток вызовов не утихнет на N мс — каждый новый вызов сбрасывает таймер; финальный effect происходит после паузы. Throttle гарантирует что функция выполнится не чаще раза в N мс — первый вызов проходит сразу, последующие в окне игнорируются (или ставятся в очередь — leading/trailing варианты). Правило: debounce когда важен ИТОГ (поиск, autosave), throttle когда важна РЕГУЛЯРНОСТЬ (scroll, mousemove, real-time updates)."
+  },
+  "must-have-blitz__8": {
+    "hintEasy": "interface — расширяемый, может склеиваться (declaration merging). type — может всё (union, mapped, conditional), но не мержится.",
+    "hintFull": "interface — для object shapes, особенно публичные API. Поддерживает declaration merging и extends. type — алиас, может описывать union, intersection, primitives, conditional/mapped types. В большинстве кейсов — взаимозаменяемы.",
+    "answer": "interface — описывает форму объекта, расширяется через extends, поддерживает declaration merging (можно дописать поле в той же или другой декларации того же имени — удобно для расширения сторонних типов). type — alias, может описывать всё что угодно: object, union, intersection, mapped, conditional, primitive. Merge'ить нельзя. Практика: для public API публичных пакетов — interface (расширяемость), для всего остального — type. Performance компиляции у interface чуть лучше на больших иерархиях."
+  },
+  "must-have-blitz__9": {
+    "hintEasy": "unknown — «что-то есть, но я не знаю что». any — «отключи проверки».",
+    "hintFull": "any выключает type-checker полностью — переданное никак не проверяется. unknown заставляет сузить тип (через typeof/instanceof/in/type guard) перед использованием. Это безопасный any.",
+    "answer": "unknown и any оба означают «значение неизвестного типа», но unknown — type-safe, any — нет. С any можно делать что угодно (вызвать как функцию, обратиться к полю), компилятор молчит. С unknown — обязан сузить тип через type guard (`typeof`, `instanceof`, custom predicate) до операции. Поэтому unknown — правильный выбор для входных границ (API-ответ, JSON.parse, postMessage), а any — почти всегда technical debt и code smell."
+  },
+  "must-have-blitz__10": {
+    "hintEasy": "never — тип значения, которое НИКОГДА не существует. Проверка exhaustiveness в switch.",
+    "hintFull": "Возвращается из функций которые никогда не возвращаются (throw, infinite loop). Используется для exhaustive check в discriminated union: ветка default присваивается never, и компилятор ругнётся если добавили новый case.",
+    "answer": "never — тип, у которого нет ни одного значения. Возвращают функции, которые не завершаются нормально (throw error, бесконечный цикл). Главное применение в дизайне типов — exhaustive check: в switch'е по discriminated union в default'е присваивай переменную типа never (`const _: never = x`). Если добавишь новый вариант в union, но забудешь обработать — TS ругнётся, что в default попало неприсваиваемое значение. never поглощает в union (T | never = T)."
+  },
+  "must-have-blitz__11": {
+    "hintEasy": "Union с общим литеральным полем-discriminator, по которому TS сужает тип.",
+    "hintFull": "type Action = { type: 'add', id: string } | { type: 'remove', id: string, soft?: boolean }. Switch по a.type автоматически сужает тип внутри case'ов, без type assertions.",
+    "answer": "Discriminated union — union из объектов, у которых есть общее литеральное поле (обычно `type` или `kind`), различающее варианты. TypeScript использует это поле как discriminator: внутри `if (x.type === 'add')` или `case 'add':` — тип сужен до соответствующего варианта, без всяких `as`. Это идеальная замена перегрузок и проверок через `instanceof` для бизнес-логики (Redux actions, AsyncState, API responses, машины состояний)."
+  },
+  "must-have-blitz__12": {
+    "hintEasy": "Параметризованный тип — позволяет описать переиспользуемое поведение без потери информации о типе.",
+    "hintFull": "function pluck<T, K extends keyof T>(o: T, k: K): T[K]. Generic берёт типы как параметры, что даёт type-safe API без any. Можно ограничивать через extends, ставить дефолты.",
+    "answer": "Generic — параметризованный тип. Функция/класс/интерфейс принимают тип как аргумент, что даёт переиспользуемый type-safe код. Базовая форма: `function id<T>(x: T): T`. Можно ограничить параметр (`<T extends object>`), задать дефолт (`<T = string>`), чейнить (`<T, K extends keyof T>`). Главное правило: generic полезен когда тип результата ЗАВИСИТ от типа входа. Если внутри ты делаешь `as` — generic скорее всего лишний."
+  },
+  "must-have-blitz__13": {
+    "hintEasy": "Сужение более широкого типа до конкретного по runtime-проверке (typeof / in / instanceof / guard).",
+    "hintFull": "Type narrowing — TypeScript следит за runtime-проверкой и сужает тип в этой ветке. Работает с typeof, instanceof, in, equality, discriminated unions, custom user-defined type guards.",
+    "answer": "Type narrowing — сужение типа на основе runtime-проверки. Виды: typeof (`typeof x === 'string'`), instanceof (`x instanceof Error`), in (`'foo' in x`), equality (`x === null`), discriminated union (`x.type === 'add'`), custom guard (`isUser(x)`), assertion function (`asserts x is User`). Работает в обе стороны — в `if`-ветке тип сужен в одну сторону, в else — в другую. Это основной механизм безопасной работы с unknown / unions."
+  },
+  "must-have-blitz__14": {
+    "hintEasy": "Render — расчёт VDOM (pure). Commit — применение к DOM + side-эффекты + lifecycle.",
+    "hintFull": "Render — чистая функция props/state в JSX, может прерываться в Concurrent React. Commit — мутирует DOM, запускает refs, useLayoutEffect, потом useEffect.",
+    "answer": "Render-фаза — React вызывает компоненты и считает новый VDOM. Это должно быть pure: никаких side effects, мутаций пропсов, прямого доступа к DOM. В Concurrent React эта фаза может прерываться и стартовать заново. Commit-фаза — React применяет diff к реальному DOM, обновляет refs, синхронно вызывает useLayoutEffect, потом асинхронно useEffect. Commit нельзя прервать — он атомарен. Понимать разницу важно для отладки: если эффект «не должен» крутиться при каждом render — проблема обычно в render-фазе."
+  },
+  "must-have-blitz__15": {
+    "hintEasy": "Алгоритм diff'а старого и нового VDOM-дерева для минимизации DOM-операций.",
+    "hintFull": "React сравнивает старый и новый tree узел за узлом по типу элемента + key. При совпадении переиспользует DOM/component instance. При разнице — выкидывает поддерево и строит заново.",
+    "answer": "Reconciliation — алгоритм, которым React сравнивает прошлый и новый VDOM, чтобы понять минимальный набор DOM-операций. Эвристики: разные типы элементов в одной позиции = выбросить поддерево; одинаковый тип = переиспользовать DOM-node, обновить пропсы; для списков — match по `key`. Поэтому ключи нужно стабильные и уникальные среди siblings, а не индексы. В Concurrent React reconciliation может прерываться, чтобы дать высокоприоритетным апдейтам пройти первыми."
+  },
+  "must-have-blitz__16": {
+    "hintEasy": "Стабильный идентификатор элемента в списке — помогает reconciliation сохранять state.",
+    "hintFull": "Без key React не знает, какой child есть какой. С index'ом как ключом — при insert/remove перетасовываются compoenent instances и DOM-nodes, теряется local state и focus.",
+    "answer": "key — стабильный идентификатор элемента списка, который React использует для diff'а. С правильным key React понимает, какие элементы переехали, какие добавились, какие удалились — и переиспользует DOM-ноды и component instances. Index в качестве key опасен при операциях вставки/удаления в середине списка: компоненты «съезжают», state, focus и uncontrolled input'ы теряются или перепутываются. Используй ID из данных или композицию полей; index'ом можно когда список статичен и сортировка не меняется."
+  },
+  "must-have-blitz__17": {
+    "hintEasy": "Controlled — значение управляет React (value+onChange). Uncontrolled — DOM сам, читаем через ref.",
+    "hintFull": "Controlled даёт точный контроль, валидацию на лету, derive state. Uncontrolled — производительнее на больших формах, проще для file input'ов и third-party виджетов.",
+    "answer": "Controlled component — value управляется React-state'ом, onChange синкает обратно. Дает мгновенную валидацию, форматирование, derive state. Цена — re-render на каждый ввод. Uncontrolled component — input хранит значение в DOM, читаем через ref/event.target. Выгоден на больших формах, обязателен для file input, удобен для third-party (CodeMirror и подобные). Hybrid: controlled с debounce. Practial advice: для UX-критичных форм — controlled, для огромных — uncontrolled + collected ref'ами на submit."
+  },
+  "must-have-blitz__18": {
+    "hintEasy": "Side-effect, синхронизированный с external system. Запускается ПОСЛЕ commit'а.",
+    "hintFull": "useEffect — для подписок, fetch, timers, DOM-мутаций которые не нужны для layout. Зависит от deps array — пересоздаётся когда хоть одна dep поменялась. Cleanup-функция отрабатывает перед следующим запуском и при unmount.",
+    "answer": "useEffect — хук для side-effect'ов, синхронизирующих компонент с внешним миром (fetch, subscriptions, timers, manual DOM, аналитика). Запускается после commit'а — DOM уже обновился, layout посчитан. Зависит от deps: пустой массив — один раз после mount; список — при изменении любой dep; нет массива — после каждого render'а. Возвращай cleanup, чтобы отписаться/отменить запрос. В React 18 Strict Mode эффекты в dev монтируются дважды — это намеренно, чтобы ловить idempotency-ошибки."
+  },
+  "must-have-blitz__19": {
+    "hintEasy": "Как useEffect, но синхронно ДО paint'а — для вычислений, которые видны пользователю как мерцание.",
+    "hintFull": "useLayoutEffect блокирует paint: запускается после commit, но до того как браузер нарисует. Используется для измерений (getBoundingClientRect) и синхронных DOM-мутаций, чтобы не было flash'а.",
+    "answer": "useLayoutEffect отрабатывает после commit'а, но синхронно ДО paint'а — браузер не нарисует кадр пока не отработает. Это нужно когда ты делаешь измерение DOM и решаешь на его основе тут же скорректировать стили (типичный кейс: tooltip позиционирование, авто-фокус с прокруткой). Эффект блокирует paint, поэтому его cost виден пользователю — используй только когда useEffect даёт визуальный «прыжок». В SSR не запускается, поэтому хорошие либы делают `useIsomorphicLayoutEffect`."
+  },
+  "must-have-blitz__20": {
+    "hintEasy": "Мемоизация результата вычисления между render'ами по deps.",
+    "hintFull": "useMemo не «делает быстрее по умолчанию» — он сохраняет referential equality для derived value. Полезен когда вычисление дорогое или результат идёт в deps другого hook'а / в memo-компонент.",
+    "answer": "useMemo кеширует результат функции по deps между render'ами. Два валидных кейса: (1) вычисление реально дорогое (фильтрация большого массива, сложный selector); (2) referential equality важна — результат идёт пропсом в React.memo-компонент или в deps другого хука, иначе там сорвётся мемоизация. По умолчанию НЕ оборачивай всё подряд — useMemo сам стоит сравнения deps + хранения значения, на дешёвых вычислениях вреден."
+  },
+  "must-have-blitz__21": {
+    "hintEasy": "Мемоизация САМОЙ функции (а не результата) между render'ами.",
+    "hintFull": "Чтобы handler-функция не пересоздавалась — иначе она ломает React.memo у дочки и попадает в deps других hook'ов как «новая» каждый render.",
+    "answer": "useCallback — это `useMemo(() => fn, deps)`, мемоизирует функцию по deps. Полезен в двух случаях: (1) функция передаётся в React.memo-компонент как prop — без useCallback memo бесполезен, prop меняется каждый render; (2) функция стоит в deps другого hook'а (useEffect) — без него эффект перезапускается на каждый render. В остальных случаях — overhead без выгоды. Часто можно вообще обойтись через ref-стабильный handler или паттерн с reducer."
+  },
+  "must-have-blitz__22": {
+    "hintEasy": "HOC, который пропускает re-render если props по shallow equal не поменялись.",
+    "hintFull": "React.memo сравнивает props shallow по умолчанию. Если parent re-render'ится, но props у memo-компонента те же (по ===) — render skipped. Помогает только если props стабильны.",
+    "answer": "React.memo — HOC, который при ре-рендере parent'а пропускает render компонента, если props по shallow comparison не изменились. Работает только если props стабильны: если каждый раз передаёшь свежий объект/массив/функцию, memo ничего не сэкономит. Обычно идёт в паре с useCallback / useMemo на стороне parent. Можно передать кастомный comparator вторым аргументом, но в 99% случаев лучше пересмотреть структуру state. Это инструмент по нужде, не дефолт."
+  },
+  "must-have-blitz__23": {
+    "hintEasy": "useState для сложного state с многими переходами — централизуем апдейты в reducer-функции.",
+    "hintFull": "useReducer лучше когда: (1) next state зависит от нескольких полей предыдущего, (2) много разных типов апдейтов, (3) хочется тестировать переходы отдельно. Pure reducer + dispatch.",
+    "answer": "useReducer — альтернатива useState для сложного state. Принимает (state, action) => newState reducer и initialState; возвращает [state, dispatch]. Лучше useState когда: state — объект с несколькими полями, апдейты разнородны, переходы зависят от текущего state. Reducer pure → легко тестировать. Часто комбинируется с Context для передачи dispatch вниз без prop drilling. Хорошо моделирует машины состояний (loading/success/error/idle)."
+  },
+  "must-have-blitz__24": {
+    "hintEasy": "Mutable container, переживающий render'ы и НЕ триггерящий re-render при изменении.",
+    "hintFull": "ref.current можно менять без последствий для render-цикла. Два юзкейса: (1) DOM-нода через ref={ref}; (2) хранение mutable значения, которое нужно между render'ами без re-render — таймеры, instance-объекты, latest-snapshot.",
+    "answer": "useRef — создаёт mutable объект {current}, который переживает все render'ы и НЕ вызывает re-render при изменении current. Применения: (1) ref на DOM-ноду через JSX `ref={myRef}`; (2) хранение instance-объектов (timer ID, observer, abort controller); (3) latest-value pattern — держать актуальное значение в closure-зависимом callback'е, обновляя в useEffect. Не используй ref для значения, которое должно отображаться в UI — для этого state."
+  },
+  "must-have-blitz__25": {
+    "hintEasy": "Помечает state-update как low-priority, не блокирует урожный input.",
+    "hintFull": "startTransition оборачивает setState — React пометит этот update как transition; высокоприоритетные (например, ввод в input) пройдут первыми. Полезно для тяжёлой фильтрации/навигации.",
+    "answer": "useTransition — хук Concurrent React, помечает state-апдейт как «несрочный transition». Возвращает [isPending, startTransition]. startTransition(() => setState(...)) — этот апдейт не блокирует более приоритетные (например, печатание в input). isPending — флаг, что transition ещё в работе. Типичный кейс: фильтрация большого списка по input'у — input остаётся отзывчивым, тяжёлый список обновляется отложенно. Не серебряная пуля — сначала уменьшай объём работы, transition только сглаживает."
+  },
+  "must-have-blitz__26": {
+    "hintEasy": "Возвращает «отложенную» копию value, которая обновляется как low-priority.",
+    "hintFull": "useDeferredValue(value) — производное значение, которое в момент тяжёлого апдейта может «отставать» от input. Похоже на debounce, но управляется планировщиком React, а не таймером.",
+    "answer": "useDeferredValue(value) возвращает «отстающую» версию value: при срочных апдейтах оно показывает старое значение, потом догоняет в transition. В отличие от debounce — задержка адаптивная, рассчитывается планировщиком; на быстрой машине почти нет задержки, на медленной — есть. Хорош для деривативов которые дорого считать (фильтр, граф). useTransition нужен когда ты сам инициируешь setState; useDeferredValue — когда value приходит сверху (props, context) и оборачивать setState ты не можешь."
+  },
+  "must-have-blitz__27": {
+    "hintEasy": "Подписка на external store с гарантией consistency в Concurrent React.",
+    "hintFull": "useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot?) — официальный API React 18 для интеграции внешних state-источников. Решает tearing — когда разные компоненты читают разные снапшоты во время одного render'а.",
+    "answer": "useSyncExternalStore — API для подключения внешнего store к React в Concurrent режиме без tearing'а. Принимает subscribe(callback) и getSnapshot() (синхронно возвращающий текущее значение), опционально getServerSnapshot для SSR. React гарантирует, что в рамках одного render'а все компоненты увидят один и тот же snapshot. Используют Redux 8+, Zustand, Jotai — иначе при concurrent rendering получишь разные подписки в разных частях дерева, видящих разные версии state."
+  },
+  "must-have-blitz__28": {
+    "hintEasy": "Любое изменение value у Provider re-render'ит ВСЕХ потребителей.",
+    "hintFull": "Context не диспатчит селективно — любой consumer видит весь объект. Решения: разделить Context (state vs dispatch), мемоизировать value, использовать external store + useSyncExternalStore для селекторов.",
+    "answer": "Context при каждом изменении value в Provider'е перерендеривает всех потребителей, независимо от того, какое именно поле value их интересует. На больших деревьях это становится bottleneck'ом. Стратегии: (1) разделить контексты на стабильные (dispatch, API) и часто меняющиеся (current value); (2) мемоизировать value на стороне Provider'а; (3) использовать external store с селекторами (Zustand, Redux) — где компоненты подписываются на slice; (4) use-context-selector от @dai-shi для сужения подписки."
+  },
+  "must-have-blitz__29": {
+    "hintEasy": "Server state приходит из бэка и устаревает; client state — локальный UI.",
+    "hintFull": "Server state имеет lifecycle: fetch, cache, invalidate, refetch, sync. Client state — модалки, фильтры, форма в драфте. Смешивание убивает архитектуру — server state кладите в React Query / SWR, client state в local или Zustand.",
+    "answer": "Client state — локальное UI-состояние: открыта ли модалка, индекс таба, форма-черновик, тема. Полностью под контролем клиента, нет concept'а «устаревания». Server state — данные с бэка: лист пользователей, текущий ордер, прайсы. У него есть lifecycle: fetch, cache, stale, refetch, optimistic update, invalidation, real-time sync. Эти два типа имеют РАЗНЫЕ требования и инструменты. Server state в Redux часто превращается в hand-rolled cache; лучше React Query / TanStack Query / SWR. Client state — useState / useReducer / Zustand / Jotai."
+  },
+  "must-have-blitz__30": {
+    "hintEasy": "Cache+sync-слой для server state: fetch, dedupe, retry, refetch, invalidate, optimistic updates.",
+    "hintFull": "useQuery(['users'], fetcher) — авто-кеш по ключу, refetch on focus/reconnect, stale time, dedupe одинаковых запросов. Mutations + invalidateQueries для синка после write'ов. Решает 80% server state-болей одним пакетом.",
+    "answer": "React Query (TanStack Query) — слой синка server state. Ключевые фичи: кеш по queryKey с автоматическим dedup'ом параллельных запросов; stale time / cache time; refetch on window focus / reconnect / interval; pagination и infinite queries; mutations с onSuccess invalidation; optimistic updates. Заменяет hand-rolled solutions с Redux + thunks для CRUD-приложений. Boilerplate минимальный, DevTools отдельные. Альтернативы: SWR от Vercel (проще), RTK Query (если уже на Redux), Apollo (для GraphQL)."
+  },
+  "must-have-blitz__31": {
+    "hintEasy": "Мощно для сложного client state + middleware, но boilerplate-heavy и часто overkill.",
+    "hintFull": "Плюсы: predictable, devtools, middleware (saga, thunk), time-travel, тестируемость. Минусы: много boilerplate (RTK сильно режет), легко тащить server state куда не надо, performance с большим store требует селекторов и тонкой настройки.",
+    "answer": "Redux: плюсы — централизованный store, predictable updates через pure reducers, devtools с time-travel debugging, отличные middleware (saga для side-effects, thunk), легко тестировать. Минусы — много boilerplate (Redux Toolkit это сильно сократил), легко свалить server state в store вместо React Query, при большом store нужны нормализация и тонкие селекторы (reselect) против лишних re-render'ов. Когда брать: сложный кросс-фичный client state, требования к audit/replay (фин.приложения), большая команда с явной потребностью в дисциплине. В остальном Zustand + React Query закрывают 80% кейсов проще."
+  },
+  "must-have-blitz__32": {
+    "hintEasy": "Метрики UX: LCP (load), INP (interaction), CLS (visual stability).",
+    "hintFull": "LCP — время до отрисовки самого крупного content-элемента (good <2.5s). INP — отзывчивость на любой ввод (заменил FID, good <200ms). CLS — суммарный layout shift без действия пользователя (good <0.1).",
+    "answer": "Core Web Vitals — три метрики UX, которые Google использует в ранжировании и которые отражают реальный пользовательский опыт. LCP (Largest Contentful Paint) — время до отрисовки самого крупного видимого элемента, цель <2.5s; виноваты обычно тяжёлые images, fonts, render-blocking JS. INP (Interaction to Next Paint, заменил FID в марте 2024) — задержка между любым взаимодействием и следующим paint, цель <200ms; виноваты long tasks. CLS (Cumulative Layout Shift) — смещения layout без действий юзера, цель <0.1; виноваты images без размеров, поздно загружающиеся шрифты, динамический content над уже видимым."
+  },
+  "must-have-blitz__33": {
+    "hintEasy": "Рендерить только видимые строки списка/таблицы вместо тысяч DOM-нод.",
+    "hintFull": "react-window / react-virtuoso монтируют только то что в viewport + buffer. DOM-нод единицы вместо тысяч — рендер быстрее, scroll плавный. Сложности: dynamic row height, sticky elements, accessibility, find-on-page.",
+    "answer": "Virtualization (windowing) — техника, при которой в DOM присутствуют только видимые элементы списка плюс небольшой buffer; остальные виртуальные. Библиотеки: react-window (минималистичный), react-virtuoso (динамические высоты, grouping), TanStack Virtual (headless, под любую таблицу). Включаем когда строк >100-500 и каждая нетривиальна. Подводные: dynamic row height требует измерения и предсказания; sticky headers внутри scroll-контейнера; Ctrl+F не находит виртуализированные строки; a11y — нужен правильный aria-rowcount/aria-rowindex."
+  },
+  "must-have-blitz__34": {
+    "hintEasy": "Делить bundle на чанки, грузить по требованию.",
+    "hintFull": "Route-level (lazy() + Suspense per route) и component-level (модальные окна, тяжёлые виджеты). Уменьшает initial JS, ускоряет TTI. Граница — UX: lazy всё подряд = много спиннеров и flash'ей.",
+    "answer": "Bundle splitting — разбиение bundle на отдельные чанки, которые грузятся по требованию. Уровни: route-level (каждый роут отдельным chunk через React.lazy + Suspense), component-level (тяжёлые модалки, charts, редакторы — грузятся при открытии), vendor splitting (отдельный chunk для библиотек с долгим cache lifetime). Бандлеры (Vite/Rollup) делают это через dynamic import(). Цель — уменьшить initial JS до того, что нужно для first paint и first interaction. Ловушки: overzealous splitting приводит к waterfall'у запросов и flash'ам."
+  },
+  "must-have-blitz__35": {
+    "hintEasy": "Бандлер вырезает неиспользуемые экспорты на этапе билда.",
+    "hintFull": "Работает по ESM-модулям (статические import/export). Ломается при side-effects (без `\"sideEffects\": false` в package.json), при CommonJS, при динамическом доступе к экспортам. Без неё библиотеки тянут лишнее.",
+    "answer": "Tree shaking — статический анализ ESM-импортов, удаляющий неиспользованные экспорты из финального bundle. Работает только с ES modules (статические import/export); CommonJS — нет. Ломается если у пакета есть side-effects (импорт сам по себе что-то делает) и в package.json не указано `\"sideEffects\": false` или не перечислены файлы с side-effects. Также ломается при `import * as lib from 'lib'` если bundler не умеет анализировать использования. На практике все современные либы (lodash-es, date-fns) tree-shakeable — при правильном использовании bundle режется в разы."
+  },
+  "must-have-blitz__36": {
+    "hintEasy": "Соединение умирает → переоткрыть с exponential backoff + jitter, не долбить сервер.",
+    "hintFull": "WebSocket close → попытка reconnect через 1s, 2s, 4s, 8s… с jitter (рандомный шум) чтобы фронты не synchronously долбили после общего outage. После N попыток — surface error пользователю.",
+    "answer": "WebSocket disconnect должен корректно обрабатываться: переподключаться с exponential backoff (1s, 2s, 4s, 8s, capped) + jitter (±20%) — иначе все клиенты после общего outage синхронно долбанут сервер. Послушать `online` event window'а для немедленного reconnect. Различать stale connection (heartbeat ping/pong каждые 30с) и реальный close. После reconnect — отправить заново снапшот subscriptions, опционально запросить delta с last-known sequence id. UX: показывать subtle indicator «connection lost», блокировать критичные действия только если данные могут быть устаревшими."
+  },
+  "must-have-blitz__37": {
+    "hintEasy": "Источник шлёт быстрее чем потребитель успевает обработать — нужен механизм притормозить или дропнуть.",
+    "hintFull": "В UI typical: 1000 msg/s WebSocket'а — нельзя setState на каждый. Решения: батч через RAF, дроп устаревших, throttle, держать последний snapshot за key (last-write-wins).",
+    "answer": "Backpressure — ситуация, когда producer выдаёт данные быстрее, чем consumer может обработать. На фронте классика: real-time feed (price ticks, market data) шлёт сотни сообщений в секунду, а render не успевает. Стратегии: (1) batch — копить за окно (16ms через requestAnimationFrame) и применять разом; (2) throttle/sample — обновлять не чаще N Hz; (3) drop — last-write-wins по key, устаревшие выбрасываем; (4) coalescing — собрать diff, применить раз; (5) Web Worker для preprocess'а, в main thread приходят уже агрегированные. Без этого — фриз UI и memory growth."
+  },
+  "must-have-blitz__38": {
+    "hintEasy": "Инъекция вредоносного скрипта через user input, который попадает в DOM как код.",
+    "hintFull": "Reflected (URL-параметр), stored (БД), DOM-based (innerHTML). React по умолчанию escape'ит content, но dangerouslySetInnerHTML/href=javascript:/eval/нештатные API оставляют дыру.",
+    "answer": "XSS (Cross-Site Scripting) — инъекция вредоносного кода в страницу, который выполняется в браузере жертвы с её правами (cookies, session). Виды: reflected — параметр URL отражается в HTML; stored — попадает в БД и потом отображается всем; DOM-based — клиентский JS пишет user input в DOM как код. Защита: (1) React по умолчанию escape'ит JSX-content — основная защита; (2) dangerouslySetInnerHTML только с sanitizer (DOMPurify); (3) валидировать `href`/`src` (запретить `javascript:`); (4) Content Security Policy — script-src self без unsafe-inline; (5) HttpOnly cookies — токены не отдаются JS."
+  },
+  "must-have-blitz__39": {
+    "hintEasy": "Браузерная защита: разные origin'ы по дефолту не могут читать друг друга. Сервер указывает кому можно.",
+    "hintFull": "Origin = scheme + host + port. CORS-headers (Access-Control-Allow-Origin) на ответе разрешают cross-origin request. Preflight (OPTIONS) перед запросами с custom-headers / non-simple methods. CORS — НЕ замена auth.",
+    "answer": "CORS (Cross-Origin Resource Sharing) — механизм, через который сервер сообщает браузеру, что запрос с другого origin'а разрешён. По умолчанию SOP (Same-Origin Policy) запрещает JS читать ответ кросс-origin запроса. Сервер шлёт `Access-Control-Allow-Origin: <origin>` (и возможно Allow-Methods/Headers/Credentials), и браузер разрешает доступ. Для не-simple запросов (custom headers, не-GET/POST/HEAD, JSON content-type иногда) браузер сначала шлёт preflight OPTIONS. CORS — НЕ авторизация и не защита от server-side атак, а защита пользователя от утечки данных другому домену."
+  },
+  "must-have-blitz__40": {
+    "hintEasy": "HttpOnly cookie для refresh-token; access-token в memory. localStorage = уязвим к XSS.",
+    "hintFull": "localStorage читается JS — любой XSS = угон токена. Cookies HttpOnly недоступны JS, но требуют CSRF-защиты (SameSite=Strict/Lax + анти-csrf-token). Лучшая практика: refresh в HttpOnly cookie, короткоживущий access в memory.",
+    "answer": "Token storage — компромисс между удобством и безопасностью. localStorage — простой, но любой XSS читает токен и отправляет attacker'у; не подходит для чувствительных систем. HttpOnly cookies — JS не имеет доступа, защита от XSS-краж. Цена — нужна CSRF-защита: SameSite=Strict/Lax + анти-CSRF token для state-changing запросов. Sessionstorage — то же что localStorage, плюс умирает с табом. Best practice для финтех: refresh-token в HttpOnly Secure SameSite=Strict cookie + короткоживущий access-token в memory (теряется при reload — это ок, в обмен у нас нет XSS-вектора)."
+  },
+  "must-have-blitz__41": {
+    "hintEasy": "Семантический HTML, keyboard-навигация, контраст, alt-text, focus management.",
+    "hintFull": "Базовый чек: native button вместо div, label у input, alt у img, focus visible, контраст 4.5:1 для текста, всё работает по Tab. Это 80% выигрыша.",
+    "answer": "Accessibility basics — то, что делает интерфейс пригодным для людей с инвалидностью (screen readers, keyboard-only, low vision) и попутно улучшает UX для всех. Чеклист: (1) семантический HTML — `<button>` вместо `<div role=button>`; (2) labels на inputs; (3) alt-текст на images, aria-label на icon-buttons; (4) keyboard-навигация — всё доступно через Tab/Enter/Escape; (5) видимый focus-state (не убирай outline без замены); (6) контраст текста ≥4.5:1; (7) heading-иерархия h1>h2>h3 без скачков; (8) reduced-motion preference. Тулинг: axe DevTools, Lighthouse a11y audit, manual screen reader test (VoiceOver/NVDA)."
+  },
+  "must-have-blitz__42": {
+    "hintEasy": "Атрибуты для расширения семантики там, где native HTML не хватает. \"No ARIA лучше плохого ARIA\".",
+    "hintFull": "ARIA: roles (role=tablist, role=alert), states (aria-expanded, aria-selected), properties (aria-label, aria-describedby), live regions (aria-live=polite). Не перекрывает дефолты — кнопка <button> уже имеет role=button.",
+    "answer": "ARIA (Accessible Rich Internet Applications) — атрибуты для расширения семантики HTML, когда нативных тегов недостаточно (custom dropdown, tabs, live updates). Roles описывают что элемент делает (tablist, dialog, alert), states — текущий статус (aria-expanded, aria-selected, aria-checked), properties — связи и описания (aria-label, aria-describedby, aria-controls). Live regions (aria-live=polite/assertive) — для динамических сообщений (toasts). Главное правило WAI: «No ARIA лучше плохого ARIA» — native `<button>` уже знает что он кнопка, не пиши `<div role=button>`. ARIA только дополняет HTML, не заменяет."
+  },
+  "must-have-blitz__43": {
+    "hintEasy": "Тестируй как пользователь — getByRole, не testid'ы, не implementation details.",
+    "hintFull": "Принципы: query'й по тому что видит пользователь (role, label, text), не по class/id. Тест переживает рефакторинг разметки. testid — последний resort. Не тестируй state, тестируй observable behavior.",
+    "answer": "Testing Library построена вокруг принципа «тестируй так, как видит пользователь». Иерархия запросов: getByRole > getByLabelText > getByText > getByTitle > getByTestId. Это заставляет писать a11y-friendly разметку и делает тесты устойчивыми к рефакторингу — не сломаются при смене tag/class. Не тестируй internal state и implementation details — тестируй observable behavior: «после клика по 'Add' появляется новый элемент в списке». При async-апдейтах — findBy/waitFor (auto-retry до таймаута), не setTimeout'ы. testid — крайняя мера для неименованных элементов, не дефолт."
+  },
+  "must-have-blitz__44": {
+    "hintEasy": "Стабильные locator'ы: getByRole, getByLabel, getByText. Избегай CSS selector'ов и xpath'а.",
+    "hintFull": "Playwright auto-wait: locator знает что элемент должен быть visible/enabled/stable перед actionом — explicit sleep'ы не нужны. Цепочки .filter().getByRole() выбирают точно нужный элемент.",
+    "answer": "В Playwright предпочитай user-facing locator'ы: getByRole, getByLabel, getByPlaceholder, getByText, getByTestId. CSS selector'ы и xpath ломаются при рефакторинге верстки. Locators в Playwright lazy — не ищут элемент сразу, а при actionе с auto-waiting (visible, enabled, stable). Поэтому explicit sleeps не нужны, click() сам подождёт. Цепочки: page.getByRole('listitem').filter({ hasText: 'Foo' }).getByRole('button', { name: 'Delete' }) — точечный target в сложной разметке. data-testid — допустимо для динамики (списки), но в первую очередь старайся писать a11y-friendly разметку."
+  },
+  "must-have-blitz__45": {
+    "hintEasy": "Lint → typecheck → unit → integration → build → e2e smoke → deploy.",
+    "hintFull": "Quality gates: каждый PR проходит pipeline; failing pipeline блокирует merge. Build once, deploy many — артефакт собирается раз и продвигается через preview/staging/prod. Параллелизм там где можно.",
+    "answer": "Типичный frontend CI/CD pipeline: (1) install (cache node_modules); (2) lint + typecheck — параллельно; (3) unit/integration tests — с кэшем + shard'ами для скорости; (4) build — один раз, артефакт сохраняется и переезжает между environments; (5) Playwright smoke на preview-environment'е; (6) bundle-size budget check (failing build при regression'е); (7) deploy на preview/staging/prod через manual approve или auto-promote. Quality gates: failing любого шага блокирует merge. Артефакт ОДИН — не пересобираем для prod, чтобы preview ≡ prod."
+  },
+  "must-have-blitz__46": {
+    "hintEasy": "Включить/выключить фичу runtime'ом без redeploy. Gradual rollout, A/B, kill switch.",
+    "hintFull": "Сервис (LaunchDarkly, Unleash, Statsig, ConfigCat) или собственный config-endpoint. Флаг — типизированный, имеет default, имеет owner и срок жизни. Иначе превращаются в постоянное legacy.",
+    "answer": "Feature flags — runtime-переключатели для фич, не зависящие от деплоя. Применения: (1) gradual rollout — сначала 1%, потом 10%, 50%, 100%; (2) kill switch — мгновенное выключение сломанной фичи без rollback'а; (3) A/B testing; (4) trunk-based development без long-lived branches; (5) entitlements — фичи под платный план/роль. Инструменты: LaunchDarkly, Unleash (open-source), Statsig, ConfigCat, или свой config-endpoint. Дисциплина: каждый флаг имеет owner, expiry date, default value, типизирован. Иначе через год — гниль из 200 неудалённых флагов."
+  },
+  "must-have-blitz__47": {
+    "hintEasy": "Откат к прошлому known-good релизу при инциденте. Должен быть быстрее и проще forward-fix.",
+    "hintFull": "Стратегии: blue-green (мгновенный switch на старый), canary (rollback canary subset'а), feature flag (выключить фичу не трогая релиз), redeploy предыдущего артефакта. Главное — отрепетировано и быстро.",
+    "answer": "Rollback — откат к прошлому known-good состоянию, когда новый релиз ломает прод. Виды: (1) instant — flip обратно на старый артефакт через blue-green deployment или CDN switch; (2) feature flag off — релиз остаётся, но фича выключена (часто быстрее всего); (3) redeploy предыдущего тэга — медленнее, но надёжно. Условие чтобы это работало: артефакты иммутабельны и подписаны, БД-миграции backward-compatible (никогда DROP COLUMN на release), state-машина идемпотентна. Rollback должен быть отрепетирован — на инциденте не время разбираться."
+  },
+  "must-have-blitz__48": {
+    "hintEasy": "Logs / metrics / traces. Видеть, что приложение делает в проде без отладчика.",
+    "hintFull": "На фронте: Web Vitals + RUM (real user monitoring) + JS error tracking (Sentry) + custom metrics (slow long tasks, failed API). Связать с release-меткой и backend trace'ами через correlation id.",
+    "answer": "Observability — способность понять, что система делает в production по её output'у, не подключая дебаггер. Три pillars: logs (что произошло), metrics (агрегаты по времени — error rate, p95 latency), traces (распределённый запрос through множество сервисов). На фронте: Web Vitals (LCP, INP, CLS) через web-vitals lib; JS errors через Sentry/Rollbar/Datadog с release-tagging и source maps; custom metrics — long tasks, failed API calls, WebSocket reconnects, slow renders. Trace-correlation: бэкенд возвращает trace-id, фронт логирует его в errors — можно связать UX-баг с backend-инцидентом."
+  },
+  "must-have-blitz__49": {
+    "hintEasy": "Один сайт собирается из независимо разрабатываемых и деплоящихся фронтенд-приложений.",
+    "hintFull": "Каждая команда владеет своим remote'ом, деплоит независимо, работает на своём стеке. Shell объединяет их в единый UX. Цена: shared dependencies, contracts, runtime ошибки, увеличенный bundle.",
+    "answer": "Microfrontends — паттерн, где один продукт собирается из нескольких независимо разрабатываемых и деплоящихся фронтенд-приложений. Каждой команде — свой кусок UI, свой стек, свой релизный цикл. Shell-приложение оркестрирует. Решает проблему scaling'а команд (10+ команд на одном monolith'е давно превращаются в merge-hell). Цена: shared dependencies (React copies), version skew, performance (lazy-loading remotes), цельный UX (требует disciplined design system), сложнее debugging. Включаем когда команд много и независимость > consistency. Иначе — modular monolith с feature-folders проще."
+  },
+  "must-have-blitz__50": {
+    "hintEasy": "Webpack/Vite-плагин: runtime подгрузка чужого bundle'а как обычного импорта, share dependencies.",
+    "hintFull": "Host объявляет remotes, remote объявляет exposed modules. Shared dependencies помечаются singleton (один React на всю систему). Container'ы проверяют version compatibility runtime'ом.",
+    "answer": "Module Federation — фича Webpack 5 (и Vite через плагин), которая позволяет одному приложению (host) загружать модули другого приложения (remote) во время выполнения, как обычный import. Каждое приложение объявляет exposes (что отдаёт) и remotes (что потребляет), плюс shared dependencies (React, design system) с version constraints. На runtime container'ы согласуют версии shared deps — по дефолту singleton, чтобы не было двух React'ов в дереве. Это техническая основа большинства microfrontend-архитектур; альтернативы: import maps, single-spa, iframe-based."
+  }
+}

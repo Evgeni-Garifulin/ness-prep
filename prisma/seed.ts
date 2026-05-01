@@ -35,21 +35,59 @@ type Content = {
 };
 
 function loadAnswers(): Record<string, Content> {
-  const p = path.resolve(process.cwd(), "data/answers.json");
-  if (!fs.existsSync(p)) return {};
-  try {
-    return JSON.parse(fs.readFileSync(p, "utf8")) as Record<string, Content>;
-  } catch (err) {
-    console.warn("[seed] answers.json present but invalid JSON, ignoring:", err);
-    return {};
+  // Контент лежит в data/answers/<slug>.json — по файлу на секцию.
+  // Для обратной совместимости поддерживается и старый монолит data/answers.json,
+  // если он остался локально.
+  const merged: Record<string, Content> = {};
+
+  const dir = path.resolve(process.cwd(), "data/answers");
+  if (fs.existsSync(dir) && fs.statSync(dir).isDirectory()) {
+    const files = fs
+      .readdirSync(dir)
+      .filter((f) => f.endsWith(".json"))
+      .sort();
+    for (const f of files) {
+      const full = path.join(dir, f);
+      try {
+        const obj = JSON.parse(fs.readFileSync(full, "utf8")) as Record<
+          string,
+          Content
+        >;
+        for (const [k, v] of Object.entries(obj)) {
+          if (k.startsWith("_")) continue; // skip _meta-like keys
+          merged[k] = v;
+        }
+      } catch (err) {
+        console.warn(`[seed] ${f} present but invalid JSON, ignoring:`, err);
+      }
+    }
   }
+
+  const legacy = path.resolve(process.cwd(), "data/answers.json");
+  if (fs.existsSync(legacy)) {
+    try {
+      const obj = JSON.parse(fs.readFileSync(legacy, "utf8")) as Record<
+        string,
+        Content
+      >;
+      for (const [k, v] of Object.entries(obj)) {
+        if (k.startsWith("_")) continue;
+        // Per-section files выигрывают, поэтому legacy идёт только как fallback.
+        if (!(k in merged)) merged[k] = v;
+      }
+    } catch (err) {
+      console.warn("[seed] answers.json present but invalid JSON, ignoring:", err);
+    }
+  }
+
+  return merged;
 }
 
 async function main() {
   const file = path.resolve(process.cwd(), "data/questions.json");
   const raw = JSON.parse(fs.readFileSync(file, "utf8")) as { sections: RawSection[] };
-  // answers.json — отдельный файл с подсказками и эталонными ответами,
-  // мержится поверх structure из questions.json. Можно дозаливать порциями
+  // data/answers/*.json — по файлу на секцию с подсказками и эталонными ответами.
+  // Мержится поверх structure из questions.json. Можно дозаливать порциями
   // (по секциям) и пересеивать — старые поля не затираются.
   const answers = loadAnswers();
   let withContent = 0;
