@@ -69,18 +69,16 @@ export default async function SocialPage() {
           }
           title="Social"
           description={
-            <>
-              <p>HR    ENGLISH    BEHAVIORAL    REVERSE Q&amp;A</p>
-              <p>
-                {sections.length} SECTIONS    {answered} / {total}    {pct}%
-              </p>
-            </>
+            <p>HR    ENGLISH    BEHAVIORAL    REVERSE Q&amp;A</p>
           }
+          progress={{
+            percent: pct,
+            current: answered,
+            total,
+            meta: `${sections.length} SECTIONS`,
+          }}
         />
-        <div className="mt-6 h-px w-full bg-foreground/20" />
-        <div className="-mt-px h-px bg-foreground" style={{ width: `${pct}%` }} />
-
-        <div className="mt-8">
+        <div className="mt-10">
           <TrackGrid sections={sections} />
         </div>
       </main>

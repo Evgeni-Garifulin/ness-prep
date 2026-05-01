@@ -70,16 +70,17 @@ export default async function HomePage() {
           description={
             <>
               <p>FRONTEND INTERVIEW DRILL    RECALL OVER MEMORY</p>
-              <p>
-                TWO TRACKS    {grandTotal} CARDS    {grandAnswered} / {grandTotal}    {grandPct}%
-              </p>
+              <p>TWO TRACKS    {grandTotal} CARDS</p>
             </>
           }
+          progress={{
+            percent: grandPct,
+            current: grandAnswered,
+            total: grandTotal,
+          }}
         />
 
-        <div className="mt-8 h-px w-full bg-foreground" />
-
-        <ul className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-0 border border-foreground">
+        <ul className="mt-10 grid grid-cols-1 sm:grid-cols-2 gap-0 border border-foreground">
           {stats.map((track, idx) => {
             const pct = track.total
               ? Math.round((track.answered / track.total) * 100)

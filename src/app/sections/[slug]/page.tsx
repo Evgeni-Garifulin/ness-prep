@@ -110,19 +110,21 @@ export default async function SectionPage({ params }: { params: Params }) {
           title={stripSectionPrefix(section.title)}
           description={
             <p>
-              {trackLabel}    {positionLabel}    {answered} / {total}    {pct}%
+              {trackLabel}    {positionLabel}
             </p>
           }
+          progress={{
+            percent: pct,
+            current: answered,
+            total,
+          }}
         />
-
-        <div className="mt-6 h-px w-full bg-foreground/20" />
-        <div className="-mt-px h-px bg-foreground" style={{ width: `${pct}%` }} />
 
         <div className="mt-10 space-y-12">
           {groups.map((g, gi) => (
             <section key={gi} className="space-y-4">
               {g.subsection && (
-                <h2 className="yzy-label text-muted-foreground border-b border-foreground/30 pb-2">
+                <h2 className="text-xl sm:text-2xl font-medium uppercase tracking-tight text-foreground">
                   {g.subsection}
                 </h2>
               )}

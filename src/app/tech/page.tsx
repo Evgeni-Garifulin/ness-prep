@@ -69,18 +69,16 @@ export default async function TechPage() {
           topRight={<ResetButton scope="all" label="RESET PROGRESS" />}
           title="Tech"
           description={
-            <>
-              <p>JS    TS    REACT    PERFORMANCE    ARCHITECTURE</p>
-              <p>
-                {sections.length} SECTIONS    {answered} / {total}    {pct}%
-              </p>
-            </>
+            <p>JS    TS    REACT    PERFORMANCE    ARCHITECTURE</p>
           }
+          progress={{
+            percent: pct,
+            current: answered,
+            total,
+            meta: `${sections.length} SECTIONS`,
+          }}
         />
-        <div className="mt-6 h-px w-full bg-foreground/20" />
-        <div className="-mt-px h-px bg-foreground" style={{ width: `${pct}%` }} />
-
-        <div className="mt-8">
+        <div className="mt-10">
           <TrackGrid sections={sections} />
         </div>
 
