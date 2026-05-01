@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { SiteHeader } from "@/components/site-header";
+import { PageHeader } from "@/components/page-header";
 import { TrackGrid } from "@/components/track-grid";
 import { categoryFor, sortKey } from "@/lib/categories";
 
@@ -57,30 +58,25 @@ export default async function SocialPage() {
     <>
       <SiteHeader username={username} />
       <main className="mx-auto max-w-6xl px-4 sm:px-8 py-8 sm:py-12">
-        <Link
-          href="/"
-          className="yzy-label text-muted-foreground hover:text-foreground transition-colors"
-        >
-          INDEX
-        </Link>
-        <div className="mt-4 grid grid-cols-12 gap-4 items-end">
-          <div className="col-span-12 md:col-span-8">
-            <p className="yzy-label text-muted-foreground">TRACK 02 / 02</p>
-            <h1 className="mt-2 text-3xl sm:text-5xl font-medium uppercase leading-[1.05] tracking-tight">
-              Social
-            </h1>
-            <p className="mt-3 yzy-meta text-muted-foreground">
-              HR · English · Behavioral · Reverse Q&amp;A
-            </p>
-          </div>
-          <div className="col-span-12 md:col-span-4 md:text-right">
-            <p className="yzy-label text-muted-foreground">PROGRESS</p>
-            <p className="mt-1 text-3xl font-medium tabular-nums">{pct}%</p>
-            <p className="yzy-meta text-muted-foreground mt-0.5">
-              {answered} / {total} · {sections.length} SECTIONS
-            </p>
-          </div>
-        </div>
+        <PageHeader
+          topLeft={
+            <Link
+              href="/"
+              className="yzy-label text-muted-foreground hover:text-foreground transition-colors"
+            >
+              INDEX
+            </Link>
+          }
+          title="Social"
+          description={
+            <>
+              <p>HR    ENGLISH    BEHAVIORAL    REVERSE Q&amp;A</p>
+              <p>
+                {sections.length} SECTIONS    {answered} / {total}    {pct}%
+              </p>
+            </>
+          }
+        />
         <div className="mt-6 h-px w-full bg-foreground/20" />
         <div className="-mt-px h-px bg-foreground" style={{ width: `${pct}%` }} />
 

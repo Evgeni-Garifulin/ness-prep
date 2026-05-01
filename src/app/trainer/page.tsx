@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { SiteHeader } from "@/components/site-header";
+import { PageHeader } from "@/components/page-header";
 import { TrainerSession } from "@/components/trainer-session";
 import { ResetTestButton } from "@/components/reset-test-button";
 import { categoryFor } from "@/lib/categories";
@@ -55,20 +56,26 @@ export default async function TrainerPage() {
   return (
     <>
       <SiteHeader username={username} />
-      <main className="mx-auto max-w-3xl px-4 sm:px-8 py-8 sm:py-12">
-        <div className="flex items-baseline justify-between gap-4">
-          <p className="yzy-label text-muted-foreground">SEASON — Q2 / 2026</p>
-          <ResetTestButton />
-        </div>
-        <h1 className="mt-3 text-3xl sm:text-5xl font-medium uppercase leading-[1.05] tracking-tight">
-          Trainer
-        </h1>
-        <div className="mt-4 yzy-label text-foreground space-y-1 leading-relaxed whitespace-pre-wrap">
-          <p>NO INPUT    NO TIMER    JUST RECALL</p>
-          <p>SEE THE QUESTION    ANSWER IT IN YOUR HEAD    REVEAL    JUDGE</p>
-          <p>+ IF YOU KNEW IT       − IF YOU MISSED</p>
-          <p>{SESSION_SIZE} CARDS PER ROUND    WEAK SPOTS STACK BELOW</p>
-        </div>
+      <main className="mx-auto max-w-6xl px-4 sm:px-8 py-8 sm:py-12">
+        <PageHeader
+          topLeft={
+            <p className="yzy-label text-muted-foreground">
+              SEASON — Q2 / 2026
+            </p>
+          }
+          topRight={<ResetTestButton />}
+          title="Trainer"
+          description={
+            <>
+              <p>NO INPUT    NO TIMER    JUST RECALL</p>
+              <p>
+                SEE THE QUESTION    ANSWER IT IN YOUR HEAD    REVEAL    JUDGE
+              </p>
+              <p>+ IF YOU KNEW IT       − IF YOU MISSED</p>
+              <p>{SESSION_SIZE} CARDS PER ROUND    WEAK SPOTS STACK BELOW</p>
+            </>
+          }
+        />
 
         <TrainerSession
           questions={session.map((q) => ({

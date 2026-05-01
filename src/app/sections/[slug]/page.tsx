@@ -4,6 +4,7 @@ import { notFound, redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { SiteHeader } from "@/components/site-header";
+import { PageHeader } from "@/components/page-header";
 import { QuestionCard } from "@/components/question-card";
 import { ResetButton } from "@/components/reset-button";
 import { categoryFor, sortKey } from "@/lib/categories";
@@ -90,31 +91,29 @@ export default async function SectionPage({ params }: { params: Params }) {
     <>
       <SiteHeader username={username} />
       <main className="mx-auto max-w-3xl px-4 sm:px-8 py-8 sm:py-12">
-        <div className="flex items-baseline justify-between gap-4">
-          <Link
-            href={trackHref}
-            className="yzy-label text-muted-foreground hover:text-foreground transition-colors"
-          >
-            {trackLabel}
-          </Link>
-          <ResetButton
-            scope="section"
-            sectionSlug={section.slug}
-            label="RESET SECTION"
-          />
-        </div>
-
-        <div className="mt-4">
-          <p className="yzy-label text-muted-foreground">
-            {trackLabel} · {positionLabel}
-          </p>
-          <h1 className="mt-2 text-2xl sm:text-4xl font-medium uppercase leading-[1.05] tracking-tight">
-            {stripSectionPrefix(section.title)}
-          </h1>
-          <p className="mt-3 yzy-meta text-muted-foreground tabular-nums">
-            {answered} / {total} · {pct}%
-          </p>
-        </div>
+        <PageHeader
+          topLeft={
+            <Link
+              href={trackHref}
+              className="yzy-label text-muted-foreground hover:text-foreground transition-colors"
+            >
+              {trackLabel}
+            </Link>
+          }
+          topRight={
+            <ResetButton
+              scope="section"
+              sectionSlug={section.slug}
+              label="RESET SECTION"
+            />
+          }
+          title={stripSectionPrefix(section.title)}
+          description={
+            <p>
+              {trackLabel}    {positionLabel}    {answered} / {total}    {pct}%
+            </p>
+          }
+        />
 
         <div className="mt-6 h-px w-full bg-foreground/20" />
         <div className="-mt-px h-px bg-foreground" style={{ width: `${pct}%` }} />

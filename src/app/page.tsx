@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { SiteHeader } from "@/components/site-header";
+import { PageHeader } from "@/components/page-header";
 import { ResetButton } from "@/components/reset-button";
 import { TRACKS, categoryFor } from "@/lib/categories";
 
@@ -52,28 +53,29 @@ export default async function HomePage() {
     <>
       <SiteHeader username={username} />
       <main className="mx-auto max-w-6xl px-4 sm:px-8 py-8 sm:py-12">
-        <div className="flex items-baseline justify-between gap-4">
-          <p className="yzy-label text-muted-foreground">SEASON — Q2 / 2026</p>
-          <ResetButton scope="all" label="RESET PROGRESS" />
-        </div>
-        <div className="mt-3 grid grid-cols-12 gap-4 sm:gap-6 items-end">
-          <div className="col-span-12 md:col-span-8">
-            <h1 className="text-3xl sm:text-5xl font-medium leading-[1.05] tracking-tight uppercase">
+        <PageHeader
+          topLeft={
+            <p className="yzy-label text-muted-foreground">
+              SEASON — Q2 / 2026
+            </p>
+          }
+          topRight={<ResetButton scope="all" label="RESET PROGRESS" />}
+          title={
+            <>
               Interview
               <br />
               Preparation
-            </h1>
-          </div>
-          <div className="col-span-12 md:col-span-4 md:text-right">
-            <p className="yzy-label text-muted-foreground">PROGRESS</p>
-            <p className="mt-1 text-3xl sm:text-4xl font-medium tabular-nums">
-              {grandPct}%
-            </p>
-            <p className="yzy-meta text-muted-foreground mt-0.5">
-              {grandAnswered} / {grandTotal}
-            </p>
-          </div>
-        </div>
+            </>
+          }
+          description={
+            <>
+              <p>FRONTEND INTERVIEW DRILL    RECALL OVER MEMORY</p>
+              <p>
+                TWO TRACKS    {grandTotal} CARDS    {grandAnswered} / {grandTotal}    {grandPct}%
+              </p>
+            </>
+          }
+        />
 
         <div className="mt-8 h-px w-full bg-foreground" />
 
