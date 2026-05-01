@@ -71,12 +71,7 @@ export default async function TechPage() {
           description={
             <p>JS    TS    REACT    PERFORMANCE    ARCHITECTURE</p>
           }
-          progress={{
-            percent: pct,
-            current: answered,
-            total,
-            meta: `${sections.length} SECTIONS`,
-          }}
+          progress={{ percent: pct }}
         />
         <div className="mt-10">
           <TrackGrid sections={sections} />

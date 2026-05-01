@@ -71,12 +71,7 @@ export default async function SocialPage() {
           description={
             <p>HR    ENGLISH    BEHAVIORAL    REVERSE Q&amp;A</p>
           }
-          progress={{
-            percent: pct,
-            current: answered,
-            total,
-            meta: `${sections.length} SECTIONS`,
-          }}
+          progress={{ percent: pct }}
         />
         <div className="mt-10">
           <TrackGrid sections={sections} />

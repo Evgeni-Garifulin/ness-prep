@@ -7,15 +7,11 @@ import * as React from "react";
 //   2) большой H1 в caps
 //   3) описание в caps yzy-label, мульти-строкой через пробельные разделители
 //
-// Опциональный слот `progress` рисует справа от H1 блок с большим %, лейблом
-// "PROGRESS" и счётчиком (как было на старой главной). На мобиле прогресс
-// уезжает под title, на md+ становится правой колонкой 12-сетки.
+// Опциональный слот `progress` рисует справа от H1 минималистичный блок:
+// лейбл `PROGRESS` + крупный процент. Без счётчиков и доп.инфы — пользователь
+// явно попросил оставить только процент.
 type Progress = {
   percent: number;
-  current: number;
-  total: number;
-  /** дополнительная подпись после счётчика, например "26 SECTIONS" */
-  meta?: React.ReactNode;
 };
 
 type Props = {
@@ -46,12 +42,8 @@ export function PageHeader({
             {title}
           </h1>
           <div className="col-span-12 md:col-span-4">
-            <div className="flex items-baseline gap-3 md:justify-end flex-wrap">
+            <div className="flex items-baseline gap-3 md:justify-end">
               <span className="yzy-label text-muted-foreground">PROGRESS</span>
-              <span className="yzy-meta text-muted-foreground tabular-nums">
-                {progress.current} / {progress.total}
-                {progress.meta ? <> · {progress.meta}</> : null}
-              </span>
               <span className="text-3xl sm:text-4xl font-medium tabular-nums leading-none">
                 {progress.percent}%
               </span>

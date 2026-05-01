@@ -113,11 +113,7 @@ export default async function SectionPage({ params }: { params: Params }) {
               {trackLabel}    {positionLabel}
             </p>
           }
-          progress={{
-            percent: pct,
-            current: answered,
-            total,
-          }}
+          progress={{ percent: pct }}
         />
 
         <div className="mt-10 space-y-12">

@@ -73,11 +73,7 @@ export default async function HomePage() {
               <p>TWO TRACKS    {grandTotal} CARDS</p>
             </>
           }
-          progress={{
-            percent: grandPct,
-            current: grandAnswered,
-            total: grandTotal,
-          }}
+          progress={{ percent: grandPct }}
         />
 
         <ul className="mt-10 grid grid-cols-1 sm:grid-cols-2 gap-0 border border-foreground">
