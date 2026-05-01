@@ -56,7 +56,7 @@ export function LayoutSwitcher({
     <Ctx.Provider value={cols}>
       <div className={cn("flex items-end justify-between gap-3", className)}>
         <div className="min-w-0">{header}</div>
-        <div className="hidden md:flex items-center gap-2 shrink-0">
+        <div className="hidden md:flex items-center gap-3 shrink-0">
           <button
             type="button"
             onClick={() => apply(1)}
@@ -67,6 +67,7 @@ export function LayoutSwitcher({
               cols === 1 ? "bg-foreground" : "bg-transparent hover:bg-muted",
             )}
           />
+          <span className="yzy-label text-muted-foreground select-none">/</span>
           <button
             type="button"
             onClick={() => apply(2)}

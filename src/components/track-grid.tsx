@@ -34,11 +34,13 @@ export function TrackGrid({ sections }: { sections: Section[] }) {
                 {s.answered}/{s.totalQuestions}
               </span>
             </div>
-            <div className="mt-auto pt-6 h-px w-full bg-foreground/20 relative">
-              <div
-                className="absolute left-0 top-0 h-px bg-foreground"
-                style={{ width: `${pct}%` }}
-              />
+            <div className="mt-auto pt-6">
+              <div className="h-px w-full bg-foreground/20 relative">
+                <div
+                  className="absolute left-0 top-0 h-px bg-foreground"
+                  style={{ width: `${pct}%` }}
+                />
+              </div>
             </div>
           </Link>
         );
