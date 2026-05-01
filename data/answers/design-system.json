@@ -1,0 +1,127 @@
+{
+  "design-system__1": {
+    "hintEasy": "Набор переиспользуемых компонентов, токенов и правил, обеспечивающий консистентность UI.",
+    "hintFull": "Tokens (цвета, шрифты, отступы) + примитивы (Button, Input) + составные (Modal, DataTable) + документация + правила использования.",
+    "answer": "Design system — это связка нескольких слоёв. Дизайн-токены — переменные для цветов, шрифтов, отступов, радиусов; источник истины. Примитивы — Button, Input, Stack — без бизнес-логики. Составные компоненты — Modal, Drawer, DataTable — собранные из примитивов. Документация (Storybook, Figma) с примерами и правилами использования. И главное — правила: какой компонент когда использовать, как именовать варианты, что считается изменением public API. Хороший DS даёт консистентность UX, ускоряет разработку, снижает баги. Без правил это просто складом компонентов, который скоро рассыпется."
+  },
+  "design-system__2": {
+    "hintEasy": "Component library — это код. Design system — code + дизайн + процесс + правила.",
+    "hintFull": "Library = просто папка с React-компонентами. DS = + tokens + Figma + документация + контракт API + governance + версионирование.",
+    "answer": "Component library — это техническая часть, набор переиспользуемых React-компонентов. Может существовать как npm-пакет с Button, Input, Modal. Design system — это надстройка: те же компоненты плюс дизайн-токены (синхронизированные с Figma), плюс правила использования, плюс документация, плюс governance — как меняется, кто owner, как версионируется. DS — это контракт между дизайном и инженерией, library — только инженерная часть. Можно иметь хорошую library и плохой DS (разные продуктовые команды используют как хотят). Можно иметь DS без публичной library (внутренний package). DS шире и сложнее, но даёт настоящую консистентность."
+  },
+  "design-system__3": {
+    "hintEasy": "Required: children. Optional: variant, size, disabled. Composition: leftIcon, asChild.",
+    "hintFull": "<Button variant='primary' size='md' leftIcon={...}>Save</Button>. Не plus-flag-ов вроде isPrimary+isDanger+isGhost. Variant как union, не boolean.",
+    "answer": "Хороший Button API. Required — children как label. Variants через единый prop variant: 'primary' | 'secondary' | 'ghost' | 'destructive', не россыпь boolean (isPrimary, isDanger). Size: 'sm' | 'md' | 'lg'. Состояния — disabled, loading. Slots для иконок: leftIcon, rightIcon (не children-как-структура). asChild-паттерн (Radix) — Button может рендериться как <a> для ссылок, не дублируя стили. forwardRef обязательно. Поддержка нативных атрибутов через ...rest, чтобы не блокировать data-атрибуты, aria-*, type='submit'. Дискриминированные TS-types для variant, чтобы IDE подсказывал."
+  },
+  "design-system__4": {
+    "hintEasy": "Compound: Modal + Modal.Header + Modal.Body + Modal.Footer. Open/onOpenChange controlled.",
+    "hintFull": "<Modal open onOpenChange><Modal.Header><Modal.Body><Modal.Footer>. Focus trap, return focus, esc, aria-modal — встроены. Без props-zoo.",
+    "answer": "Modal API через compound-component-паттерн. <Modal open={x} onOpenChange={fn}> с дочерними <Modal.Header>, <Modal.Body>, <Modal.Footer> и опциональным <Modal.Close>. Это снимает 90% props-zoo: вместо title, description, footer, showCloseButton как props — просто композиция. Внутри Modal обрабатывает focus trap, return focus, Esc-close, aria-modal, scroll-lock background-а. Готовые библиотеки (Radix Dialog, Headless UI Dialog) реализуют все edge-cases: shadow DOM, iframe, dynamic content. Своими руками — много граблей. Modal остаётся controlled (open передаётся снаружи) — потребитель решает, когда открывать."
+  },
+  "design-system__5": {
+    "hintEasy": "Headless ядро (state) + презентационная вёрстка. Колонки декларативно.",
+    "hintFull": "TanStack Table даёт sorting/filtering/pagination/virtualization. UI — наша вёрстка. Колонки описаны через columns array с accessor + cell-renderer.",
+    "answer": "Table API лучше делать через headless. TanStack Table — ядро, отвечает за state (sorting, filtering, pagination, selection, virtualization). UI — наша презентация на ds-стилях. Колонки декларативно: const columns = [{ id, header, accessor, cell: ({row}) => <Cell ... /> }]. Это даёт переиспользуемость на десятки разных таблиц. Виртуализация для больших датасетов. Server-side sort/filter — через колбэки. Не делать монолитный Table-компонент с props-zoo (sortable, filterable, paginated, selectable, expandable...) — он становится монстром. Headless разделяет логику и стили."
+  },
+  "design-system__6": {
+    "hintEasy": "Field-обёртка с label + input + error + help. RHF Controller внутри.",
+    "hintFull": "<Field label='Email' error={...} help='...'><Input /></Field>. Field связывает label с input через id, рендерит error через aria-describedby.",
+    "answer": "Form components строятся вокруг Field-обёртки. <Field label, error, help, required>{children}</Field> связывает label с input через id (генерируется внутри), рендерит error и help-текст с правильными aria-describedby/aria-invalid. Внутри — наши Input, Select, Checkbox, Textarea — простые primitives без знания о form-state. Интеграция с RHF через Controller: пользователь оборачивает <Controller> вокруг нашего Input, или мы делаем <FormField name='email'>, который сам register-ит. Накопленные годами anti-patterns — не давать <Input label='...' error='...' />, потому что label-и нужно гибко позиционировать (top, side)."
+  },
+  "design-system__7": {
+    "hintEasy": "Структурируешь как иерархию: primitive → semantic → component-specific.",
+    "hintFull": "Primitives: gray-100..900, blue-500. Semantic: --color-bg, --color-text-primary. Component: --button-bg-primary. Меняешь semantic — меняется везде.",
+    "answer": "Tokens организуются в трёх слоях. Primitives — палитра низкого уровня: gray-50..900, blue-100..900, font-size-12..48. Названия описывают что, не зачем. Semantic — назначение: --color-bg, --color-text-primary, --color-border-subtle, --space-md. Эти ссылаются на primitives. Component-specific — для конкретных компонентов: --button-bg-primary, --modal-padding. Эти ссылаются на semantic. Зачем три слоя — гибкость. Меняешь --color-bg для тёмной темы → меняется везде, где использовался semantic. Без semantic-слоя пришлось бы обновлять каждое использование gray-100. Tokens живут в JSON-объекте, генерятся в CSS-переменные через style-dictionary."
+  },
+  "design-system__8": {
+    "hintEasy": "data-theme='dark' на html, переменные с overrides — компоненты не меняются.",
+    "hintFull": "Tokens с двумя значениями — light и dark. CSS: :root[data-theme='dark'] переопределяет. Компоненты используют semantic переменные, не цвета напрямую.",
+    "answer": "Dark mode через CSS-переменные. Tokens определяются для каждой темы: :root { --color-bg: white; --color-text: black } и :root[data-theme='dark'] { --color-bg: #111; --color-text: #eee }. Компоненты используют только semantic-переменные (--color-bg), никогда хардкод-цвета. Переключение — атрибут на html, persist в localStorage, при старте читается prefers-color-scheme. Это даёт мгновенное переключение без перерендера компонентов и работает без JS на SSR. Edge-cases: изображения с hardcoded цветами (CSS filter inversion), shadow-ы для тёмной темы (другие), states (hover, focus) тоже в переменных. И тестировать обе темы."
+  },
+  "design-system__9": {
+    "hintEasy": "Tokens, меняющиеся по media-query: spacing, font-size scale.",
+    "hintFull": "--space-md: clamp(0.5rem, 2vw, 1rem). Или media-query: на mobile spacing-2 = 8px, на desktop = 16px. Container queries для component-level.",
+    "answer": "Responsive tokens — это значения, которые меняются по размеру экрана. Простой подход — clamp() с min, preferred (vw), max: --space-md: clamp(0.5rem, 2vw, 1rem). Шрифт автоматически масштабируется. Альтернатива — media-query overrides на :root: на мобильном --space-md меньше. Container queries (@container) — компонент адаптируется к своему контейнеру, не вьюпорту, что важно для widget-based UI. Tokens в JSON-объекте с breakpoint-ключами: { space: { md: { default: 16, mobile: 8 } } }. И не злоупотреблять — большинство spacing/font-size остаётся фиксированным, responsive нужно только для специфических случаев."
+  },
+  "design-system__10": {
+    "hintEasy": "Использовать готовые a11y-библиотеки (Radix, react-aria) и тестировать с jest-axe.",
+    "hintFull": "Внутри сложных компонентов — Radix или react-aria, которые делают focus trap, ARIA, keyboard правильно. Storybook + jest-axe в CI для проверки.",
+    "answer": "Главное правило — не писать сложные виджеты с нуля. Modal, Combobox, Tabs, Menu — готовые headless-библиотеки (Radix, react-aria, Headless UI) реализуют WAI-ARIA Authoring Practices правильно. На них наклеиваешь свои стили. Это даёт focus trap, ARIA, keyboard navigation, return focus, screen reader announcements бесплатно. Дополнительно — все компоненты тестируются с jest-axe, чтобы ловить регрессии (отсутствие label, плохой контраст). В Storybook — addon a11y. И ручная проверка с реальным screen reader-ом раз в спринт. Без этого минимума «accessibility by default» — пустые слова."
+  },
+  "design-system__11": {
+    "hintEasy": "Storybook с примерами для каждого варианта + Markdown-описание + а11y-чеклист.",
+    "hintFull": "Каждый компонент: stories с variants/states/edge-cases, MDX-документ с описанием, do/don't, accessibility notes, code-snippet для копипаста.",
+    "answer": "Storybook — стандарт для документирования. На каждый компонент — stories с примерами всех вариантов (primary, secondary, ghost), всех состояний (default, hover, disabled, loading), edge-кейсов (длинный текст, узкий контейнер). MDX-формат позволяет миксовать Markdown с кодом и компонентами — описание API, do/don't, accessibility notes, ссылки на Figma. Code snippets для копипаста — потребители часто хотят скопировать готовое. Auto-generated TypeScript types в табе Args. И обязательно — поиск по всему Storybook, чтобы не нужно было знать имя компонента наперёд."
+  },
+  "design-system__12": {
+    "hintEasy": "Развернуть на dev-окружении, писать stories, использовать как playground и документацию.",
+    "hintFull": "Storybook = isolated environment для компонентов. Stories для каждого варианта. Addons: docs, a11y, viewport, controls. Чат-доступ для дизайн-команды.",
+    "answer": "Storybook — это среда для разработки и документирования компонентов в изоляции. Создаются stories: один файл на компонент, в нём примеры использования с разными props. В dev-режиме разрабатываешь компонент в Storybook, не в реальной странице — быстрее итерировать. Addons: docs для генерации MD-страниц, a11y для проверки accessibility, viewport для responsive, controls для интерактивной игры с props. Хостится на dev-окружении (Chromatic, Vercel) — дизайнеры и QA имеют доступ. Все примеры тестируются автоматически (chromatic visual regression). И полезно использовать stories как тест-фикстуры в RTL — переиспользуются."
+  },
+  "design-system__13": {
+    "hintEasy": "Unit на логику, visual regression на вид, a11y-tests, тесты в реальных приложениях.",
+    "hintFull": "Юнит для hook-ов и utility. Visual regression через Chromatic / Percy. jest-axe для a11y. И обязательно — интеграционные тесты от потребителей.",
+    "answer": "Дизайн-система тестируется в нескольких слоях. Unit — логика и хуки (useDisclosure, useFocusTrap). Visual regression — Chromatic или Percy делают скриншоты каждой story и сравнивают с baseline; ловит непреднамеренные визуальные изменения. Jest-axe на каждый story для accessibility. Manual screen reader testing — раз в релиз. И самое важное — интеграционные тесты от потребителей: реальные продуктовые команды используют DS-компоненты, и их e2e-suite ловит реальные регрессии. Поэтому DS не релизится без прогона их тестов. Для подтверждения breaking changes — отдельный canary-релиз для бета-юзеров."
+  },
+  "design-system__14": {
+    "hintEasy": "Semver: major на breaking, minor на новое, patch на фиксы. Changelog обязательно.",
+    "hintFull": "Semver. Changesets для управления version-bump-ами. Major — breaking. Minor — новый API. Patch — fix без изменения поведения. Changelog для команд-потребителей.",
+    "answer": "Версионирование через semver: MAJOR.MINOR.PATCH. MAJOR — breaking changes (изменение API, удаление компонента, переименование prop). MINOR — новый API без breaking (новый компонент, новый prop). PATCH — fixes без изменения поведения (баги, перфоманс). Changesets (npm-пакет) автоматизирует это: каждый PR прикладывает changeset с описанием, при release-е генерится изменения версии и changelog. Changelog критичен — продуктовые команды читают его, чтобы понять, что обновляется. Pre-release tags (alpha, beta) для крупных изменений. И обязательно — public type-changes тоже считаются major: TS-типы — часть API."
+  },
+  "design-system__15": {
+    "hintEasy": "Депрекейшн c warning перед удалением; новые APIs параллельно со старыми.",
+    "hintFull": "Перед removal — несколько minor-релизов с deprecation warning в console. Новый API живёт рядом со старым. Документация подсказывает миграцию.",
+    "answer": "Breaking changes неизбежны, но управляются. Перед удалением — депрекейшн warning в console.warn в нескольких minor-релизах: «Button.isPrimary is deprecated, use variant='primary'». Новый API живёт рядом со старым, потребители мигрируют постепенно. Документация показывает migration path. Codemod (jscodeshift) автоматизирует изменения: запустил скрипт, он переписал isPrimary на variant. После 1-2 минор-релизов с депрекейшн — major-bump с удалением. Для совсем критичных изменений — adapter-пакет, заворачивающий старый API в новый. Никогда не делать silent breaking changes — потребители возненавидят и перестанут обновляться."
+  },
+  "design-system__16": {
+    "hintEasy": "Open issues, регулярные office hours, opt-in beta-программа, метрики использования.",
+    "hintFull": "GitHub issues / internal tickets. Office hours раз в неделю. Beta-канал для крупных изменений. Telemetry usage component-ов в реальных приложениях.",
+    "answer": "Feedback от продуктовых команд — must-have для DS. Каналы: GitHub issues или internal Jira для багов и feature requests. Office hours раз в неделю — DS-команда отвечает на вопросы, помогает с миграцией. Beta-канал для крупных изменений — энтузиасты пробуют сначала, дают feedback. Telemetry — какие компоненты, какие props используются по всем продуктам; помогает решать, что устаревшее, что добавить. Регулярные ретро с продуктовыми командами. И обязательно — DS-команда сама работает на каком-то реальном продукте, иначе оторвётся от потребностей."
+  },
+  "design-system__17": {
+    "hintEasy": "Composition вместо props-zoo. Variants, не boolean-flags. Slots, не parent-controlled-вёрстка.",
+    "hintFull": "Если props больше 7-10, стоит думать о composition. Slot-pattern (Radix) или compound-component вместо parent control over child layout.",
+    "answer": "Component API становится монстром, когда туда сваливают всё. Симптомы: 15+ props, многие boolean (showHeader, showFooter, showCloseButton), conditional logic в компоненте (if showHeader render Header). Лечение — composition. Compound components: Modal + Modal.Header + Modal.Body, потребитель сам решает структуру. Slot pattern (Radix asChild): <Button asChild><a>...</a></Button>. Variants как union, не россыпь boolean. Children как ReactNode для гибкого контента. Если что-то нужно конкретному использованию — обычно это часть приложения, не DS. И главное — пересматривать API раз в полгода, удалять неиспользуемое."
+  },
+  "design-system__18": {
+    "hintEasy": "Когда родителю важно знать или менять value (форма, фильтр, выбор).",
+    "hintFull": "Controlled — value + onChange проп. Когда родителю нужно сбросить, инициализировать, синхронизировать с другим state. Сложные виджеты обычно поддерживают оба режима.",
+    "answer": "Controlled component держит value наружно — через value + onChange props. Использовать когда родитель должен знать состояние (форма с валидацией), сбрасывать его (reset button), синхронизировать с другим state (master-detail). Uncontrolled — value хранится внутри, через defaultValue. Использовать когда состояние нужно только этому компоненту (search-input в шапке без отношения к остальной странице). Многие сложные компоненты (Dialog, Select, Tabs) поддерживают оба режима: open + onOpenChange (controlled), defaultOpen (uncontrolled). DS должен это поддерживать, иначе ограничивает потребителей."
+  },
+  "design-system__19": {
+    "hintEasy": "Когда у компонента сложная структура и потребителю нужна гибкость в layout.",
+    "hintFull": "Modal, Tabs, Accordion, Dropdown. Когда есть несколько связанных частей с разными ролями. Compound даёт композицию вместо props.",
+    "answer": "Compound components оправданы для сложных структурных компонентов. Modal + Header + Body + Footer + Close. Tabs + List + Trigger + Content. Accordion + Item + Trigger + Content. Признак — у компонента несколько связанных частей, и каждая может содержать произвольный контент. Альтернатива — передавать структуру через props (titleSlot, footerSlot) — менее гибко, нужно много условий внутри. Compound через React Context: родитель управляет state, дети читают через useContext. Это шаблон Radix, Headless UI, и большинства серьёзных DS. Накладные расходы — учить потребителей паттерну."
+  },
+  "design-system__20": {
+    "hintEasy": "Когда нужна логика без жёсткой вёрстки — потребитель сам стилизует.",
+    "hintFull": "Combobox, Table, Dropdown с уникальной стилистикой каждого продукта. Логика и a11y — в headless-ядре. Вёрстка — у потребителя.",
+    "answer": "Headless component нужен, когда логика сложная (state, ARIA, keyboard navigation), но визуально каждый продукт хочет свой стиль. Примеры — Radix UI (headless dialog, menu, tabs), TanStack Table, Downshift (combobox), use-floating (popper). Headless даёт hooks или slot-API: useTable, useCombobox; они возвращают props и handlers, потребитель прикрепляет к своим элементам. Это разделяет «как работает» и «как выглядит». В DS — headless для специализированных кейсов, готовые-стилизованные обёртки для общих. Современные DS часто строятся на Radix как фундаменте."
+  },
+  "design-system__21": {
+    "hintEasy": "Headless ядро + Tailwind/CSS-вёрстка наверху. Логика в hook, стили в компоненте.",
+    "hintFull": "Логика — Radix или собственный hook (state, ARIA, keyboard). Стили — отдельный слой (Tailwind, CSS-modules). Стили можно поменять без переписывания логики.",
+    "answer": "Разделение через слои. Логика — в hook или headless component (state, accessibility, keyboard). Стили — в обычном React-компоненте с Tailwind или CSS-modules. <Dialog> из Radix — логика; наш <ConfirmDialog> — стили + использует Radix внутри. Можно поменять стили без переписывания логики, и наоборот. Это даёт переиспользуемость через продукты с разной стилистикой и тестируемость (логику тестируешь без рендера). Для совсем простых компонентов (Button) разделение overkill — всё в одном месте. Для сложных (Tabs, Combobox) — обязательно. И tokens-system делает стили легко настраиваемыми."
+  },
+  "design-system__22": {
+    "hintEasy": "Chromatic / Percy — скриншоты Stories, сравнение с baseline.",
+    "hintFull": "Chromatic интегрирован со Storybook: PR создаёт скриншоты всех stories, diff показывается в UI, человек апрувит. Регрессии ловятся автоматически.",
+    "answer": "Visual regression в DS — must-have, потому что сложно вручную проверить, что 100 компонентов в 5 вариантах не сломались. Chromatic (от Storybook team) интегрируется бесшовно: на каждый PR делает скриншоты всех stories, сравнивает с baseline в main. Diff показывается в UI с before/after, человек апрувит изменение или отклоняет. Percy — альтернатива. Опционально — multi-browser / multi-viewport screenshots. Для cross-browser важно, потому что небольшие отличия рендеринга часто незаметны, но иногда ломают UX. После апрува — новый baseline. Это самая дешёвая страховка от непреднамеренного breaking change в стилях."
+  },
+  "design-system__23": {
+    "hintEasy": "SVG-sprite или импорт компонентов; стандартные размеры; unicolored для color-inheritance.",
+    "hintFull": "SVG inline через React-компоненты (lucide-react). Унифицированные размеры (16, 20, 24px). currentColor вместо хардкод — наследует color от parent.",
+    "answer": "Иконки в современном DS — SVG-компоненты, не sprite-файлы и не icon-fonts. Библиотеки (lucide-react, react-icons) или собственный набор. Каждая иконка — React-component с size и color props. Атрибут fill='currentColor' и stroke='currentColor' — иконка наследует цвет от parent через CSS color, что упрощает theming и hover-states. Стандартные размеры (16, 20, 24, 32) — иначе хаос. Bundle-size — важно: tree-shaking работает только если иконки экспортируются как отдельные модули, а не одним index.ts с re-export-ами. Custom-иконки — добавлять через тот же интерфейс."
+  },
+  "design-system__24": {
+    "hintEasy": "Шкала из степеней 4 или 8 px: 0, 4, 8, 12, 16, 24, 32, 48, 64.",
+    "hintFull": "Не произвольные значения, а scale: 4px база. Tokens space-1=4, space-2=8, space-3=12... Stack/Inline-компоненты используют scale.",
+    "answer": "Spacing system — это шкала (scale) из заранее определённых значений. База — 4 или 8 пикселей. Шкала: 0, 4, 8, 12, 16, 20, 24, 32, 40, 48, 64. Tokens: --space-1 (4px), --space-2 (8px) и так далее. Все отступы (margin, padding, gap) используют только scale — это даёт визуальную гармонию. Произвольные значения (margin: 13px) запрещены. В коде — Stack и Inline компоненты с gap-prop принимают только эти значения; это enforcement через TS-типы. Большой DS использует logical properties (margin-block, margin-inline) для RTL-friendly, но это уже advanced."
+  },
+  "design-system__25": {
+    "hintEasy": "Один пакет DS на все микрофронты, peer-dependency, единая версия.",
+    "hintFull": "DS — npm-package, у всех микрофронтов одна major-версия. Tokens через CSS-переменные на корневом host-приложении. Module Federation — share DS как singleton.",
+    "answer": "Микрофронты часто ломают consistency, потому что каждая команда выбирает компоненты сама. Решение — один общий DS-пакет, обязательная зависимость для всех микрофронтов. Версионирование через peer-dependency: все на одной major-версии, иначе runtime-конфликты. Tokens (CSS-переменные) определяются на host-приложении, дочерние их наследуют — единая тема для всех. Module Federation — share DS как singleton, чтобы не было multiple instances React-Context-а. Periodic audits — automated scan, что используется в каждом микрофронте; дрейф ловится. Без enforcement DS на микрофронтах никто не будет — каждая команда экономит время."
+  }
+}

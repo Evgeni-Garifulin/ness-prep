@@ -1,0 +1,152 @@
+{
+  "api-graphql__1": {
+    "hintEasy": "REST когда схема устойчива и кеш-friendly. GraphQL когда фронт хочет точечные данные.",
+    "hintFull": "REST: простота, HTTP-кеш, разные команды бэка независимо. GraphQL: гибкость для фронта, точечные данные, type-safety. Зависит от команды и масштаба.",
+    "answer": "Зависит от контекста. REST хорош, когда схема стабильна, ресурсы хорошо ложатся в URLs, нужен HTTP-кеш и CDN-friendly. Простой, без learning curve, бэкенд-команды работают независимо. GraphQL хорош, когда фронт хочет точечно выбирать поля, есть несколько клиентов с разными потребностями (web, mobile, watch), и важна type-safety. Минусы GraphQL — сложность кеширования, N+1 на бэке, сложнее наблюдаемость. Часто оптимум — REST + минимальные fragments, или BFF, который абстрагирует. Главное — не выбирать инструмент по моде; обоснование должно быть в реальных болях."
+  },
+  "api-graphql__2": {
+    "hintEasy": "Точные данные, type-safety из схемы, один endpoint, версионирование без breaking.",
+    "hintFull": "Запрос только нужных полей (нет overfetch). Type generation. Один endpoint вместо N REST-route-ов. Эволюция схемы без новых endpoint-ов.",
+    "answer": "Главные плюсы для фронта. Точечный запрос: фронт сам решает, какие поля нужны — никакого overfetch-а. Type-safety: GraphQL Code Generator генерирует TS-типы из схемы, любая опечатка ловится compile-time. Один endpoint: один POST /graphql вместо десятков REST-route-ов. Эволюция через добавление полей — старые клиенты не ломаются, новые поля просто игнорируют. Удобство federation: один graph объединяет несколько backend-сервисов. Mobile/web shared: одна схема для всех клиентов, каждый берёт своё. Все эти преимущества заметны в средних и крупных проектах; на мелких overhead не окупается."
+  },
+  "api-graphql__3": {
+    "hintEasy": "Сложность кеширования, риск N+1, server-сложность, безопасность.",
+    "hintFull": "HTTP-кеш не работает (POST). N+1 на бэке без DataLoader-а. Сложнее observability. Атакующий может сделать тяжёлый query — нужен query complexity limit.",
+    "answer": "Минусы GraphQL ощутимы. HTTP-кеш и CDN не работают на POST /graphql — кешируется на уровне клиента (Apollo, urql). N+1 на бэке: вложенные resolver-ы вызывают несколько SQL-запросов; решается DataLoader-ом, но это extra-сложность. Observability сложнее — все запросы идут на один endpoint, traces менее очевидны. Безопасность: атакующий может прислать тяжёлый query (deeply nested, expensive resolver) — нужен query complexity limit, depth limit, persisted queries. Bundle-size GraphQL-клиента (Apollo) обычно больше, чем REST-fetcher. И learning curve для команды."
+  },
+  "api-graphql__4": {
+    "hintEasy": "Сервер возвращает больше полей, чем фронт использует — лишний трафик и работа.",
+    "hintFull": "REST endpoint /users/1 возвращает 50 полей, фронт использует 5. На медленных сетях и мобильных — лишние KB. На бэке — лишние JOIN-ы.",
+    "answer": "Overfetching — это когда сервер возвращает больше данных, чем фронт реально использует. Классический REST: GET /users/1 возвращает все 50 полей юзера, а на странице нужны только имя и аватар. На медленных сетях это лишние килобайты, на бэке — лишние JOIN-ы. GraphQL это решает: запрашиваешь только нужные поля. В REST — либо разные endpoint-ы (/users/1/short, /users/1/full), либо query-параметр fields=name,avatar, либо BFF, который специально режет. Overfetching особенно болезнен на мобильных и со slow API: каждый лишний килобайт — задержка."
+  },
+  "api-graphql__5": {
+    "hintEasy": "Один запрос не покрывает нужду — приходится делать несколько последовательных.",
+    "hintFull": "REST: GET /user → потом GET /user/posts → потом GET /post/comments. Три round-trip-а. GraphQL делает это одним запросом.",
+    "answer": "Underfetching — обратная проблема. Один endpoint возвращает не всё, что нужно странице, и фронт делает дополнительные запросы. Классика: GET /user, потом GET /user/posts, потом GET /posts/{id}/comments — три последовательных round-trip-а. Каждый добавляет latency сети, особенно на 4G/3G это 100-300мс на каждый. GraphQL решает одним запросом, который вытаскивает связанные данные. В REST лечится либо BFF-endpoint-ом (специальный для нужд фронта), либо смежной техникой include / expand параметров. Underfetching — главный аргумент в пользу GraphQL для сложных страниц с deeply nested данными."
+  },
+  "api-graphql__6": {
+    "hintEasy": "GraphQL Code Generator: схема → TS-типы и type-safe queries.",
+    "hintFull": "graphql-codegen берёт схему и .graphql-файлы с queries, генерит types и hooks. Опечатка в query = compile error. Type-safety из коробки.",
+    "answer": "Стандартный инструмент — GraphQL Code Generator. Берёт схему (sdl или introspection) и .graphql-файлы с queries и mutations, генерирует TypeScript-типы и optionally хуки для Apollo / urql / TanStack Query. Опечатка в query = compile error. Поля, которые не возвращаются, в TS-типах помечены required, остальные — optional. Это устраняет целый класс runtime-багов: неправильно набрал имя поля, использовал поле, которого не запросил. Устанавливается как codegen-команда в build. Более продвинутый вариант — TypedDocumentNode, который объединяет query и тип в один объект."
+  },
+  "api-graphql__7": {
+    "hintEasy": "GraphQL может вернуть data + errors одновременно. Парсить и показывать соответственно.",
+    "hintFull": "errors[] на root, data может быть partial. errorPolicy в Apollo: ignore / all / none. Network error vs GraphQL error — разные кейсы.",
+    "answer": "GraphQL errors отличаются от REST. Сервер может вернуть HTTP 200 с errors[] в payload — это GraphQL-ошибка, не сетевая. data может быть partial — часть полей с error, остальные с данными. Apollo errorPolicy: 'all' возвращает и data, и errors; 'none' — только error при наличии (default); 'ignore' — игнорирует, дает только data. В коде: ловить network errors (offline, 5xx) и GraphQL errors отдельно. Errors имеют path и extensions с custom-кодом — фронт может map-ить на UI: UNAUTHENTICATED → redirect на login, FORBIDDEN → toast, VALIDATION → ошибки полей формы."
+  },
+  "api-graphql__8": {
+    "hintEasy": "Apollo / urql / Relay имеют нормализованный кеш по __typename + id.",
+    "hintFull": "Кеш нормализован: каждый объект по __typename:id. Запрос двух разных queries возвращает связанные данные — один и тот же объект обновляется в обоих.",
+    "answer": "GraphQL clients (Apollo Client, urql, Relay) имеют нормализованный кеш. Каждый объект хранится по __typename + id (например, User:42). Когда два разных query возвращают одного и того же User-а, оба используют одну запись в кеше. Изменение в одном месте — обновление везде. Это решает проблему consistency в сложных UI. Mutation возвращает обновлённого юзера — кеш сам пересчитывает все queries, использующие этого юзера. Для этого важно — всегда запрашивать id поля. Tanstack Query — flat кеш по queryKey, без normalization, но проще. Relay — самый строгий, требует id в каждом типе и фрагмент-разделение."
+  },
+  "api-graphql__9": {
+    "hintEasy": "Cursor-based для бесконечных лент, offset для известного количества страниц.",
+    "hintFull": "Cursor (Relay-style edges/nodes) — стабильно при insert. Offset (page=2) проще, но shifts при insert-е. GraphQL стандарт — Relay Connection spec.",
+    "answer": "Pagination в GraphQL обычно делается через Relay Connection spec: { edges: [{ node, cursor }], pageInfo: { hasNextPage, endCursor } }. Cursor-based стабилен при insert: новый item добавляется в начале — не сбивает текущую страницу. Apollo и Relay имеют built-in поддержку через fetchMore + merge function в кеше. Offset (skip/take) проще, но при insert-е страница 2 показывает дубликаты или пропуски. Для бесконечных лент (Twitter, чат) — обязательно cursor. Для классической pagination с известным total и кнопками страниц — offset проще."
+  },
+  "api-graphql__10": {
+    "hintEasy": "Cursor — стабильность и производительность; offset — простота и random access.",
+    "hintFull": "Cursor: O(1), не сбивается при изменении данных, нет SQL OFFSET. Offset: проще, можно прыгнуть на страницу 50, но O(N) и duplicates при insert-е.",
+    "answer": "Cursor pagination — каждый item имеет уникальный cursor (id или composite), запросы вида after: cursor, first: 20. SQL — WHERE id > :cursor LIMIT 20, эффективно даже на огромных таблицах. При insert-е новых items текущая страница не сбивается. Минус — нельзя прыгнуть на страницу 50 (только последовательно). Offset pagination — page=2&size=20 → SQL OFFSET 20. Просто, можно random access. Минус — на больших таблицах OFFSET 100000 медленный. И при insert-е страница 2 показывает дубликаты или пропуски (item смещается). Для feed-style UI — cursor; для admin-таблицы с чёткой пагинацией — offset."
+  },
+  "api-graphql__11": {
+    "hintEasy": "Apollo: optimisticResponse + кеш-апдейт. На error — кеш откатывается автоматически.",
+    "hintFull": "useMutation({ optimisticResponse: { ... }, update: (cache, result) => ... }). Apollo применяет optimistic, на error откатит автоматически.",
+    "answer": "В Apollo / urql есть встроенная поддержка optimistic response. У useMutation указываешь optimisticResponse — фейковый ответ, который применяется к кешу до сетевого запроса. Update-функция описывает, как обновить кеш. UI обновляется мгновенно. На error — Apollo автоматически откатывает кеш до предыдущего состояния. Это намного проще, чем в REST с React Query, где приходится вручную onMutate / onError / onSettled. Главное — указать __typename и id в optimisticResponse, чтобы кеш правильно нормализовал. Edge-case: rollback может пропустить, если другой mutation в полёте; для критичных кейсов всё равно нужно тестировать."
+  },
+  "api-graphql__12": {
+    "hintEasy": "Тонкий слой над fetch с интерсепторами: auth, retry, error-handling, cancel.",
+    "hintFull": "axios или ky-instance с base URL, interceptors на 401-refresh, 5xx-retry, AbortController, parseError. Один на приложение.",
+    "answer": "Один API-client на приложение, тонкий слой над fetch/axios. Внутри — base URL, default headers (Content-Type, Authorization). Интерсепторы на response: 401 → triggerRefresh → retry; 5xx → exponential backoff + retry с лимитом; парсинг error в типизированный объект. Request — поддержка AbortController через signal. Ошибки бросаются как структурированные ApiError с code/message/fieldErrors, чтобы UI мог их обрабатывать. Используется в React Query queryFn-ах. Тонкий — не пытается быть фреймворком, не дублирует cache (это работа React Query). Один источник истины для transport, бизнес-логика в hooks/use-cases выше."
+  },
+  "api-graphql__13": {
+    "hintEasy": "AbortController в каждом запросе. Cancel при unmount или новом запросе.",
+    "hintFull": "fetch(url, { signal: controller.signal }). controller.abort() при unmount или при смене параметров. React Query делает это автоматически в queries.",
+    "answer": "Запрос должен отменяться, когда результат уже не нужен. AbortController — стандартный API. На каждый запрос создаётся controller, signal передаётся в fetch. controller.abort() вызывается, когда: компонент размонтировался, изменились параметры запроса, пользователь отменил действие. React Query / SWR делают это автоматически в queries: при изменении queryKey старый запрос abort-ится. Для axios — CancelToken (legacy) или AbortController (modern). Для GraphQL clients — Apollo использует AbortController внутри. Без cancellation — race conditions, лишний трафик, обновление state на размонтированном компоненте."
+  },
+  "api-graphql__14": {
+    "hintEasy": "Retry с exponential backoff и jitter; не на 4xx; cap на попытки.",
+    "hintFull": "5xx и network errors → retry с delay = base * 2^attempt + jitter. 4xx (client errors) — не retry. Cap 3-5 попыток. На critical actions — никакого retry без idempotency-key.",
+    "answer": "Retry policy строится по принципам. Retry на: network errors (offline, timeout), 5xx (server errors), 429 (rate limit) с Retry-After заголовком. Не retry на: 4xx client errors (400, 401, 403, 404 — повтор не поможет). Exponential backoff: delay = base * 2^attempt + jitter (случайная составляющая ±25%) — без jitter все клиенты долбят синхронно. Cap на попытки (3-5), потом fail. Для critical actions (платёж, оформление заказа) — не retry без idempotency-key, иначе двойное списание. React Query имеет встроенный retry с настройкой; для axios — axios-retry."
+  },
+  "api-graphql__15": {
+    "hintEasy": "Не-идемпотентные мутации без idempotency-key. Critical actions без подтверждения.",
+    "hintFull": "POST /transfer без idempotency-key — retry = double-spend. POST /create-order без idempotency — два заказа. PUT/DELETE могут быть идемпотентны.",
+    "answer": "Запросы, которые нельзя retry-ить — те, что меняют state и не идемпотентны. Без защиты POST /transfer повторно отправит деньги; POST /create-order создаст два. Если retry нужен для устойчивости — добавляется idempotency-key (UUID на клиентской стороне), бэк хранит {key → response} с TTL и при повторе возвращает первый ответ, не выполняя действие повторно. PUT и DELETE по REST-конвенции должны быть идемпотентны — повтор не вреден. GET — всегда безопасен. Критичные действия (deposit, withdraw, kyc-submit) — обязательно с idempotency-key, и retry разрешён только при наличии."
+  },
+  "api-graphql__16": {
+    "hintEasy": "Одна и та же операция повторяется без побочных эффектов — bestkey-key или natural id.",
+    "hintFull": "Idempotency-Key: UUID в header. Сервер хранит {key → response} с TTL. Повторный запрос с тем же key — возврат первого ответа без повторного действия.",
+    "answer": "Idempotency на API-уровне делается через Idempotency-Key. Клиент генерирует UUID на старте операции, передаёт в Idempotency-Key header. Сервер при первом запросе выполняет действие и сохраняет {key → response} в БД с TTL (например, 24 часа). При повторе с тем же key — возвращает сохранённый response, не выполняя действие повторно. Это защита от: client retry после network timeout-а, double-submit от нетерпеливого юзера, любого случая, когда клиент не уверен в успехе. Stripe и многие платёжные API именно так и работают. Frontend — генерировать key один раз при старте, передавать во все retries."
+  },
+  "api-graphql__17": {
+    "hintEasy": "429 Too Many Requests + Retry-After header. Backoff и не долбить.",
+    "hintFull": "Сервер шлёт 429 с Retry-After (секунды или дата). Клиент ждёт указанное время, retry. Если без header — exponential backoff. UI: пометить «too many requests, попробуйте позже».",
+    "answer": "Rate limits появляются при превышении квоты. Сервер отвечает 429 Too Many Requests, обычно с Retry-After header (секунды до повторной попытки). Клиент должен дождаться этого времени и retry. Без Retry-After — exponential backoff. UI индикатор: toast «Too many requests, please slow down». Для предсказуемой нагрузки (известный лимит из docs) — на клиенте throttle/queue запросов, чтобы не упираться. На критичных действиях — graceful degradation: показать сообщение, не блокировать UI. И для обнаружения проблем — мониторить процент 429-ответов в RUM."
+  },
+  "api-graphql__18": {
+    "hintEasy": "401 — не авторизован, refresh token и retry или logout. 403 — нет прав, показать ошибку.",
+    "hintFull": "401 → попробовать refresh access token. Если refresh fail — logout. 403 → показать «нет прав» (это не auth-проблема, перерыв доступ — это нормально для UX).",
+    "answer": "401 и 403 — разные. 401 Unauthorized — пользователь не авторизован (токен истёк, недействителен). Стандартный flow: response interceptor ловит 401, пытается refresh access token через refresh-token, retry-ит оригинальный запрос. Если refresh fail — logout, redirect на /login. 403 Forbidden — пользователь авторизован, но нет прав на это действие. Показать понятное сообщение «нет доступа», не делать redirect — пользователь залогинен. На фронте часто скрывают UI для недоступных actions, чтобы не доходить до 403, но серверная проверка всё равно обязательна. И никогда не путать эти коды."
+  },
+  "api-graphql__19": {
+    "hintEasy": "401 → POST /refresh с refresh-cookie → новый access → retry оригинального запроса.",
+    "hintFull": "Interceptor ловит 401, ставит запросы в очередь, делает refresh, при success ретраит ожидающие. Refresh fail → logout. Защита от concurrent refresh.",
+    "answer": "Token refresh flow. Response-interceptor ловит 401. Чтобы не делать N parallel refresh-ей при пачке concurrent 401-ов — глобальный lock: первый запрос триггерит refresh, остальные ждут результата. После refresh — retry ожидающих с новым токеном. Refresh-token хранится в HttpOnly cookie, отправляется автоматически на /refresh. Если /refresh вернул 401 — refresh-токен истёк, logout + redirect на /login. Дополнительно — refresh token rotation: каждый refresh выдаёт новый refresh-token, старый инвалидируется (защита от кражи). Frontend — это все hidden от пользователя, ему просто работает."
+  },
+  "api-graphql__20": {
+    "hintEasy": "Параллельные запросы вместо последовательных. Promise.all, GraphQL one-query.",
+    "hintFull": "Не fetch → fetch → fetch последовательно. Promise.all([req1, req2, req3]). GraphQL — один query. Suspense — параллельные suspense-границы.",
+    "answer": "Request waterfall — это последовательные зависимые запросы, каждый ждёт предыдущий. Видно как каскад в Network tab — главная причина медленных страниц. Лечение: где запросы независимы — Promise.all для параллельного выполнения. В GraphQL это естественно — один query вытаскивает всё нужное. В React Query — useQueries для нескольких параллельных. В Suspense — suspense-границы рядом, не вложенные. Иногда waterfall неизбежен (нужен id из первого запроса для второго) — оптимизация через prefetch на основе userбы данных, или через server-side composition (BFF). В Network tab визуально проверяешь."
+  },
+  "api-graphql__21": {
+    "hintEasy": "Загружать данные до того, как пользователь их потребует — на hover, на intersection.",
+    "hintFull": "Hover на ссылку → prefetch query для целевой страницы. Visible в viewport → prefetch следующих. queryClient.prefetchQuery в React Query.",
+    "answer": "Prefetch — загрузка данных до того, как пользователь их явно потребует. React Query: queryClient.prefetchQuery(key, fn) кладёт данные в кеш заранее. Триггеры: hover на ссылку (за 200мс пока юзер дойдёт до клика, данные уже есть), intersection в viewport (видна следующая карточка — prefetch её details), idle время (после загрузки страницы). Next.js Link prefetch-ит код страницы при viewport-видимости автоматически. Главное — не overdo: prefetch всё подряд = лишний трафик и нагрузка. Балансировать по вероятности перехода. И мониторить — prefetch hit-rate показывает эффективность."
+  },
+  "api-graphql__22": {
+    "hintEasy": "React Query / Apollo дедуплицирует запросы по queryKey автоматически.",
+    "hintFull": "Два компонента вызвали useQuery с одним queryKey — фактически один запрос. Кеш по ключу. Apollo делает то же самое по __typename+id.",
+    "answer": "В современных libraries дедупликация запросов built-in. React Query / SWR: useQuery с одинаковым queryKey возвращает результат одного запроса, даже если компонентов много. В полёте — дополнительные подписки на тот же promise. После получения — все компоненты обновляются разом. Apollo нормализует по __typename+id, повторные queries за тем же объектом — попадают в кеш сразу. Без таких libraries — обычная боль: 5 компонентов на странице делают 5 запросов за тем же юзером. Своими руками — глобальный Map<key, Promise> кешируется в-полёте запросы. Но проще взять library, она это делает правильно."
+  },
+  "api-graphql__23": {
+    "hintEasy": "Backend for Frontend — отдельный API-слой, точно под нужды фронта.",
+    "hintFull": "BFF агрегирует несколько backend-services в один endpoint, оптимизированный под UI. Снимает overfetch / underfetch и упрощает фронт.",
+    "answer": "BFF (Backend for Frontend) — это API-слой, разработанный под конкретный клиент (web, iOS, watch). Он сидит между фронтом и микросервисами, агрегирует ответы от нескольких сервисов в один payload, оптимизированный под UI. Например, страница profile-а на фронте требует юзера, его друзей, последние посты — три микросервиса; BFF делает три внутренних запроса, склеивает, отдаёт фронту одним. Реализуется на Node.js (Next.js API routes, Express, Fastify) или GraphQL gateway. Снимает underfetch и waterfall. Также делает auth/cache/transform. Стандарт для крупных приложений."
+  },
+  "api-graphql__24": {
+    "hintEasy": "Когда несколько микросервисов и фронту неудобно их агрегировать.",
+    "hintFull": "Микросервисная архитектура, разные клиенты с разными потребностями (web/mobile), сложные страницы с composable data из 5+ источников.",
+    "answer": "BFF оправдан в нескольких случаях. Микросервисная архитектура — фронт не должен знать про 50 внутренних сервисов; BFF абстрагирует. Несколько клиентов с разными UX (web с деталями, mobile с минимумом) — разные BFF-ы под каждый, каждый возвращает оптимальный для своего клиента payload. Сложная агрегация — страница, которой нужны данные из 5 источников; делать на фронте — waterfall. Server-side concerns (auth, rate limiting, cache, sanitization) — централизованное место. Не нужен BFF для простых CRUD-приложений с одним backend-сервисом — overhead не окупается."
+  },
+  "api-graphql__25": {
+    "hintEasy": "Дополнительный сервис для деплоя, ownership, риск превратить в bottleneck.",
+    "hintFull": "BFF — ещё один сервис: deployment, monitoring, on-call. Может стать bottleneck-ом или single point of failure. Owner: front-team или платформа?",
+    "answer": "Риски BFF. Дополнительный сервис — лишние deploy, мониторинг, on-call, capacity planning. Может стать bottleneck-ом или single point of failure, если не масштабирован. Дублирование логики между BFF и backend сервисами — risk диверг. Ownership-вопрос: кто владеет BFF — front-team (плюс — близко к UI, минус — не имеют backend-опыта) или platform (плюс — стабильность, минус — далеко от потребностей UI). Latency overhead — лишний hop между фронтом и сервисами, обычно 10-30ms; для большинства не критично. Решается размещением BFF близко к front-edge (CDN, edge functions)."
+  },
+  "api-graphql__26": {
+    "hintEasy": "Pact / Schemathesis — фронт описывает контракт, бэк проверяет, что не сломал.",
+    "hintFull": "Consumer-driven contract: фронт пишет тесты, что ожидает от API. Бэк прогоняет эти тесты — фейл = фронт-команда узнает до релиза.",
+    "answer": "Contract testing проверяет, что фронт и бэк ожидают одно и то же от API. Стандарт — Pact: consumer (фронт) описывает в тесте, какие запросы делает и какие ответы ожидает; генерится pact-файл. Provider (бэк) при build-е прогоняет эти контракты против реального API — если ответ не совпадает, бэк-build фейлится. Это заменяет полный e2e на стыке: дешевле и быстрее. Альтернатива для GraphQL — schema-комитятся в репо, фронт-codegen ловит изменения. Для OpenAPI / TypeSpec — генерация типов из спеки, типы лежат в shared-package, изменение схемы пробивает сборку клиентов."
+  },
+  "api-graphql__27": {
+    "hintEasy": "Добавлять, не ломать. Новые поля — optional. Удаление — после deprecation.",
+    "hintFull": "Adding fields — safe. Removing/renaming — breaking. Deprecation period с warning. Versioning через URL (/v1, /v2) или GraphQL field deprecation.",
+    "answer": "Backwards compatibility означает, что новая версия API работает с существующими клиентами. Безопасные изменения: добавление новых полей в response (optional на клиенте), новых endpoint-ов, новых query parameters. Опасные: удаление поля, переименование, изменение типа, делание required-поля optional или наоборот, изменение URL. На GraphQL deprecation — @deprecated directive, поле всё ещё работает, но с warning. На REST — версионирование через URL (/v1/users, /v2/users) или через Accept header. Старая версия живёт, пока есть клиенты. И monitor usage — когда v1 не используется, можно удалить."
+  },
+  "api-graphql__28": {
+    "hintEasy": "Параллельные версии (v1 и v2 одновременно), миграция клиентов, удаление старой.",
+    "hintFull": "Strangler-pattern. v2 запускается рядом с v1. Фронт мигрирует постепенно. Когда v1 не используется (телеметрия) — удаляется. Никаких big-bang.",
+    "answer": "API-миграция через strangler-pattern, не big-bang. v2 деплоится рядом с v1, обе работают. Новые фичи — только в v2. Существующие клиенты постепенно мигрируют: они переходят при следующем deploy-е, либо forced через лимит времени с заранее сообщённой датой. Телеметрия — какой % трафика идёт на v1, кто из клиентов всё ещё его использует. Когда v1 не используется (или ниже какого-то порога) — удаляется. Для GraphQL — deprecation field-ов, потом удаление в major-version-bump схемы. Codemod-скрипты помогают мигрировать большие codebase автоматически. Без strangler — миграция превращается в месяцы фриза."
+  },
+  "api-graphql__29": {
+    "hintEasy": "Сервер вернул только часть полей — фронт обрабатывает как nullable.",
+    "hintFull": "GraphQL: одно поле упало с error, остальные с data. REST с partial response: 207 Multi-Status или внутренние markers. Клиент рендерит то, что есть.",
+    "answer": "Partial response — это когда сервер возвращает часть данных и часть ошибок. В GraphQL это естественное поведение: одно поле resolver-а упал, остальные успешно — payload содержит и data, и errors[] на проблемные пути. Клиент рендерит то, что есть, плюс показывает пометку для проблемных. В REST — 207 Multi-Status или custom-формат с массивом результатов. Frontend должен быть готов к partial: использовать null-safe доступ к полям, рендерить fallback вместо value, показывать «эта часть не загрузилась» точечно. Это часть graceful degradation — упало одно, но не всё."
+  },
+  "api-graphql__30": {
+    "hintEasy": "Skeleton + optimistic UI + caching + Suspense.",
+    "hintFull": "Skeleton сразу. Кеш предыдущего ответа как stale-while-revalidate. Тяжёлые операции — startTransition. Если совсем долго — progress + cancel.",
+    "answer": "Slow API лечится несколькими слоями. UX-слой: skeleton сразу при mount-е, кеш предыдущего ответа показываем сразу (stale-while-revalidate), при долгих операциях — progress-indicator с возможностью cancel. Network-слой: prefetch на hover/intersection, чтобы данные были готовы к моменту нужды. React-слой: Suspense + RSC дают streaming SSR — медленные блоки приходят позже, страница не блокируется. Для очень медленных — startTransition, чтобы тяжёлый рендер не блокировал ввод. И backend-side — мониторить slow queries, оптимизировать SQL, добавлять индексы, кешировать на сервере. Но это уже бэк-зона."
+  }
+}

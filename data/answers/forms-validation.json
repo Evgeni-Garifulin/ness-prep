@@ -1,0 +1,102 @@
+{
+  "forms-validation__1": {
+    "hintEasy": "Сегментировать на секции, описать схему данных, выбрать библиотеку, продумать состояния.",
+    "hintFull": "Большую форму режем на FormSection-ы, описываем zod-схему, берём react-hook-form, проектируем loading/error/success/draft.",
+    "answer": "Сложную форму проектирую сверху вниз. Сначала схема данных через zod — она же будет валидацией. Потом сегментация на секции (FormSection) — каждая своя группа полей, можно показывать поэтапно или всё сразу. Управление state — react-hook-form, чтобы не было перерендеров на каждый ввод. Поля — обёртки над дизайн-системой через Controller или register. Submit — один на форму с мутацией. Состояния продумываются явно: idle, validating, submitting, error, success. Дополнительно — draft в localStorage или server-side, чтобы пользователь не терял прогресс. И a11y: label связаны с input, error-message через aria-describedby, focus на первой ошибке после submit."
+  },
+  "forms-validation__2": {
+    "hintEasy": "Controlled — value в state. Uncontrolled — value в DOM, через ref.",
+    "hintFull": "Controlled даёт мгновенный доступ к value, но рендер на каждый символ. Uncontrolled быстрее, но лезть к value через ref. RHF — uncontrolled с подпиской.",
+    "answer": "Controlled input хранит value в React-state — каждое нажатие клавиши вызывает setState и перерендер компонента. Удобно, потому что value всегда под рукой. Минус — на больших формах перерендеры дорогие. Uncontrolled держит value в DOM, читается через ref или onSubmit (через FormData). Перерендеров нет, но менее удобно для условной логики. React Hook Form — гибрид: внутри uncontrolled с регистрацией через ref, но даёт API подписки на конкретные поля через watch/useWatch. Это лучшее из двух миров. Для простой формы с двумя полями — controlled. Для большой — RHF."
+  },
+  "forms-validation__3": {
+    "hintEasy": "Когда форма большая, валидация сложная, или важна производительность.",
+    "hintFull": "10+ полей, async-валидация, multi-step, динамические массивы (useFieldArray) — RHF снимает boilerplate и оптимизирует render.",
+    "answer": "React Hook Form оправдан, когда форма реально сложная. Десять и более полей с валидацией — без библиотеки получится много useState и многочасовый ребилд при каждом символе. Async-валидация (email already taken) — RHF имеет встроенный mode='onBlur' с поддержкой promise. Multi-step с шарингом state между шагами. Динамические массивы (useFieldArray) — добавлять/удалять поля. Интеграция с zod-схемой — одна строка через resolver. И главное — почти полное отсутствие перерендеров, поля изолированы. Для формы из двух полей RHF — overkill: useState + ручная валидация быстрее."
+  },
+  "forms-validation__4": {
+    "hintEasy": "Маленькая форма с 1-3 полями и простой валидацией.",
+    "hintFull": "Login, search, contact form — useState + useState для error-ов проще, чем подключать библиотеку. Меньше зависимостей, быстрее писать.",
+    "answer": "Без библиотеки лучше, когда форма маленькая и простая. Login с email и password, search-input, contact form, comment-box. 1-3 поля, простая валидация (required, email format). useState на каждое поле, простая onSubmit-функция, ручная проверка. Преимущества — нулевой bundle, нулевая learning curve, читается как обычный React. Если на простой форме потащить RHF, получится больше boilerplate, чем без него. Граница перехода — 5+ полей или async-валидация: тогда RHF реально окупается. До этого — нативный React."
+  },
+  "forms-validation__5": {
+    "hintEasy": "Через схему (zod), на blur и submit. Inline-сообщения возле полей.",
+    "hintFull": "Описываешь zod-схему, прогоняешь через resolver. Onlur показываешь ошибки. На submit — финальная валидация, focus на первой ошибке.",
+    "answer": "Client validation — это первая линия для UX, не для безопасности. Описываю схему через zod (или yup), привязываю к форме через resolver. Валидация on-blur (не on-change — иначе ругается на каждый символ во время ввода). На submit — финальная проверка, фокус на первое invalid-поле. Используется для немедленного фидбэка: формат email, длина пароля, обязательные поля. Server validation обязателен поверх — клиент уязвим к обходу через DevTools. Той же zod-схемой можно валидировать и на сервере (на Node.js), один источник истины."
+  },
+  "forms-validation__6": {
+    "hintEasy": "Та же zod-схема, что на клиенте. Отдельная серверная проверка бизнес-правил и uniqueness.",
+    "hintFull": "Структурная валидация — та же zod-схема, что на клиенте. Бизнес-правила (email уникален, slot свободен) — серверные. Возвращать структурированные ошибки.",
+    "answer": "Server validation — это безопасный слой. Клиент можно обмануть через DevTools, поэтому каждое поле проверяется на сервере заново. Структурная валидация (формат, длина, типы) — той же zod-схемой, что на клиенте: пакет переиспользуется, один источник истины. Бизнес-правила, требующие БД-запроса (email уникален, юзер существует, slot не занят), — только на сервере. Возвращать структурированные ошибки: { errors: { email: 'already-taken', date: 'unavailable' } }, чтобы фронт мог показать их рядом с правильными полями. Не одно generic «validation failed» — это плохой UX."
+  },
+  "forms-validation__7": {
+    "hintEasy": "Шарить zod-схему через общий пакет; маппить серверные ошибки на поля формы.",
+    "hintFull": "Общая zod-схема в shared-пакете, импортируется и фронтом, и бэком. На submit сервер вернёт structured errors — frontend мапит их в setError по полю.",
+    "answer": "Синхронизация в двух слоях. Структурная — одна zod-схема в shared-пакете монорепы (или npm-пакете). Импортируется на фронт через resolver, на бэк — для validate перед записью в БД. Изменил схему — оба слоя обновляются вместе. Бизнес-валидация только серверная, но возвращается структурированно: { errors: { fieldName: errorCode } }. На фронте после submit — пробегаешь по errors, делаешь setError(field, { type: 'server', message: ... }) в RHF. Ошибки появляются возле полей. Generic-error от сервера показываешь summary-блоком над формой, не теряешь."
+  },
+  "forms-validation__8": {
+    "hintEasy": "Сообщение рядом с полем + связь через aria-describedby + aria-invalid + summary вверху.",
+    "hintFull": "<input aria-invalid='true' aria-describedby='err-id'>. <span id='err-id'>Error</span>. После submit — error summary вверху с фокусом на первой ошибке.",
+    "answer": "Полная схема. Каждое поле имеет связанный label. При ошибке — aria-invalid='true', aria-describedby на error-message-span. SR при фокусе на input объявит «email, edit, invalid, Email is required». Visual: error-text красным цветом и иконкой (не только цвет — для дальтоников). После submit с ошибками — error-summary в начале формы (ul со ссылками на проблемные поля), фокус переводится на summary, role='alert'. Inline-валидация — на blur, не на input (SR не прерывается на каждый символ). Ошибка пропадает, когда поле становится валидным."
+  },
+  "forms-validation__9": {
+    "hintEasy": "RHF трекает touched (юзер был в поле) и dirty (значение изменилось). Используешь для логики показа ошибок.",
+    "hintFull": "Touched — юзер вошёл в поле и вышел. Dirty — значение отличается от default. Ошибки показывать только для touched полей до submit.",
+    "answer": "В RHF touched и dirty доступны через formState. Touched — юзер был в поле и blur-нул. Dirty — значение изменилось от дефолта. Логика обычно такая: до submit показываем ошибки только для touched полей (иначе юзер ругается на пустую форму). После попытки submit — для всех полей (он явно сказал «готово»). Dirty полезен для confirm-on-leave: «вы редактировали, точно уйти?». Также для autosave — saveDraft только если dirty, не на каждый рендер. И для submit-кнопки: enabled только если форма dirty И валидна. Без этих флагов UX становится агрессивным."
+  },
+  "forms-validation__10": {
+    "hintEasy": "Debounce + мгновенный pending-state + cancel при новом вводе.",
+    "hintFull": "Поле с async-валидацией: debounce 300мс на ввод, pending-spinner возле, AbortController для отмены устаревших запросов.",
+    "answer": "Async-валидация (email уже занят, username доступен) — нужно несколько вещей. Debounce ввода (300-500 мс), чтобы не дёргать API на каждый символ. Pending-state на поле — spinner или текст «проверяем...» с aria-busy для SR. AbortController на запрос — при новом вводе старый запрос отменяется. Race-condition защита через флаг ignore или AbortController, чтобы старый ответ не перетёр результат нового. RHF поддерживает async validators через Promise — возвращай boolean или message. И UX-аспект: блокировать submit, пока async-валидация в полёте, иначе можно отправить с устаревшей проверкой."
+  },
+  "forms-validation__11": {
+    "hintEasy": "AbortController на запрос; abort при новом вводе или unmount.",
+    "hintFull": "В debounced validate — controller = new AbortController(), fetch(url, {signal}). На новый ввод — controller.abort(). И в cleanup тоже.",
+    "answer": "Stale validation request — это запрос валидации, ответ которого пришёл после нового ввода. Без отмены он перетрёт текущее состояние, и пользователь увидит ошибку для значения, которое уже изменилось. Защита через AbortController. Каждый раз при запуске валидации создаёшь новый controller, передаёшь signal в fetch. Перед стартом нового — abort предыдущего. В cleanup при unmount — тоже abort. Для дополнительной страховки — флаг ignore: при abort устанавливаешь ignore=true, в then проверяешь, и если устарел, не setState. Готовые решения (RHF + zod async) делают это автоматически."
+  },
+  "forms-validation__12": {
+    "hintEasy": "State machine + URL-segment + общий FormProvider, шарящий state между шагами.",
+    "hintFull": "Wizard как XState. URL отражает шаг (/wizard/step-2). Между шагами — RHF FormProvider, чтобы данные не терялись. Save-draft при переходе.",
+    "answer": "Multi-step form — это конечный автомат. Текущий шаг и переходы описываю явно: useReducer или XState. Текущий шаг хранится в URL (/checkout/shipping, /checkout/payment) — F5 не сбрасывает прогресс, ссылку можно скинуть. Между шагами — общий FormProvider от RHF, чтобы поля разных шагов жили в одном form-state. На переходе — валидация только полей текущего шага (trigger from RHF), не всей формы. Save-draft при переходе или autosave. На последнем шаге — submit всей формы. UI — progress-bar показывает где находишься, кнопки Back/Next. Сохранять состояние формы и при reload-е страницы."
+  },
+  "forms-validation__13": {
+    "hintEasy": "localStorage для коротких форм, server-side draft для длинных.",
+    "hintFull": "watch + debounce → save в localStorage по ключу формы. На mount — load обратно. Длинные формы — POST /draft с TTL.",
+    "answer": "Draft-сохранение зависит от длины формы. Короткие (контактная форма, 5 полей) — localStorage по ключу формы. RHF watch + debounce 1-2 секунды, на каждое изменение save. На mount — read из localStorage и reset. После успешного submit — clear. Длинные (KYC, multi-step checkout) — server-side draft: POST /api/drafts/{id}, бэк хранит JSON. На мобильных это позволяет продолжить с другого устройства. С TTL (через неделю удалить). Важно — не сохранять чувствительное в localStorage (CVV, пароли). И давать пользователю явную кнопку «сохранить и закрыть», помимо автоматической."
+  },
+  "forms-validation__14": {
+    "hintEasy": "Debounced мутация, в фоне, индикатор статуса (saving / saved / error).",
+    "hintFull": "watch + debounce 1с → trigger autosave-mutation. Visual indicator: «saving...», «saved 2s ago», error → retry. Conflict resolution для concurrent edits.",
+    "answer": "Autosave строится на debounce + visual feedback. RHF watch отдаёт изменения, debounce 1-2 секунды, после паузы запускается мутация. UI индикатор: spinner «saving...», потом «saved» с timestamp, при error — «failed, retry». Никаких modal-confirm — autosave должен быть невидим, пока не происходит проблема. Conflict resolution для concurrent edits: optimistic concurrency через version-поле, при конфликте показать «кто-то ещё редактирует, перезагрузить?» Для долгих сессий — periodic save каждые N минут на случай, если debounce не сработал. И обязательно — сохранять при page leave (beforeunload)."
+  },
+  "forms-validation__15": {
+    "hintEasy": "Сразу показать success-state, в фоне отправить. Откатить и показать ошибку при reject.",
+    "hintFull": "Мгновенно close form / переход на следующий экран. Mutation в фоне. При error — вернуть на форму с error-сообщением, не теряя данных.",
+    "answer": "Optimistic submit делает форму отзывчивой. Юзер нажал «Save» — UI сразу переходит в success-state (закрылась модалка, перешёл на следующий экран). Mutation идёт в фоне через React Query. При success — финальное обновление кеша, всё гладко. При error — toast «не получилось сохранить», возможность вернуться к форме с заполненными значениями (форма не теряет данные). Хорошо подходит для незначительных действий — переименование, отметка как прочитанное. Не подходит для критичных — оплата, отправка денег, deletion. Там обязателен честный pending-state и подтверждение."
+  },
+  "forms-validation__16": {
+    "hintEasy": "Disable submit-кнопку на время мутации; idempotency-key на бэке.",
+    "hintFull": "Frontend: isSubmitting → disable button. Backend: idempotency-key в header, повторный запрос с тем же key возвращает первый ответ.",
+    "answer": "Защита двухслойная. Frontend — на старте submit setSubmitting(true), кнопка disabled, повторный клик проигнорирован. RHF делает это автоматически через formState.isSubmitting. Дополнительно — debounce/throttle на onClick. Backend — idempotency-key в header. Frontend генерирует UUID на старте submit и шлёт в Idempotency-Key заголовке. Сервер хранит {key → response} с TTL и при повторе с тем же key возвращает первый ответ, не выполняя действие повторно. Это защита от случаев, когда сетевой timeout заставил клиент ретраить, но сервер уже выполнил. Для платежей и других critical-actions — обязательно."
+  },
+  "forms-validation__17": {
+    "hintEasy": "Disabled только когда есть конкретная причина — показывать её рядом.",
+    "hintFull": "Disable submit при isSubmitting, при невалидной форме, при отсутствии изменений (для edit). Tooltip объясняет почему.",
+    "answer": "Disabled submit-кнопка по нескольким причинам. isSubmitting (мутация в полёте) — disable, показать spinner. Форма невалидна (есть ошибки) — disable, но опционально: некоторые предпочитают enable с показом ошибок при попытке submit, чтобы юзер видел проблемы. Edit-форма не dirty (ничего не изменилось) — disable. Важно — не оставлять disabled-кнопку без объяснения. Tooltip или текст рядом: «заполните email», «нет изменений для сохранения». A11y: aria-disabled='true' (не disabled-атрибут, чтобы сохранять focus и tooltip-доступ). Disabled-state визуально отличается, но не сливается с фоном (контраст 3:1)."
+  },
+  "forms-validation__18": {
+    "hintEasy": "Drag-drop + кнопка, прогресс, валидация типа/размера, optimistic preview.",
+    "hintFull": "<input type='file'> + drag-drop overlay. Валидация type/size до отправки. Прогресс через XMLHttpRequest. Превью на client до upload-а. Resume для больших файлов.",
+    "answer": "File upload — несколько слоёв. UI: <input type='file'> + drag-drop overlay (dragenter/dragover/drop events), показать список файлов. Валидация на client — accept-атрибут, manual проверка type и size до отправки, удобный error-messages. Прогресс — XMLHttpRequest или fetch с ProgressEvent (или библиотеки типа axios). Optimistic preview — для изображений через FileReader или URL.createObjectURL до завершения upload-а. Большие файлы — chunked upload или resumable (TUS-protocol), чтобы не терять при разрыве. Серверная валидация обязательна (тип, размер, malware-scan). И a11y — правильный label, статус через aria-live."
+  },
+  "forms-validation__19": {
+    "hintEasy": "RHF с раздельной регистрацией полей; FormProvider + useFormContext, чтобы не ребилдить всё.",
+    "hintFull": "RHF — поля независимы, перерендер только нужного. Большие списки — useFieldArray + memo каждой строки. Не watch на всю форму — только на конкретное поле.",
+    "answer": "Большая форма с десятками полей часто лагает из-за лишних перерендеров. RHF решает большую часть: поля регистрируются через ref, изменение одного не перерендеривает другие. Дополнительно — FormProvider + useFormContext, чтобы вложенные секции не передавали props через 5 уровней. Для больших динамических списков — useFieldArray, и каждая строка как memo-компонент. Не использовать watch на всю форму, только на конкретное поле — иначе перерендер на каждый ввод где угодно. Если форма вообще огромная (KYC с 100 полями) — разделять на multi-step, рендерить только текущий шаг."
+  },
+  "forms-validation__20": {
+    "hintEasy": "RTL + userEvent: заполнить, submit, проверить result или ошибки.",
+    "hintFull": "Render → userEvent.type на каждое поле → click submit. Mock API через MSW. Проверять success-state или error-сообщения. Тестировать validation-edge-cases.",
+    "answer": "Стандартный подход. Render формы через RTL, заполнение через userEvent.type/click. Submit через click на кнопку или userEvent.keyboard('{Enter}'). Mock API через MSW. Проверки: success-flow (форма закрылась, появился toast), error-flow (server error → message, форма не сброшена), validation (невалидное → ошибка возле поля), reset (после submit поля очистились). Edge-cases: required validation, format validation (email, phone), max-length, async-validation (mock с delay). Для multi-step — отдельный test-suite, каждый шаг и переход. Accessibility — userEvent.tab проверяет focus order, jest-axe — общие нарушения."
+  }
+}
