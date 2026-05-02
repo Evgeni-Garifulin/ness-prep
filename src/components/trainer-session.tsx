@@ -10,6 +10,7 @@ type Question = {
   hintEasy: string;
   hintFull: string;
   answer: string;
+  section: string;
 };
 
 type Stat = {
@@ -328,18 +329,18 @@ function RunningCard({
 }) {
   return (
     <article className="border border-foreground bg-card p-4 sm:p-6">
-      <header className="flex items-baseline gap-4">
-        <div className="text-sm sm:text-base leading-snug font-medium tabular-nums shrink-0 min-w-[2ch] text-muted-foreground">
-          {String(q.number).padStart(2, "0")}
+      <header className="flex flex-col gap-2">
+        <div className="flex items-baseline justify-between gap-4">
+          <span className="yzy-label text-muted-foreground">{q.section}</span>
+          {(stat.knownCount > 0 || stat.unknownCount > 0) && (
+            <span className="yzy-label tabular-nums text-muted-foreground whitespace-nowrap">
+              +{stat.knownCount} / −{stat.unknownCount}
+            </span>
+          )}
         </div>
-        <h3 className="flex-1 min-w-0 text-sm sm:text-base leading-snug font-medium tracking-tight">
+        <h3 className="text-sm sm:text-base leading-snug font-medium tracking-tight">
           {q.text}
         </h3>
-        {(stat.knownCount > 0 || stat.unknownCount > 0) && (
-          <span className="yzy-label tabular-nums text-muted-foreground whitespace-nowrap">
-            +{stat.knownCount} / −{stat.unknownCount}
-          </span>
-        )}
       </header>
 
       <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-2 text-xs">

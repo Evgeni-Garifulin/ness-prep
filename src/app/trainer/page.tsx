@@ -7,6 +7,7 @@ import { PageHeader } from "@/components/page-header";
 import { TrainerSession } from "@/components/trainer-session";
 import { ResetTestButton } from "@/components/reset-test-button";
 import { categoryFor } from "@/lib/categories";
+import { stripSectionPrefix } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
@@ -36,6 +37,7 @@ export default async function TrainerPage() {
       hintFull: true,
       answer: true,
       sectionSlug: true,
+      section: { select: { title: true } },
     },
   });
   const techPool = allQuestions.filter(
@@ -85,6 +87,7 @@ export default async function TrainerPage() {
             hintEasy: q.hintEasy,
             hintFull: q.hintFull,
             answer: q.answer,
+            section: stripSectionPrefix(q.section.title).toUpperCase(),
           }))}
           initialStats={allStats.map((s) => ({
             questionId: s.questionId,
