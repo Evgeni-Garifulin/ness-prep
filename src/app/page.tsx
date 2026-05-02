@@ -114,7 +114,20 @@ export default async function HomePage() {
       meta: `${notes} ${notes === 1 ? "NOTE" : "NOTES"}`,
       progress: null,
     },
+    {
+      key: "cv",
+      title: "CV",
+      subtitle: "ONE-PAGE BUILDER    LIVE PREVIEW    EXPORT TO PDF",
+      href: "/cv",
+      meta: "BUILDER",
+      progress: null,
+    },
   ];
+
+  // Координаты «последней строки» сетки 2-в-ряд: для нечётного количества
+  // плиток последний ряд содержит одну ячейку, и границы у неё не должны
+  // дублироваться.
+  const lastRowStart = Math.floor((tiles.length - 1) / 2) * 2;
 
   return (
     <>
@@ -150,7 +163,7 @@ export default async function HomePage() {
             // у верхних клеток. На мобиле — только нижний между всеми, кроме
             // последней.
             const isRightCol = idx % 2 === 1;
-            const isBottomRow = idx >= 2;
+            const isBottomRow = idx >= lastRowStart;
             const borderClasses = [
               !isBottomRow ? "border-b border-foreground" : "",
               !isRightCol ? "sm:border-r border-foreground" : "",

@@ -114,7 +114,20 @@ export function CVBuilder() {
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   };
 
-  const printPDF = () => window.print();
+  // Имя итогового PDF в Chrome берётся из document.title. Подменяем перед
+  // печатью на "CV / ИМЯ ФАМИЛИЯ" (капс), после события afterprint
+  // восстанавливаем оригинальный title.
+  const printPDF = () => {
+    const original = document.title;
+    const safeName = (data.name || "").trim().toUpperCase();
+    document.title = safeName ? `CV / ${safeName}` : "CV";
+    const restore = () => {
+      document.title = original;
+      window.removeEventListener("afterprint", restore);
+    };
+    window.addEventListener("afterprint", restore);
+    window.print();
+  };
 
   const reset = () => {
     if (window.confirm("Сбросить все поля? Это нельзя отменить.")) {

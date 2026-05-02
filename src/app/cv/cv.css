@@ -907,33 +907,79 @@
 /* ── print ──────────────────────────────────────────────────────────────── */
 
 @media print {
-  /* Прячем всё, кроме листа CV. */
-  body * {
-    visibility: hidden !important;
+  /* Сбрасываем фоны и высоты — иначе sticky-хедер и min-h-dvh body
+     раздувают первую страницу пустотой. */
+  html,
+  body {
+    min-height: 0 !important;
+    height: auto !important;
+    background: #fff !important;
   }
-  .cv-paper,
-  .cv-paper * {
-    visibility: visible !important;
+
+  /* Скрываем весь UI вокруг листа: header, тулбары, форму, табы, нижние
+     действия. Display:none — чтобы они не занимали место в потоке. */
+  body > header,
+  .cv-top-row,
+  .cv-title,
+  .cv-meta-lines,
+  .cv-col-form,
+  .cv-col-label,
+  .cv-paper-foot,
+  .cv-center-action {
+    display: none !important;
   }
+
+  /* Раскладку под лист сжимаем в одну колонку без отступов. */
+  .cv-canvas {
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  .cv-work {
+    display: block !important;
+    margin: 0 !important;
+    gap: 0 !important;
+    grid-template-columns: none !important;
+  }
+  .cv-col-preview {
+    position: static !important;
+    top: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* Лист «течёт» на сколько A4-страниц нужно — никакого position:fixed,
+     никакого aspect-ratio, никакого overflow:hidden. Поля задаём через @page. */
   .cv-paper {
-    position: fixed;
-    left: 0;
-    top: 0;
-    width: 210mm;
-    height: 297mm;
-    aspect-ratio: auto;
     border: 0 !important;
-    box-shadow: none !important;
-    margin: 0;
-    padding: 0;
-    overflow: hidden;
+    aspect-ratio: auto !important;
+    width: 100% !important;
+    height: auto !important;
+    overflow: visible !important;
   }
   .cv-paper-inner {
-    padding: 14mm 16mm !important;
-    height: 100%;
+    padding: 0 !important;
+    height: auto !important;
+    overflow: visible !important;
   }
+
+  /* Предотвращаем разрыв смысловых блоков: запись опыта, заголовок секции,
+     строка таблицы, итоговый штамп spec-sheet. */
+  .tpl-manuscript .item,
+  .tpl-manuscript .sec-h,
+  .tpl-twocol .right .xp,
+  .tpl-twocol .right .sec-h,
+  .tpl-spec .sec-h,
+  .tpl-spec .table tr,
+  .tpl-spec .footer-stamp {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
   @page {
     size: A4;
-    margin: 0;
+    margin: 14mm 16mm;
   }
 }
