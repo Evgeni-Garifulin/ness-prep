@@ -137,58 +137,39 @@
   display: grid;
   grid-template-columns: 1fr auto;
   gap: 16px;
-  padding-bottom: 4px;
-  margin-bottom: 18px;
-  border-bottom: 1px solid var(--cv-fg);
+  margin-bottom: 32px;
   font-size: 10px;
   letter-spacing: 0.18em;
   font-weight: 500;
   text-transform: uppercase;
   align-items: baseline;
-}
-.cv-col-label .ct {
   color: var(--cv-fg-muted);
-  font-weight: 400;
-  white-space: nowrap;
-}
-.cv-col-label .glyph {
-  color: var(--cv-fg);
-  margin-right: 8px;
 }
 
 /* ── form ───────────────────────────────────────────────────────────────── */
 
 .cv-form {
   display: grid;
-  gap: 28px;
+  /* Просторнее между группами — разделение чисто за счёт воздуха,
+     никаких hairline-разделителей. */
+  gap: 56px;
 }
 .cv-group {
   display: grid;
-  gap: 10px;
+  gap: 18px;
 }
 .cv-group-h {
   display: grid;
   grid-template-columns: 1fr auto;
   align-items: baseline;
   gap: 12px;
-  font-size: 10px;
-  letter-spacing: 0.18em;
+  /* Подкатегории заметно крупнее тела формы — главные «опоры»
+     иерархии страницы. */
+  font-size: 15px;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  font-weight: 500;
+  font-weight: 600;
   color: var(--cv-fg);
-}
-.cv-group-num {
-  color: var(--cv-fg-muted);
-  font-weight: 400;
-  font-size: 9px;
-  margin-right: 12px;
-}
-.cv-group-ct {
-  color: var(--cv-fg-muted);
-  font-weight: 400;
-  font-size: 9px;
-  margin-left: 16px;
-  white-space: nowrap;
 }
 .cv-toggle {
   background: none;
@@ -196,6 +177,10 @@
   padding: 0;
   cursor: pointer;
   font: inherit;
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  font-weight: 500;
+  text-transform: uppercase;
   color: var(--cv-fg-muted);
   transition: color 150ms;
 }

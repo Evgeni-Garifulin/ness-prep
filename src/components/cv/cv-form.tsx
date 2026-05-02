@@ -62,25 +62,17 @@ function Field({
 }
 
 type GroupProps = {
-  num: number;
   name: string;
-  count?: string;
   open: boolean;
   onToggle: () => void;
   children: React.ReactNode;
 };
 
-function Group({ num, name, count, open, onToggle, children }: GroupProps) {
+function Group({ name, open, onToggle, children }: GroupProps) {
   return (
     <section className="cv-group">
       <header className="cv-group-h">
-        <span>
-          <span className="ct yzy-num cv-group-num">
-            {String(num).padStart(2, "0")}
-          </span>
-          {name}
-          {count ? <span className="ct cv-group-ct">{count}</span> : null}
-        </span>
+        <span>{name}</span>
         <button type="button" className="cv-toggle" onClick={onToggle}>
           {open ? "HIDE" : "SHOW"}
         </button>
@@ -112,10 +104,7 @@ function EntryRow({
   return (
     <div className="cv-entry">
       <div className="cv-entry-head">
-        <span>
-          {kind} · {String(idx + 1).padStart(2, "0")} /{" "}
-          {String(total).padStart(2, "0")}
-        </span>
+        <span>{kind}</span>
         <div className="controls">
           <button
             type="button"
@@ -304,12 +293,7 @@ export function CVForm({ data, setData }: Props) {
 
   return (
     <div className="cv-form">
-      <Group
-        num={1}
-        name="HEADER"
-        open={open.head}
-        onToggle={() => toggle("head")}
-      >
+      <Group name="HEADER" open={open.head} onToggle={() => toggle("head")}>
         <Field
           label="NAME"
           value={data.name}
@@ -354,9 +338,7 @@ export function CVForm({ data, setData }: Props) {
       </Group>
 
       <Group
-        num={2}
         name="SUMMARY"
-        count={`${data.summary.length} / 320`}
         open={open.summary}
         onToggle={() => toggle("summary")}
       >
@@ -372,9 +354,7 @@ export function CVForm({ data, setData }: Props) {
       </Group>
 
       <Group
-        num={3}
         name="EXPERIENCE"
-        count={`${String(data.experience.length).padStart(2, "0")} ENTRIES`}
         open={open.exp}
         onToggle={() => toggle("exp")}
       >
@@ -401,9 +381,7 @@ export function CVForm({ data, setData }: Props) {
       </Group>
 
       <Group
-        num={4}
         name="EDUCATION"
-        count={`${String(data.education.length).padStart(2, "0")} ENTRIES`}
         open={open.edu}
         onToggle={() => toggle("edu")}
       >
@@ -430,9 +408,7 @@ export function CVForm({ data, setData }: Props) {
       </Group>
 
       <Group
-        num={5}
         name="SKILLS"
-        count={`${String(data.skills.length).padStart(2, "0")} TOKENS`}
         open={open.skills}
         onToggle={() => toggle("skills")}
       >
@@ -461,9 +437,7 @@ export function CVForm({ data, setData }: Props) {
       </Group>
 
       <Group
-        num={6}
         name="LANGUAGES"
-        count={`${String(data.languages.length).padStart(2, "0")}`}
         open={open.lang}
         onToggle={() => toggle("lang")}
       >

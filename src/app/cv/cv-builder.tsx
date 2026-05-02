@@ -212,13 +212,7 @@ export function CVBuilder() {
         {/* FORM */}
         <div className="cv-col-form">
           <div className="cv-col-label">
-            <span>
-              <span className="glyph">+</span>FILL
-            </span>
-            <span className="ct">
-              {String(stats.filled).padStart(2, "0")} /{" "}
-              {String(stats.total).padStart(2, "0")} BLOCKS
-            </span>
+            <span>FILL</span>
           </div>
           <CVForm data={data} setData={setData} />
         </div>
@@ -226,9 +220,7 @@ export function CVBuilder() {
         {/* PREVIEW */}
         <div className="cv-col-preview">
           <div className="cv-col-label">
-            <span>
-              <span className="glyph">−</span>PREVIEW
-            </span>
+            <span>PREVIEW</span>
             <span className="cv-preview-tabs">
               {TABS.map(([k, l]) => (
                 <button
