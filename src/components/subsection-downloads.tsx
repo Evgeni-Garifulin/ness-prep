@@ -1,37 +1,41 @@
 import { methodologyFor } from "@/lib/methodology";
 
-// Две кнопки-ссылки на скачивание методички подсекции — PDF и EPUB.
-// Отображаются справа от заголовка подкатегории на странице секции.
+// Мета-строка под заголовком подсекции:
+//   LEARN IT FOR 7 DAYS    PDF    IBOOKS
 //
-// Если для данной подсекции методички нет — компонент рендерит null и
-// заголовок остаётся как был.
+// Стиль — yzy-label, серый по умолчанию, ховер чёрный. Без рамок и
+// без иконок — единый стиль ссылок проекта (см. RESET SECTION).
 //
-// Стиль — yzy-label, моноширинный, монохром. На мобилке кнопки уезжают
-// под заголовок (flex-wrap у родителя), на sm+ — стоят в ряд справа.
+// Если для подсекции нет методички — компонент рендерит null, и под
+// заголовком ничего не появляется.
 export function SubsectionDownloads({ subsection }: { subsection: string | null | undefined }) {
   const files = methodologyFor(subsection);
   if (!files) return null;
 
-  const itemClass =
-    "yzy-label inline-flex items-center gap-2 px-2.5 h-7 " +
-    "border border-foreground text-foreground hover:bg-foreground hover:text-background " +
-    "transition-colors";
+  const linkClass =
+    "yzy-label text-muted-foreground hover:text-foreground transition-colors";
 
   return (
-    <div className="flex items-center gap-2 shrink-0">
-      <a href={files.pdf} download className={itemClass} aria-label="Скачать методичку в PDF">
-        <span aria-hidden>↓</span>
-        <span>PDF</span>
+    <div className="mt-2 flex flex-wrap items-center gap-x-5 gap-y-1">
+      {files.hint ? (
+        <span className="yzy-label text-muted-foreground">{files.hint}</span>
+      ) : null}
+      <a
+        href={files.pdf}
+        download
+        className={linkClass}
+        aria-label="Скачать методичку в PDF"
+      >
+        PDF
       </a>
       <a
         href={files.epub}
         download
-        className={itemClass}
-        aria-label="Скачать методичку в формате EPUB (для Apple Books / iBooks)"
+        className={linkClass}
+        aria-label="Скачать методичку для Apple Books / iBooks"
         title="EPUB — открывается в Apple Books / iBooks"
       >
-        <span aria-hidden>↓</span>
-        <span>iBOOKS</span>
+        IBOOKS
       </a>
     </div>
   );

@@ -6,17 +6,25 @@
 // «EVENT LOOP / ASYNC» считались одним и тем же.
 //
 // Значения — пути к статическим файлам в /public, отдаются Next-ом
-// как обычные ассеты.
+// как обычные ассеты. `hint` — короткий лейбл слева от ссылок-скачивания
+// (например, "LEARN IT FOR 7 DAYS").
 
 export type MethodologyFiles = {
   pdf: string;
   epub: string;
+  hint?: string;
 };
 
 const REGISTRY: Record<string, MethodologyFiles> = {
   "event loop / async": {
     pdf: "/methodology/event-loop-async.pdf",
     epub: "/methodology/event-loop-async.epub",
+    hint: "LEARN IT FOR 7 DAYS",
+  },
+  "closures / scope / memory": {
+    pdf: "/methodology/closures-scope-memory.pdf",
+    epub: "/methodology/closures-scope-memory.epub",
+    hint: "LEARN IT FOR 7 DAYS",
   },
 };
 
