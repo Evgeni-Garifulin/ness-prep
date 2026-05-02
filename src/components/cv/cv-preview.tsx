@@ -360,11 +360,15 @@ function SpecSheet({ data }: { data: CVData }) {
 type Props = {
   data: CVData;
   template: CVTemplate;
+  paperRef?: React.Ref<HTMLDivElement>;
 };
 
-export function CVPreview({ data, template }: Props) {
+export function CVPreview({ data, template, paperRef }: Props) {
   return (
-    <div className="cv-paper">
+    <div className="cv-paper" ref={paperRef}>
+      {/* Декоративные hairline-разделители на каждой A4-границе. Чисто
+          визуальный гид, в печать не уходит. */}
+      <div className="cv-page-breaks" aria-hidden />
       <div className="cv-paper-inner">
         {template === "twocol" && <TwoCol data={data} />}
         {template === "spec" && <SpecSheet data={data} />}

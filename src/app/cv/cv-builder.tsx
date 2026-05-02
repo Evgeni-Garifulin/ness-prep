@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { CVForm } from "@/components/cv/cv-form";
 import { CVPreview } from "@/components/cv/cv-preview";
 import {
@@ -55,11 +55,18 @@ function todayStamp() {
   return new Date().toISOString().slice(0, 10).replace(/-/g, ".");
 }
 
+// useLayoutEffect не работает в SSR — биндим к useEffect, чтобы Next.js
+// не варнил при гидратации.
+const useIsoLayoutEffect =
+  typeof window !== "undefined" ? useLayoutEffect : useEffect;
+
 export function CVBuilder() {
   const [data, setData] = useState<CVData>(DEFAULT_CV);
   const [tab, setTab] = useState<CVTemplate>("manuscript");
   const [savedAt, setSavedAt] = useState<SaveStatus>("IDLE");
   const [hydrated, setHydrated] = useState(false);
+  const [pageCount, setPageCount] = useState(1);
+  const paperRef = useRef<HTMLDivElement>(null);
 
   // Поднимаем сохранённое состояние из localStorage один раз на клиенте.
   useEffect(() => {
@@ -101,6 +108,28 @@ export function CVBuilder() {
   }, [data, hydrated]);
 
   const stats = useMemo(() => computeStats(data), [data]);
+
+  // Считаем количество A4-страниц превью: paper.scrollHeight ÷ (width × 1.414).
+  // ResizeObserver на самом листе и его содержимом ловит как изменения
+  // размера контейнера, так и наполнения формы (новые записи, длинный summary).
+  useIsoLayoutEffect(() => {
+    const paper = paperRef.current;
+    if (!paper) return;
+    const inner = paper.querySelector<HTMLDivElement>(".cv-paper-inner");
+    const measure = () => {
+      const w = paper.clientWidth;
+      if (!w) return;
+      const pageH = w * 1.414;
+      const contentH = paper.scrollHeight;
+      const next = Math.max(1, Math.ceil(contentH / pageH));
+      setPageCount((prev) => (prev === next ? prev : next));
+    };
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(paper);
+    if (inner) ro.observe(inner);
+    return () => ro.disconnect();
+  }, [data, tab]);
 
   const exportJSON = () => {
     const blob = new Blob([JSON.stringify(data, null, 2)], {
@@ -213,10 +242,12 @@ export function CVBuilder() {
               ))}
             </span>
           </div>
-          <CVPreview data={data} template={tab} />
+          <CVPreview data={data} template={tab} paperRef={paperRef} />
           <div className="cv-paper-foot">
             <span className="yzy-meta">A4 · 210 × 297</span>
-            <span className="yzy-meta yzy-num">PG 01 / 01</span>
+            <span className="yzy-meta yzy-num">
+              PG 01 / {String(pageCount).padStart(2, "0")}
+            </span>
           </div>
         </div>
       </div>

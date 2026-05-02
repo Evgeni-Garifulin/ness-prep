@@ -445,22 +445,49 @@
 /* ── paper ──────────────────────────────────────────────────────────────── */
 
 .cv-paper {
+  position: relative;
   border: 1px solid var(--cv-fg);
   background: var(--cv-bg);
-  aspect-ratio: 1 / 1.414;
   width: 100%;
-  overflow: hidden;
+  /* Лист — это «контейнер» для cqi-юнитов, чтобы min-height и hairline
+     разделители страниц могли считаться от ширины листа в A4-пропорции. */
+  container-type: inline-size;
+  /* Минимальная высота — одна A4-страница; контент течёт ниже без
+     обрезания, так что превью показывает весь CV целиком. */
+  min-height: 141.4cqi;
+  height: auto;
+  overflow: visible;
 }
 .cv-paper-inner {
   padding: 44px 48px;
-  height: 100%;
-  overflow: hidden;
+  min-height: calc(141.4cqi - 2px);
+  position: relative;
+  z-index: 1;
 }
 @media (max-width: 640px) {
   .cv-paper-inner {
     padding: 28px 24px;
   }
 }
+
+/* Hairline-«линейка» под каждой A4-страницей: повторяющийся 1px на отметке
+   141.4cqi, 282.8cqi и т. д. Линии видно только если контент простирается
+   за первую страницу (дальше первой отметки). z-index ниже контента —
+   текст никогда не пересекается с ними визуально. */
+.cv-page-breaks {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent calc(141.4cqi - 1px),
+    var(--cv-fg-faint) calc(141.4cqi - 1px),
+    var(--cv-fg-faint) 141.4cqi
+  );
+}
+
 .cv-paper-foot {
   margin-top: 14px;
   display: flex;
@@ -914,6 +941,36 @@
     min-height: 0 !important;
     height: auto !important;
     background: #fff !important;
+  }
+
+  /* На печати поднимаем контраст: сами «токены» темнее, чтобы текст и
+     hairline-разделители читались на бумаге, где серый ≠ серый на экране.
+     Делается переопределением CSS-переменных на канвасе — каскад сам
+     дотянет их до paper. */
+  .cv-canvas {
+    --cv-fg: #000 !important;
+    --cv-fg-muted: #2b2b2b !important;
+    --cv-fg-faint: rgba(0, 0, 0, 0.45) !important;
+    --cv-fg-faintest: rgba(0, 0, 0, 0.18) !important;
+  }
+  /* Просим браузер не глушить наши цвета авто-настройкой принтера. */
+  .cv-paper,
+  .cv-paper * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  /* Декоративные линии страниц на бумаге не нужны — пагинацию рисует @page. */
+  .cv-page-breaks {
+    display: none !important;
+  }
+  /* На печати лист сжимаем под край страницы — без min-height, чтобы
+     не было пустой первой страницы. */
+  .cv-paper {
+    min-height: 0 !important;
+    container-type: normal !important;
+  }
+  .cv-paper-inner {
+    min-height: 0 !important;
   }
 
   /* Скрываем весь UI вокруг листа: header, тулбары, форму, табы, нижние
