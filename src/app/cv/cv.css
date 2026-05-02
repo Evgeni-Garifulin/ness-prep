@@ -117,6 +117,22 @@
   }
 }
 
+/* На десктопе превью «прилипает» к верху, форма скроллится сама.
+   max-height + overflow позволяет читать весь A4-лист, если он выше окна.
+   На мобиле колонки и так стэкнуты — sticky выключаем. */
+@media (min-width: 1025px) {
+  .cv-col-preview {
+    position: sticky;
+    top: 72px; /* очищаем sticky SiteHeader (~56px) + воздух */
+    align-self: start;
+    max-height: calc(100dvh - 96px);
+    overflow: auto;
+    /* отступ под scrollbar чтобы hairline-рамка не дрожала */
+    padding-right: 4px;
+    margin-right: -4px;
+  }
+}
+
 .cv-col-label {
   display: grid;
   grid-template-columns: 1fr auto;
