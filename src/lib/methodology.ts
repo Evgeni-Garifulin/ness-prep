@@ -26,6 +26,11 @@ const REGISTRY: Record<string, MethodologyFiles> = {
     epub: "/methodology/closures-scope-memory.epub",
     hint: "LEARN IT FOR 7 DAYS",
   },
+  "prototypes / objects / classes": {
+    pdf: "/methodology/prototypes-objects-classes.pdf",
+    epub: "/methodology/prototypes-objects-classes.epub",
+    hint: "LEARN IT FOR 7 DAYS",
+  },
 };
 
 function normalize(s: string): string {
