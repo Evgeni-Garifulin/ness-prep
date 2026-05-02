@@ -429,25 +429,38 @@
 
 /* ── paper ──────────────────────────────────────────────────────────────── */
 
+/* Стопка A4-«квадратиков». Каждая страница — отдельный лист с фиксированным
+   аспектом и обрезающим бордером; контент общий, сдвигается на --page-i. */
+.cv-pages {
+  position: relative;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
 .cv-paper {
   position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1.414;
   border: 1px solid var(--cv-fg);
   background: var(--cv-bg);
-  width: 100%;
-  /* Лист — это «контейнер» для cqi-юнитов, чтобы min-height и hairline
-     разделители страниц могли считаться от ширины листа в A4-пропорции. */
+  overflow: hidden;
+  /* cqi внутри = % от ширины этого листа — так смещение страницы
+     остаётся пропорциональным при ресайзе. */
   container-type: inline-size;
-  /* Минимальная высота — одна A4-страница; контент течёт ниже без
-     обрезания, так что превью показывает весь CV целиком. */
-  min-height: 141.4cqi;
-  height: auto;
-  overflow: visible;
+}
+
+/* Внутренний слой контента — абсолютный, сдвигается вверх на N A4-страниц.
+   Высота берётся от своего контента, бордер листа просто отрезает лишнее. */
+.cv-paper-content {
+  position: absolute;
+  top: calc(var(--page-i, 0) * -141.4cqi);
+  left: 0;
+  right: 0;
 }
 .cv-paper-inner {
   padding: 44px 48px;
-  min-height: calc(141.4cqi - 2px);
-  position: relative;
-  z-index: 1;
 }
 @media (max-width: 640px) {
   .cv-paper-inner {
@@ -455,22 +468,16 @@
   }
 }
 
-/* Hairline-«линейка» под каждой A4-страницей: повторяющийся 1px на отметке
-   141.4cqi, 282.8cqi и т. д. Линии видно только если контент простирается
-   за первую страницу (дальше первой отметки). z-index ниже контента —
-   текст никогда не пересекается с ними визуально. */
-.cv-page-breaks {
+/* Невидимый «измерительный» лист — сидит абсолютом на той же ширине, что и
+   реальные страницы, и держит весь контент целиком. По его scrollHeight
+   считается pageCount, а на печать раскрывается именно он. */
+.cv-measure {
   position: absolute;
-  inset: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  visibility: hidden;
   pointer-events: none;
-  z-index: 0;
-  background: repeating-linear-gradient(
-    to bottom,
-    transparent 0,
-    transparent calc(141.4cqi - 1px),
-    var(--cv-fg-faint) calc(141.4cqi - 1px),
-    var(--cv-fg-faint) 141.4cqi
-  );
 }
 
 .cv-paper-foot {
@@ -938,26 +945,6 @@
     --cv-fg-faint: rgba(0, 0, 0, 0.45) !important;
     --cv-fg-faintest: rgba(0, 0, 0, 0.18) !important;
   }
-  /* Просим браузер не глушить наши цвета авто-настройкой принтера. */
-  .cv-paper,
-  .cv-paper * {
-    -webkit-print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
-  }
-  /* Декоративные линии страниц на бумаге не нужны — пагинацию рисует @page. */
-  .cv-page-breaks {
-    display: none !important;
-  }
-  /* На печати лист сжимаем под край страницы — без min-height, чтобы
-     не было пустой первой страницы. */
-  .cv-paper {
-    min-height: 0 !important;
-    container-type: normal !important;
-  }
-  .cv-paper-inner {
-    min-height: 0 !important;
-  }
-
   /* Скрываем весь UI вокруг листа: header, тулбары, форму, табы, нижние
      действия. Display:none — чтобы они не занимали место в потоке. */
   body > header,
@@ -992,19 +979,27 @@
     padding: 0 !important;
   }
 
-  /* Лист «течёт» на сколько A4-страниц нужно — никакого position:fixed,
-     никакого aspect-ratio, никакого overflow:hidden. Поля задаём через @page. */
-  .cv-paper {
-    border: 0 !important;
-    aspect-ratio: auto !important;
-    width: 100% !important;
-    height: auto !important;
-    overflow: visible !important;
+  /* Видимая стопка A4-«квадратиков» — это on-screen артефакт. На печать
+     прячем её и раскрываем измерительный лист с непрерывным контентом —
+     браузер сам разложит его по @page A4. */
+  .cv-pages > .cv-paper {
+    display: none !important;
   }
-  .cv-paper-inner {
+  .cv-measure {
+    position: static !important;
+    visibility: visible !important;
+    width: 100% !important;
+    pointer-events: auto !important;
+  }
+  .cv-measure .cv-paper-inner {
     padding: 0 !important;
-    height: auto !important;
-    overflow: visible !important;
+  }
+
+  /* Просим браузер не глушить наши цвета авто-настройкой принтера. */
+  .cv-measure,
+  .cv-measure * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
   }
 
   /* Предотвращаем разрыв смысловых блоков: запись опыта, заголовок секции,

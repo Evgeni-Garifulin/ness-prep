@@ -1,6 +1,18 @@
 "use client";
 
+import {
+  CSSProperties,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import { CVData, CVTemplate } from "./cv-data";
+
+// useLayoutEffect не работает на сервере — в SSR деградируем до useEffect,
+// чтобы Next.js не варнил при гидратации.
+const useIsoLayoutEffect =
+  typeof window !== "undefined" ? useLayoutEffect : useEffect;
 
 function pad(n: number) {
   return String(n).padStart(2, "0");
@@ -360,20 +372,64 @@ function SpecSheet({ data }: { data: CVData }) {
 type Props = {
   data: CVData;
   template: CVTemplate;
-  paperRef?: React.Ref<HTMLDivElement>;
+  /** Колбэк для родителя — сообщает актуальное число страниц A4. */
+  onPageCountChange?: (n: number) => void;
 };
 
-export function CVPreview({ data, template, paperRef }: Props) {
+export function CVPreview({ data, template, onPageCountChange }: Props) {
+  const measureRef = useRef<HTMLDivElement>(null);
+  const [pageCount, setPageCount] = useState(1);
+
+  // Считаем сколько A4 нужно: невидимый «измерительный» узел рендерит
+  // весь контент на той же ширине, что и видимые листы. Делим scrollHeight
+  // на высоту страницы (width × 1.414).
+  useIsoLayoutEffect(() => {
+    const node = measureRef.current;
+    if (!node) return;
+    const measure = () => {
+      const w = node.clientWidth;
+      if (!w) return;
+      const pageH = w * 1.414;
+      const contentH = node.scrollHeight;
+      setPageCount(Math.max(1, Math.ceil(contentH / pageH)));
+    };
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(node);
+    return () => ro.disconnect();
+  }, [data, template]);
+
+  useEffect(() => {
+    onPageCountChange?.(pageCount);
+  }, [pageCount, onPageCountChange]);
+
+  const renderTemplate = () => {
+    if (template === "twocol") return <TwoCol data={data} />;
+    if (template === "spec") return <SpecSheet data={data} />;
+    return <Manuscript data={data} />;
+  };
+
   return (
-    <div className="cv-paper" ref={paperRef}>
-      {/* Декоративные hairline-разделители на каждой A4-границе. Чисто
-          визуальный гид, в печать не уходит. */}
-      <div className="cv-page-breaks" aria-hidden />
-      <div className="cv-paper-inner">
-        {template === "twocol" && <TwoCol data={data} />}
-        {template === "spec" && <SpecSheet data={data} />}
-        {template === "manuscript" && <Manuscript data={data} />}
+    <div className="cv-pages">
+      {/* Измерительный узел: тот же контент и ширина, скрыт visibility.
+          На печать раскрывается именно он — текст течёт по @page A4. */}
+      <div className="cv-measure" ref={measureRef} aria-hidden>
+        <div className="cv-paper-inner">{renderTemplate()}</div>
       </div>
+
+      {/* Видимая стопка отдельных A4-«квадратиков». Каждая страница —
+          фиксированный лист с overflow:hidden, внутри один и тот же
+          непрерывный контент сдвинут вверх на (--page-i × 141.4cqi). */}
+      {Array.from({ length: pageCount }, (_, i) => (
+        <div className="cv-paper" key={i}>
+          <div
+            className="cv-paper-content"
+            style={{ "--page-i": i } as CSSProperties}
+          >
+            <div className="cv-paper-inner">{renderTemplate()}</div>
+          </div>
+        </div>
+      ))}
     </div>
   );
 }
