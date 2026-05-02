@@ -31,6 +31,21 @@ const REGISTRY: Record<string, MethodologyFiles> = {
     epub: "/methodology/prototypes-objects-classes.epub",
     hint: "LEARN IT FOR 7 DAYS",
   },
+  "basics / types": {
+    pdf: "/methodology/ts-basics-types.pdf",
+    epub: "/methodology/ts-basics-types.epub",
+    hint: "LEARN IT FOR 7 DAYS",
+  },
+  "generics / advanced ts": {
+    pdf: "/methodology/ts-generics-advanced.pdf",
+    epub: "/methodology/ts-generics-advanced.epub",
+    hint: "LEARN IT FOR 7 DAYS",
+  },
+  "ts architecture": {
+    pdf: "/methodology/ts-architecture.pdf",
+    epub: "/methodology/ts-architecture.epub",
+    hint: "LEARN IT FOR 7 DAYS",
+  },
 };
 
 function normalize(s: string): string {
