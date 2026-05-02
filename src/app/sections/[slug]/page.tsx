@@ -8,6 +8,7 @@ import { PageHeader } from "@/components/page-header";
 import { QuestionCard } from "@/components/question-card";
 import { ResetButton } from "@/components/reset-button";
 import { SubsectionNav } from "@/components/subsection-nav";
+import { SubsectionDownloads } from "@/components/subsection-downloads";
 import { LayoutSwitcher, LayoutGrid } from "@/components/layout-switcher";
 import { categoryFor, sortKey } from "@/lib/categories";
 import { stripSectionPrefix } from "@/lib/utils";
@@ -135,12 +136,15 @@ export default async function SectionPage({ params }: { params: Params }) {
             storageKey="layout:section-cards"
             header={
               groups[0]?.subsection ? (
-                <h2
-                  id={subsectionId(groups[0].subsection, 0)}
-                  className="text-xl sm:text-2xl font-medium uppercase tracking-tight text-foreground scroll-mt-24"
-                >
-                  {groups[0].subsection}
-                </h2>
+                <div className="flex flex-wrap items-end justify-between gap-3">
+                  <h2
+                    id={subsectionId(groups[0].subsection, 0)}
+                    className="text-xl sm:text-2xl font-medium uppercase tracking-tight text-foreground scroll-mt-24"
+                  >
+                    {groups[0].subsection}
+                  </h2>
+                  <SubsectionDownloads subsection={groups[0].subsection} />
+                </div>
               ) : null
             }
           >
@@ -148,12 +152,15 @@ export default async function SectionPage({ params }: { params: Params }) {
               {groups.map((g, gi) => (
                 <section key={gi} className="space-y-4 scroll-mt-24">
                   {gi > 0 && g.subsection && (
-                    <h2
-                      id={subsectionId(g.subsection, gi)}
-                      className="text-xl sm:text-2xl font-medium uppercase tracking-tight text-foreground scroll-mt-24"
-                    >
-                      {g.subsection}
-                    </h2>
+                    <div className="flex flex-wrap items-end justify-between gap-3">
+                      <h2
+                        id={subsectionId(g.subsection, gi)}
+                        className="text-xl sm:text-2xl font-medium uppercase tracking-tight text-foreground scroll-mt-24"
+                      >
+                        {g.subsection}
+                      </h2>
+                      <SubsectionDownloads subsection={g.subsection} />
+                    </div>
                   )}
                   <LayoutGrid>
                     {g.items.map((q) => (
