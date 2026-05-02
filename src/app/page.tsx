@@ -27,10 +27,17 @@ export default async function HomePage() {
     },
   });
 
-  const answers = await prisma.answer.findMany({
-    where: { username },
-    select: { questionId: true, text: true },
-  });
+  const [answers, trainerStats, notes] = await Promise.all([
+    prisma.answer.findMany({
+      where: { username },
+      select: { questionId: true, text: true },
+    }),
+    prisma.trainerStat.findMany({
+      where: { username },
+      select: { knownCount: true, unknownCount: true },
+    }),
+    prisma.note.count({ where: { username } }),
+  ]);
   const answeredIds = new Set(
     answers.filter((a) => a.text.trim().length > 0).map((a) => a.questionId),
   );
@@ -48,6 +55,66 @@ export default async function HomePage() {
   const grandTotal = stats.reduce((a, s) => a + s.total, 0);
   const grandAnswered = stats.reduce((a, s) => a + s.answered, 0);
   const grandPct = grandTotal ? Math.round((grandAnswered / grandTotal) * 100) : 0;
+
+  // Trainer: учитываем только tech-карточки с заполненным эталонным ответом —
+  // именно они попадают в drill-pool. Accuracy = known / (known + unknown).
+  const trainerPoolSize = sections
+    .filter((s) => categoryFor(s.slug) === "tech")
+    .reduce((acc, s) => acc + s._count.questions, 0);
+  const trainerKnown = trainerStats.reduce((a, s) => a + s.knownCount, 0);
+  const trainerUnknown = trainerStats.reduce((a, s) => a + s.unknownCount, 0);
+  const trainerTotal = trainerKnown + trainerUnknown;
+  const trainerAccuracy = trainerTotal
+    ? Math.round((trainerKnown / trainerTotal) * 100)
+    : 0;
+
+  type Tile = {
+    key: string;
+    title: string;
+    subtitle: string;
+    href: string;
+    /** правый показатель в нижней строке (правее ENTER) */
+    meta: string;
+    /** ширина прогресс-полосы в процентах (0..100), null — без полосы */
+    progress: number | null;
+  };
+
+  const tiles: Tile[] = [
+    {
+      key: "tech",
+      title: "Tech",
+      subtitle: stats[0].subtitle,
+      href: "/tech",
+      meta: `${stats[0].total ? Math.round((stats[0].answered / stats[0].total) * 100) : 0}%`,
+      progress: stats[0].total ? Math.round((stats[0].answered / stats[0].total) * 100) : 0,
+    },
+    {
+      key: "social",
+      title: "Social",
+      subtitle: stats[1].subtitle,
+      href: "/social",
+      meta: `${stats[1].total ? Math.round((stats[1].answered / stats[1].total) * 100) : 0}%`,
+      progress: stats[1].total ? Math.round((stats[1].answered / stats[1].total) * 100) : 0,
+    },
+    {
+      key: "trainer",
+      title: "Trainer",
+      subtitle: "RANDOM 25 · NO INPUT · KNOW IT OR FACE IT",
+      href: "/trainer",
+      meta: trainerTotal
+        ? `${trainerAccuracy}%`
+        : `${trainerPoolSize} READY`,
+      progress: trainerTotal ? trainerAccuracy : null,
+    },
+    {
+      key: "notes",
+      title: "Notes",
+      subtitle: "STAR STORIES · VOCAB · TALKING POINTS",
+      href: "/notes",
+      meta: `${notes} ${notes === 1 ? "NOTE" : "NOTES"}`,
+      progress: null,
+    },
+  ];
 
   return (
     <>
@@ -77,41 +144,46 @@ export default async function HomePage() {
         />
 
         <ul className="mt-10 grid grid-cols-1 sm:grid-cols-2 gap-0 border border-foreground">
-          {stats.map((track, idx) => {
-            const pct = track.total
-              ? Math.round((track.answered / track.total) * 100)
-              : 0;
+          {tiles.map((tile, idx) => {
+            // 2x2 на десктопе: правая колонка = idx % 2 === 1; нижняя строка =
+            // idx >= 2. Бордеры: правый — у левых клеток на десктопе; нижний —
+            // у верхних клеток. На мобиле — только нижний между всеми, кроме
+            // последней.
+            const isRightCol = idx % 2 === 1;
+            const isBottomRow = idx >= 2;
+            const borderClasses = [
+              !isBottomRow ? "border-b border-foreground" : "",
+              !isRightCol ? "sm:border-r border-foreground" : "",
+            ]
+              .filter(Boolean)
+              .join(" ");
             return (
-              <li
-                key={track.key}
-                className={
-                  idx === 0
-                    ? "border-b sm:border-b-0 sm:border-r border-foreground"
-                    : ""
-                }
-              >
+              <li key={tile.key} className={borderClasses}>
                 <Link
-                  href={track.href}
+                  href={tile.href}
                   className="flex flex-col h-full p-6 sm:p-8 hover:bg-muted transition-colors"
                 >
                   <h2 className="text-2xl sm:text-3xl font-medium leading-tight uppercase tracking-tight">
-                    {track.title}
+                    {tile.title}
                   </h2>
                   <p className="mt-3 text-sm text-muted-foreground max-w-md">
-                    {track.subtitle}
+                    {tile.subtitle}
                   </p>
 
                   <div className="mt-auto pt-10 flex items-center justify-between">
                     <span className="yzy-label">ENTER</span>
                     <span className="yzy-meta tabular-nums text-muted-foreground">
-                      {pct}%
+                      {tile.meta}
                     </span>
                   </div>
-                  <div className="mt-3 h-px w-full bg-foreground/20" />
-                  <div
-                    className="-mt-px h-px bg-foreground"
-                    style={{ width: `${pct}%` }}
-                  />
+                  <div className="mt-3 h-px w-full bg-foreground/20 relative">
+                    {tile.progress !== null && (
+                      <div
+                        className="absolute left-0 top-0 h-px bg-foreground"
+                        style={{ width: `${tile.progress}%` }}
+                      />
+                    )}
+                  </div>
                 </Link>
               </li>
             );
