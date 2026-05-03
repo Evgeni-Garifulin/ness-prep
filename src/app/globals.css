@@ -47,6 +47,17 @@ body {
   -webkit-text-size-adjust: 100%;
 }
 
+/* iOS Safari зумит страницу на focus, если у поля font-size < 16px.
+   На touch-устройствах принудительно поднимаем шрифт инпутов до 16px,
+   чтобы избежать авто-масштабирования. Десктопную типографику не трогаем. */
+@media (hover: none) and (pointer: coarse) {
+  input,
+  textarea,
+  select {
+    font-size: 16px;
+  }
+}
+
 body {
   /* IBM Plex Mono подгружается через next/font в layout.tsx и кладёт
      CSS-переменную --font-plex-mono. Fallback покрывает SSR/no-JS. */
