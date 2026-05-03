@@ -1,4 +1,4 @@
-# Exness — Senior Frontend interview prep
+# Senior Frontend interview prep
 
 Список разложен по тематическим блокам. Внутри каждого файла сохранена исходная нумерация и подразделы.
 

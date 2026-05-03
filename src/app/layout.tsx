@@ -11,11 +11,11 @@ const plexMono = IBM_Plex_Mono({
 });
 
 // Title template применяется ко всем страницам: индивидуальный title в page.tsx
-// автоматически оборачивается в " / NESS PREP".
+// автоматически оборачивается в " / ITW PREP".
 export const metadata: Metadata = {
   title: {
-    default: "NESS PREP",
-    template: "%s / NESS PREP",
+    default: "ITW PREP",
+    template: "%s / ITW PREP",
   },
   description:
     "FRONTEND INTERVIEW DRILL    RECALL OVER MEMORY    KNOW IT OR FACE IT",

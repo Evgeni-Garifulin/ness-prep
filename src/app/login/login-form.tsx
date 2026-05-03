@@ -42,7 +42,7 @@ export function LoginForm() {
       onSubmit={onSubmit}
       className="w-full max-w-sm border border-foreground bg-background p-6 sm:p-8"
     >
-      <p className="yzy-label text-muted-foreground">NESS / PREP</p>
+      <p className="yzy-label text-muted-foreground">ITW / PREP</p>
       <h1 className="mt-3 text-2xl sm:text-3xl font-medium uppercase tracking-tight leading-[1.05]">
         Sign in
       </h1>

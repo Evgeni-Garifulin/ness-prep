@@ -11,7 +11,7 @@
           "order": 0,
           "number": 1,
           "subsection": "Мотивация и fit",
-          "text": "Почему ты хочешь именно в Exness?",
+          "text": "Почему ты хочешь именно в эту компанию?",
           "hintEasy": "",
           "hintFull": "",
           "answer": ""
@@ -51,7 +51,7 @@
           "order": 4,
           "number": 5,
           "subsection": "Мотивация и fit",
-          "text": "Какие продукты Exness тебе кажутся интересными?",
+          "text": "Какие продукты этой компании тебе кажутся интересными?",
           "hintEasy": "",
           "hintFull": "",
           "answer": ""
@@ -61,7 +61,7 @@
           "order": 5,
           "number": 6,
           "subsection": "Мотивация и fit",
-          "text": "Что ты знаешь о бизнесе Exness?",
+          "text": "Что ты знаешь о бизнесе компании?",
           "hintEasy": "",
           "hintFull": "",
           "answer": ""
@@ -479,7 +479,7 @@
           "order": 1,
           "number": 2,
           "subsection": null,
-          "text": "Why are you interested in Exness?",
+          "text": "Why are you interested in this company?",
           "hintEasy": "",
           "hintFull": "",
           "answer": ""
@@ -1325,7 +1325,7 @@
           "order": 24,
           "number": 25,
           "subsection": null,
-          "text": "Какие качества отличают успешного senior engineer в Exness?",
+          "text": "Какие качества отличают успешного senior engineer в этой компании?",
           "hintEasy": "",
           "hintFull": "",
           "answer": ""

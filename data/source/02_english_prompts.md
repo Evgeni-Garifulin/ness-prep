@@ -1,7 +1,7 @@
 # 2. English interview prompts
 
 1. Tell me about yourself.
-2. Why are you interested in Exness?
+2. Why are you interested in this company?
 3. Describe your current project.
 4. What was your biggest technical challenge?
 5. Describe a complex frontend architecture you worked on.

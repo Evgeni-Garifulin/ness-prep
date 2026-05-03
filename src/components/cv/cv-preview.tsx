@@ -360,7 +360,7 @@ function SpecSheet({ data }: { data: CVData }) {
       )}
 
       <div className="footer-stamp">
-        <span>END OF SHEET · NESS / PREP</span>
+        <span>END OF SHEET · ITW / PREP</span>
         <span className="yzy-num">PG 01 / 01</span>
       </div>
     </div>
