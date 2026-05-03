@@ -26,7 +26,7 @@
       {
         "day": "ДЕНЬ 2",
         "title": "МИКРО vs МАКРО    PAINT    БЛОКИРОВКА UI",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 2,
@@ -56,7 +56,7 @@
       {
         "day": "ДЕНЬ 4",
         "title": "PROMISE API    AWAIT В ЦИКЛЕ    PARALLEL vs SEQUENTIAL",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 6,
@@ -162,7 +162,7 @@
       {
         "day": "ДЕНЬ 2",
         "title": "STALE CLOSURE    БАГИ ЗАМЫКАНИЙ",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 2,
@@ -211,7 +211,7 @@
       {
         "day": "ДЕНЬ 5",
         "title": "TDZ    СРАВНЕНИЕ ОБЪЕКТОВ    REFERENTIAL EQUALITY",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 8,
@@ -230,7 +230,7 @@
       {
         "day": "ДЕНЬ 6",
         "title": "КОПИРОВАНИЕ    SHALLOW vs DEEP    structuredClone",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 12,
@@ -279,7 +279,7 @@
       {
         "day": "ДЕНЬ 1",
         "title": "ПРОТОТИПЫ    new    Object.create / assign / freeze",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 1,
@@ -332,7 +332,7 @@
       {
         "day": "ДЕНЬ 4",
         "title": "PROPERTY DESCRIPTORS    ENUMERABLE",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 7,
@@ -347,7 +347,7 @@
       {
         "day": "ДЕНЬ 5",
         "title": "РАВЕНСТВО    COERCION    NUMBER / NaN / Infinity",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 10,
@@ -385,7 +385,7 @@
       {
         "day": "ДЕНЬ 7",
         "title": "ITERABLE / ITERATOR    GENERATORS    SYMBOLS",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 16,
@@ -434,7 +434,7 @@
       {
         "day": "ДЕНЬ 2",
         "title": "UNION    INTERSECTION    DISCRIMINATED UNION",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 3,
@@ -453,7 +453,7 @@
       {
         "day": "ДЕНЬ 3",
         "title": "NARROWING    typeof / in / instanceof    TYPE GUARD",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 8,
@@ -472,7 +472,7 @@
       {
         "day": "ДЕНЬ 4",
         "title": "unknown vs any    never vs void",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 12,
@@ -506,7 +506,7 @@
       {
         "day": "ДЕНЬ 6",
         "title": "IMPOSSIBLE STATES    КОГДА any    OPTIONAL",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 7,
@@ -551,7 +551,7 @@
       {
         "day": "ДЕНЬ 1",
         "title": "БАЗА GENERICS    extends    DEFAULT",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 1,
@@ -612,7 +612,7 @@
       {
         "day": "ДЕНЬ 4",
         "title": "API RESPONSE    ERROR    ASYNC    FORM",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 11,
@@ -658,7 +658,7 @@
       {
         "day": "ДЕНЬ 6",
         "title": "EXTERNAL STORE    WS    FEATURE FLAGS",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 19,
@@ -677,7 +677,7 @@
       {
         "day": "ДЕНЬ 7",
         "title": "PERMISSIONS    ROUTES    STATE MACHINE    KEEP IT SIMPLE",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 22,
@@ -707,7 +707,7 @@
       {
         "day": "ДЕНЬ 1",
         "title": "SHARED TYPES    DTO    ДУБЛИРОВАНИЕ",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 1,
@@ -733,7 +733,7 @@
       {
         "day": "ДЕНЬ 3",
         "title": "RUNTIME ВАЛИДАЦИЯ    Zod / Valibot / io-ts",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 4,
@@ -748,7 +748,7 @@
       {
         "day": "ДЕНЬ 4",
         "title": "DOMAIN vs API MODEL",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 6,
@@ -774,7 +774,7 @@
       {
         "day": "ДЕНЬ 6",
         "title": "as    REVIEW    ЧТО ТАКОЕ ПЛОХОЙ TS",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 9,
@@ -793,7 +793,7 @@
       {
         "day": "ДЕНЬ 7",
         "title": "BACKWARD-COMPAT    LEGACY    STRICTNESS    REFACTOR",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 12,
@@ -823,7 +823,7 @@
       {
         "day": "ДЕНЬ 1",
         "title": "ФАЗЫ    RENDER vs COMMIT    PURE",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 1,
@@ -842,7 +842,7 @@
       {
         "day": "ДЕНЬ 2",
         "title": "ЧТО ВЫЗЫВАЕТ RE-RENDER",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 4,
@@ -880,7 +880,7 @@
       {
         "day": "ДЕНЬ 4",
         "title": "CONTROLLED vs UNCONTROLLED INPUTS",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 10,
@@ -933,7 +933,7 @@
       {
         "day": "ДЕНЬ 7",
         "title": "HYDRATION    MISMATCH    DEBUG RE-RENDERS",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 18,
@@ -974,7 +974,7 @@
       {
         "day": "ДЕНЬ 2",
         "title": "useState    useReducer",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 3,
@@ -993,7 +993,7 @@
       {
         "day": "ДЕНЬ 3",
         "title": "useRef    REF vs STATE",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 6,
@@ -1008,7 +1008,7 @@
       {
         "day": "ДЕНЬ 4",
         "title": "useMemo    useCallback    React.memo — ЗАЧЕМ",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 8,
@@ -1027,7 +1027,7 @@
       {
         "day": "ДЕНЬ 5",
         "title": "КОГДА МЕМО ВРЕДЕН    БЕСПОЛЕЗЕН    НЕ ДЕФОЛТ",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 9,
@@ -1065,7 +1065,7 @@
       {
         "day": "ДЕНЬ 7",
         "title": "CUSTOM HOOKS    ТЕСТ    HIDDEN GLOBAL",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 17,
@@ -1095,7 +1095,7 @@
       {
         "day": "ДЕНЬ 1",
         "title": "ЗАЧЕМ useEffect    КОГДА НЕ НУЖЕН    SYNCHRONIZE",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 1,
@@ -1148,7 +1148,7 @@
       {
         "day": "ДЕНЬ 4",
         "title": "INFINITE LOOP    CLEANUP",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 9,
@@ -1178,7 +1178,7 @@
       {
         "day": "ДЕНЬ 6",
         "title": "useLayoutEffect    STRICT MODE    IDEMPOTENT",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 13,
@@ -1205,7 +1205,7 @@
       {
         "day": "ДЕНЬ 7",
         "title": "SUBSCRIPTIONS    TIMERS    DOM LISTENERS",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 18,
@@ -1231,7 +1231,7 @@
       {
         "day": "ДЕНЬ 1",
         "title": "useTransition    URGENT vs TRANSITION",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 1,
@@ -1250,7 +1250,7 @@
       {
         "day": "ДЕНЬ 2",
         "title": "useDeferredValue    vs DEBOUNCE    vs useTransition",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 4,
@@ -1269,7 +1269,7 @@
       {
         "day": "ДЕНЬ 3",
         "title": "SUSPENSE    ЗАЧЕМ    РИСКИ",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 7,
@@ -1341,7 +1341,7 @@
       {
         "day": "ДЕНЬ 7",
         "title": "EFFECTS + CONCURRENCY    ЧТО НЕ РЕШАЕТ    OVERKILL",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 18,
@@ -1394,7 +1394,7 @@
       {
         "day": "ДЕНЬ 2",
         "title": "ВЫБОР    REDUX vs ZUSTAND vs MOBX vs XSTATE",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 6,
@@ -1440,7 +1440,7 @@
       {
         "day": "ДЕНЬ 4",
         "title": "BOUNDARIES    URL / STORAGE / MEMORY    TABS",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 14,
@@ -1521,7 +1521,7 @@
       {
         "day": "ДЕНЬ 7",
         "title": "PERMISSIONS    FLAGS    REAL-TIME    PERF    TESTS    MIGRATION",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 29,
@@ -1563,7 +1563,7 @@
       {
         "day": "ДЕНЬ 1",
         "title": "СТРУКТУРА    FSD    SHARED / ENTITIES / FEATURES / PAGES",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 1,
@@ -1590,7 +1590,7 @@
       {
         "day": "ДЕНЬ 2",
         "title": "ГДЕ ЖИТЬ    HOOKS    DOMAIN    UI    DESIGN SYSTEM",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 6,
@@ -1632,7 +1632,7 @@
       {
         "day": "ДЕНЬ 4",
         "title": "FORM    WIZARD    DASHBOARD    LOADING/EMPTY/ERROR",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 13,
@@ -1682,7 +1682,7 @@
       {
         "day": "ДЕНЬ 6",
         "title": "DEGRADATION    FLAGS    ROLLOUT    i18n    THEMING",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 22,
@@ -1709,7 +1709,7 @@
       {
         "day": "ДЕНЬ 7",
         "title": "RESPONSIVE    SHARED API    DRILLING    REVIEW    ADR",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 27,
@@ -1759,7 +1759,7 @@
       {
         "day": "ДЕНЬ 1",
         "title": "OBSERVERS    INTERSECTION    RESIZE    MUTATION",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 1,
@@ -1786,7 +1786,7 @@
       {
         "day": "ДЕНЬ 2",
         "title": "EVENT DELEGATION    PASSIVE LISTENERS",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 6,
@@ -1813,7 +1813,7 @@
       {
         "day": "ДЕНЬ 3",
         "title": "CAPTURE / BUBBLE    stopPropagation    preventDefault",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 11,
@@ -1909,7 +1909,7 @@
       {
         "day": "ДЕНЬ 7",
         "title": "PWA    UPDATES    DEBUG SW",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 28,
@@ -1935,7 +1935,7 @@
       {
         "day": "ДЕНЬ 1",
         "title": "CORE WEB VITALS    LCP    INP    CLS",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 1,
@@ -1958,7 +1958,7 @@
       {
         "day": "ДЕНЬ 2",
         "title": "ИЗМЕРЕНИЯ    LAB vs FIELD    RUM    FINTECH",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 5,
@@ -1981,7 +1981,7 @@
       {
         "day": "ДЕНЬ 3",
         "title": "LONG TASKS    LONG ANIMATION FRAME",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 9,
@@ -2015,7 +2015,7 @@
       {
         "day": "ДЕНЬ 5",
         "title": "REFLOW    REPAINT    COMPOSITING",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 14,
@@ -2034,7 +2034,7 @@
       {
         "day": "ДЕНЬ 6",
         "title": "ДЕШЁВЫЕ CSS-СВОЙСТВА    will-change",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 17,
@@ -2049,7 +2049,7 @@
       {
         "day": "ДЕНЬ 7",
         "title": "will-change ВРЕД    SCROLL PERFORMANCE",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 19,
@@ -2071,7 +2071,7 @@
       {
         "day": "ДЕНЬ 1",
         "title": "ПОИСК ПРОБЛЕМ    PROFILER    RENDER vs NETWORK",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 1,
@@ -2090,7 +2090,7 @@
       {
         "day": "ДЕНЬ 2",
         "title": "RENDER SURFACE    RE-RENDER STORM    CONTEXT",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 4,
@@ -2151,7 +2151,7 @@
       {
         "day": "ДЕНЬ 5",
         "title": "BATCHING    SELECTORS    DERIVED    BUNDLE",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 13,
@@ -2174,7 +2174,7 @@
       {
         "day": "ДЕНЬ 6",
         "title": "DEPENDENCIES    CODE SPLITTING    LAZY",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 18,
@@ -2201,7 +2201,7 @@
       {
         "day": "ДЕНЬ 7",
         "title": "SKELETONS    IMAGES    FONTS    HYDRATION    MEMORY    BUDGET",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 23,
@@ -2247,7 +2247,7 @@
       {
         "day": "ДЕНЬ 1",
         "title": "WS    SSE    POLLING    ВЫБОР",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 1,
@@ -2336,7 +2336,7 @@
       {
         "day": "ДЕНЬ 4",
         "title": "DISCONNECT vs STALE    DEGRADED    LAST KNOWN VALUE",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 18,
@@ -2378,7 +2378,7 @@
       {
         "day": "ДЕНЬ 6",
         "title": "CONSISTENCY    PARTIAL FAILURE    TESTING    MOCK    MONITORING",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 25,
@@ -2443,7 +2443,7 @@
       {
         "day": "ДЕНЬ 1",
         "title": "SEMANTIC HTML    NATIVE BUTTON    ARIA",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 1,
@@ -2466,7 +2466,7 @@
       {
         "day": "ДЕНЬ 2",
         "title": "ACCESSIBLE NAME    SCREEN READER    CUSTOM BUTTON",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 5,
@@ -2504,7 +2504,7 @@
       {
         "day": "ДЕНЬ 4",
         "title": "TABS    TOOLTIP    TABLE    SORTABLE TABLE",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 11,
@@ -2527,7 +2527,7 @@
       {
         "day": "ДЕНЬ 5",
         "title": "ARIA-SORT    ARIA-LIVE    ALERT    STATUS",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 15,
@@ -2581,7 +2581,7 @@
       {
         "day": "ДЕНЬ 7",
         "title": "CONTRAST    REDUCED MOTION    ZOOM    ERRORS    QUALITY BAR",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 25,
@@ -2619,7 +2619,7 @@
       {
         "day": "ДЕНЬ 1",
         "title": "СТРУКТУРА    CONTROLLED vs UNCONTROLLED",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 1,
@@ -2642,7 +2642,7 @@
       {
         "day": "ДЕНЬ 2",
         "title": "ВАЛИДАЦИЯ    CLIENT / SERVER / СИНХРОНИЗАЦИЯ",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 5,
@@ -2665,7 +2665,7 @@
       {
         "day": "ДЕНЬ 3",
         "title": "TOUCHED / DIRTY    ASYNC VALIDATION    STALE",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 9,
@@ -2703,7 +2703,7 @@
       {
         "day": "ДЕНЬ 5",
         "title": "OPTIMISTIC SUBMIT    DOUBLE SUBMIT    DISABLED",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 15,
@@ -2737,7 +2737,7 @@
       {
         "day": "ДЕНЬ 7",
         "title": "ТЕСТИРОВАНИЕ COMPLEX FORM",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 20,
@@ -2755,7 +2755,7 @@
       {
         "day": "ДЕНЬ 1",
         "title": "ЧТО ТАКОЕ DS    DS vs LIBRARY    BUTTON API",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 1,
@@ -2774,7 +2774,7 @@
       {
         "day": "ДЕНЬ 2",
         "title": "MODAL    TABLE    FORM API",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 4,
@@ -2793,7 +2793,7 @@
       {
         "day": "ДЕНЬ 3",
         "title": "TOKENS    DARK MODE    RESPONSIVE",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 7,
@@ -2812,7 +2812,7 @@
       {
         "day": "ДЕНЬ 4",
         "title": "A11Y BY DEFAULT    DOCS    STORYBOOK",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 10,
@@ -2877,7 +2877,7 @@
       {
         "day": "ДЕНЬ 7",
         "title": "STYLE/BEHAVIOR    VISUAL REGRESSION    ICONS    SPACING    MF CONSISTENCY",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 21,
@@ -2911,7 +2911,7 @@
       {
         "day": "ДЕНЬ 1",
         "title": "XSS    REACT XSS    dangerouslySetInnerHTML",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 1,
@@ -2938,7 +2938,7 @@
       {
         "day": "ДЕНЬ 2",
         "title": "SANITIZATION    ESCAPING    CSP",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 6,
@@ -2969,7 +2969,7 @@
       {
         "day": "ДЕНЬ 3",
         "title": "CSRF    CORS    PREFLIGHT",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 12,
@@ -3031,7 +3031,7 @@
       {
         "day": "ДЕНЬ 5",
         "title": "LOGOUT    PROTECTED ROUTES    FE GUARD    PERMISSIONS",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 24,
@@ -3077,7 +3077,7 @@
       {
         "day": "ДЕНЬ 7",
         "title": "DEPS    AUDIT    SECURE DEFAULTS    REVIEW",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 32,
@@ -3107,7 +3107,7 @@
       {
         "day": "ДЕНЬ 1",
         "title": "REST vs GRAPHQL    OVER/UNDERFETCH",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 1,
@@ -3134,7 +3134,7 @@
       {
         "day": "ДЕНЬ 2",
         "title": "GQL TYPES    ERRORS    CACHE",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 6,
@@ -3153,7 +3153,7 @@
       {
         "day": "ДЕНЬ 3",
         "title": "PAGINATION    OPTIMISTIC    CLIENT DESIGN",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 9,
@@ -3176,7 +3176,7 @@
       {
         "day": "ДЕНЬ 4",
         "title": "CANCELLATION    RETRY    NO-RETRY    IDEMPOTENCY",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 13,
@@ -3249,7 +3249,7 @@
       {
         "day": "ДЕНЬ 7",
         "title": "CONTRACT    BACKWARDS COMPAT    MIGRATION    PARTIAL    SLOW",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 26,
@@ -3283,7 +3283,7 @@
       {
         "day": "ДЕНЬ 1",
         "title": "ЧТО ТЕСТИРОВАТЬ    PYRAMID    TROPHY",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 1,
@@ -3314,7 +3314,7 @@
       {
         "day": "ДЕНЬ 2",
         "title": "PURE FN    REDUCERS    HOOKS    ASYNC HOOKS",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 7,
@@ -3337,7 +3337,7 @@
       {
         "day": "ДЕНЬ 3",
         "title": "REACT COMPONENTS    USER-CENTRIC    NO IMPL    TESTID",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 11,
@@ -3414,7 +3414,7 @@
       {
         "day": "ДЕНЬ 6",
         "title": "OPTIMISTIC    A11Y    KEYBOARD    FORMS    VALIDATION",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 25,
@@ -3441,7 +3441,7 @@
       {
         "day": "ДЕНЬ 7",
         "title": "FLAKY",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 30,
@@ -3459,7 +3459,7 @@
       {
         "day": "ДЕНЬ 1",
         "title": "ЧТО ТЕСТИРОВАТЬ E2E    LOCATORS    getByRole",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 1,
@@ -3482,7 +3482,7 @@
       {
         "day": "ДЕНЬ 2",
         "title": "AUTO-WAITING    SLEEPS    RETRIES    FLAKY DETECT",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 5,
@@ -3532,7 +3532,7 @@
       {
         "day": "ДЕНЬ 4",
         "title": "PERMISSIONS    FLAGS    VISUAL REGRESSION",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 14,
@@ -3574,7 +3574,7 @@
       {
         "day": "ДЕНЬ 6",
         "title": "SMOKE    TEST DATA    CLEANUP",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 21,
@@ -3593,7 +3593,7 @@
       {
         "day": "ДЕНЬ 7",
         "title": "ANALYTICS    OBSERVABILITY",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 24,
@@ -3615,7 +3615,7 @@
       {
         "day": "ДЕНЬ 1",
         "title": "BUNDLER    VITE vs WEBPACK    DEV SERVER    ESM    HMR",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 1,
@@ -3646,7 +3646,7 @@
       {
         "day": "ДЕНЬ 2",
         "title": "VITE PROD BUILD    ROLLUP    ESBUILD",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 7,
@@ -3665,7 +3665,7 @@
       {
         "day": "ДЕНЬ 3",
         "title": "TREE SHAKING    SIDE EFFECTS    CODE SPLITTING",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 10,
@@ -3684,7 +3684,7 @@
       {
         "day": "ДЕНЬ 4",
         "title": "DYNAMIC IMPORT    CHUNK    CHUNK SPLITTING    BUNDLE SIZE",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 13,
@@ -3711,7 +3711,7 @@
       {
         "day": "ДЕНЬ 5",
         "title": "SOURCE MAPS    CACHE BUSTING    LONG-TERM CACHING",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 18,
@@ -3734,7 +3734,7 @@
       {
         "day": "ДЕНЬ 6",
         "title": "DEPS    POLYFILLS    LEGACY    ENV",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 22,
@@ -3791,7 +3791,7 @@
       {
         "day": "ДЕНЬ 1",
         "title": "MFE    КОГДА    OVERENGINEERING    MF",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 1,
@@ -3864,7 +3864,7 @@
       {
         "day": "ДЕНЬ 4",
         "title": "SHARE TYPES    DS    AUTH    ROUTING",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 14,
@@ -3910,7 +3910,7 @@
       {
         "day": "ДЕНЬ 6",
         "title": "TESTING    LOCAL DEV    UX CONSISTENCY    MIGRATION    STRANGLER",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 22,
@@ -3941,7 +3941,7 @@
       {
         "day": "ДЕНЬ 7",
         "title": "MONOREPO vs MF    КОГДА MONOREPO    РИСКИ    PACKAGES    SHARED CONFIG    AFFECTED    VERSIONING    MODULAR MONOLITH",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 28,
@@ -3987,7 +3987,7 @@
       {
         "day": "ДЕНЬ 1",
         "title": "PIPELINE    QUALITY GATES    TYPE/LINT/UNIT/INT/E2E",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 1,
@@ -4022,7 +4022,7 @@
       {
         "day": "ДЕНЬ 2",
         "title": "BUNDLE    DEP AUDIT    ARTIFACTS    BUILD ONCE",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 8,
@@ -4068,7 +4068,7 @@
       {
         "day": "ДЕНЬ 4",
         "title": "FLAGS    KILL FEATURE    HEALTH CHECKS    MONITORING",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 16,
@@ -4122,7 +4122,7 @@
       {
         "day": "ДЕНЬ 6",
         "title": "FE SECRETS    SOURCEMAPS    MFE RELEASE    SHARED RELEASE    DOCS",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 26,
@@ -4149,7 +4149,7 @@
       {
         "day": "ДЕНЬ 7",
         "title": "FAILED DEPLOY    PARTIAL OUTAGE    POST-RELEASE    CHANGELOG    OBS DoD",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 31,
@@ -4183,7 +4183,7 @@
       {
         "day": "ДЕНЬ 1",
         "title": "ЧТО ТАКОЕ FRONTEND OBS    LOGS/METRICS/TRACES    METRICS",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 1,
@@ -4210,7 +4210,7 @@
       {
         "day": "ДЕНЬ 2",
         "title": "ERRORS    GROUPING    PII    API FAILS",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 6,
@@ -4233,7 +4233,7 @@
       {
         "day": "ДЕНЬ 3",
         "title": "ROUTE LATENCY    WS    STALE DATA    LONG TASKS",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 10,
@@ -4279,7 +4279,7 @@
       {
         "day": "ДЕНЬ 5",
         "title": "CLIENT TRACING RISKS    SAMPLING    DASHBOARDS    ALERTS",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 18,
@@ -4325,7 +4325,7 @@
       {
         "day": "ДЕНЬ 7",
         "title": "POST-ROLLOUT    UX IMPACT    FLAGS    RELEASE ANNOT    REVIEW",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 26,
@@ -4378,7 +4378,7 @@
       {
         "day": "ДЕНЬ 2",
         "title": "ТОН    SPOR    КОГДА СОЗВОН",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 4,
@@ -4397,7 +4397,7 @@
       {
         "day": "ДЕНЬ 3",
         "title": "АРХИТЕКТУРА    HOOKS    TS",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 7,
@@ -4416,7 +4416,7 @@
       {
         "day": "ДЕНЬ 4",
         "title": "PERFORMANCE    SECURITY    A11Y",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 10,
@@ -4435,7 +4435,7 @@
       {
         "day": "ДЕНЬ 5",
         "title": "TESTS    БОЛЬШОЙ PR    РАЗБИВКА",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 13,
@@ -4454,7 +4454,7 @@
       {
         "day": "ДЕНЬ 6",
         "title": "RUBBER-STAMP    CHECKLIST    КАЧЕСТВО",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 16,
@@ -4473,7 +4473,7 @@
       {
         "day": "ДЕНЬ 7",
         "title": "LEGACY    ПЕРФЕКЦИОНИЗМ",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 19,
@@ -4518,7 +4518,7 @@
       {
         "day": "ДЕНЬ 2",
         "title": "NOTIFICATIONS    EMPLOYEE PORTAL    DESIGN SYSTEM",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 5,
@@ -4625,7 +4625,7 @@
       {
         "day": "ДЕНЬ 7",
         "title": "ERROR HANDLING    CACHE    i18n    A/B    ANALYTICS    AUTH    WS    ROLLBACK",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 23,
@@ -4671,7 +4671,7 @@
       {
         "day": "ДЕНЬ 1",
         "title": "DEBOUNCE    THROTTLE    ONCE    MEMOIZE    CURRY",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 1,
@@ -4698,7 +4698,7 @@
       {
         "day": "ДЕНЬ 2",
         "title": "DEEP CLONE    DEEP EQUAL    FLAT    UNFLATTEN",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 6,
@@ -4748,7 +4748,7 @@
       {
         "day": "ДЕНЬ 4",
         "title": "CHUNK    GROUP    UNIQ    INTERSECT    DIFF",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 15,
@@ -4821,7 +4821,7 @@
       {
         "day": "ДЕНЬ 7",
         "title": "SCHEDULER    PRIORITY QUEUE    SHEDULE",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 28,
@@ -4847,7 +4847,7 @@
       {
         "day": "ДЕНЬ 1",
         "title": "PARTIAL    REQUIRED    READONLY    PICK    OMIT",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 1,
@@ -4881,7 +4881,7 @@
       {
         "day": "ДЕНЬ 3",
         "title": "AWAITED    PROMISE TYPE    RETURN TYPE    PARAMETERS",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 6,
@@ -4983,7 +4983,7 @@
       {
         "day": "ДЕНЬ 1",
         "title": "USE-DEBOUNCE    USE-THROTTLE    USE-PREVIOUS",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 1,
@@ -5002,7 +5002,7 @@
       {
         "day": "ДЕНЬ 2",
         "title": "USE-FETCH    USE-ASYNC    USE-LOCALSTORAGE",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 4,
@@ -5196,7 +5196,7 @@
       {
         "day": "ДЕНЬ 4",
         "title": "MINI DESIGN SYSTEM    DASHBOARD URL STATE    FORM BUILDER",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 10,
@@ -5215,7 +5215,7 @@
       {
         "day": "ДЕНЬ 5",
         "title": "FLAGS UI    A/B UI    ANALYTICS DEBUGGER    ERROR DASH    PERF PLAYGROUND",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 13,
@@ -5295,7 +5295,7 @@
       {
         "day": "ДЕНЬ 1",
         "title": "ИНФИНИТНЫЙ RENDER    INFINITE EFFECT    ЛАГ INPUT",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 1,
@@ -5352,7 +5352,7 @@
       {
         "day": "ДЕНЬ 4",
         "title": "TABLE FOCUS    REACT KEY    CONTEXT RE-RENDER",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 10,
@@ -5371,7 +5371,7 @@
       {
         "day": "ДЕНЬ 5",
         "title": "useMemo НЕ ПОМОГАЕТ    BUNDLE +500KB    PLAYWRIGHT FLAKY",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 13,
@@ -5431,7 +5431,7 @@
       {
         "day": "ДЕНЬ 1",
         "title": "HOOKS DEPS    DERIVED IN EFFECT    INDEX KEYS",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 1,
@@ -5450,7 +5450,7 @@
       {
         "day": "ДЕНЬ 2",
         "title": "FORM A11Y    WS CLEANUP    API CANCELLATION",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 4,
@@ -5469,7 +5469,7 @@
       {
         "day": "ДЕНЬ 3",
         "title": "REDUCER    TS ANY    dangerouslySetInnerHTML",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 7,
@@ -5488,7 +5488,7 @@
       {
         "day": "ДЕНЬ 4",
         "title": "BIG SHARED API    OVER-ABSTRACTION    NO TESTS",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 10,
@@ -5526,7 +5526,7 @@
       {
         "day": "ДЕНЬ 6",
         "title": "CI    FLAGS ROLLOUT    TELEMETRY",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 16,
@@ -5545,7 +5545,7 @@
       {
         "day": "ДЕНЬ 7",
         "title": "ERROR HANDLING    PERF PR",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 19,
@@ -5590,7 +5590,7 @@
       {
         "day": "ДЕНЬ 2",
         "title": "AUDITABILITY    SENSITIVE LOGGING",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 5,
@@ -5658,7 +5658,7 @@
       {
         "day": "ДЕНЬ 6",
         "title": "ПОСТ-РЕЛИЗ MONITORING    DEGRADED FALLBACK    PARTIAL OUTAGE",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 15,
@@ -5677,7 +5677,7 @@
       {
         "day": "ДЕНЬ 7",
         "title": "PRECISION/ROUNDING    MONEY FORMATTING    TIMEZONE",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 18,
@@ -5703,7 +5703,7 @@
       {
         "day": "ДЕНЬ 1",
         "title": "JS CORE   ===   HOIST   THIS   ARROW   CLOSURE",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 1,
@@ -5742,7 +5742,7 @@
       {
         "day": "ДЕНЬ 2",
         "title": "EVENT LOOP   PROMISE   MICROTASK   ASYNC",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 9,
@@ -5777,7 +5777,7 @@
       {
         "day": "ДЕНЬ 3",
         "title": "REACT   KEYS   LIFTING   MEMO   USECALLBACK",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 16,
@@ -5812,7 +5812,7 @@
       {
         "day": "ДЕНЬ 4",
         "title": "HOOKS   USEEFFECT   USEREF   CONTEXT",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 23,
@@ -5917,7 +5917,7 @@
       {
         "day": "ДЕНЬ 7",
         "title": "TS   GIT   TOOLS   A11Y",
-        "lvl": "MDM LVL",
+        "lvl": "MID LVL",
         "questions": [
           {
             "id": 44,

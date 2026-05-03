@@ -56,12 +56,20 @@ export function SubsectionDownloads({
       {plan ? (
         <button
           type="button"
-          onClick={() =>
-            downloadIcs(plan, `itw-prep-${files.planSlug}.ics`)
-          }
+          onClick={() => {
+            // Абсолютные URL для ссылок внутри события — берутся из
+            // window.location.origin в момент клика, чтобы работало
+            // на любом домене, где задеплоено.
+            const origin =
+              typeof window !== "undefined" ? window.location.origin : "";
+            downloadIcs(plan, `itw-prep-${files.planSlug}.ics`, {
+              pdf: `${origin}${files.pdf}`,
+              epub: `${origin}${files.epub}`,
+            });
+          }}
           className={`${linkClass} self-start bg-transparent border-0 p-0 cursor-pointer`}
           aria-label="Скачать .ics — календарь на 7 дней с занятиями"
-          title="Календарь на 7 дней — события с 19:00 до 20:00, напоминания утром в 10:00 и за час до начала"
+          title="Календарь на 7 дней — события с 19:00 до 21:00, напоминания утром в 10:00 и за час до начала. В описании — ссылки на PDF и EPUB методички."
         >
           ADD IT TO CALENDAR .ICS
         </button>
