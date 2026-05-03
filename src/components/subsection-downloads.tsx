@@ -1,15 +1,24 @@
 import { methodologyFor } from "@/lib/methodology";
 
-// Мета-строка под заголовком подсекции:
+// Мета-строка под заголовком подсекции (или под H1 для секций без
+// подкатегорий):
 //   LEARN IT FOR 7 DAYS    PDF    IBOOKS
 //
 // Стиль — yzy-label, серый по умолчанию, ховер чёрный. Без рамок и
 // без иконок — единый стиль ссылок проекта (см. RESET SECTION).
 //
-// Если для подсекции нет методички — компонент рендерит null, и под
-// заголовком ничего не появляется.
-export function SubsectionDownloads({ subsection }: { subsection: string | null | undefined }) {
-  const files = methodologyFor(subsection);
+// Поиск методички: сначала по subsection, потом fallback по
+// sectionSlug — для секций, где subsection отсутствует.
+//
+// Если методички нет — компонент рендерит null.
+export function SubsectionDownloads({
+  subsection,
+  sectionSlug,
+}: {
+  subsection?: string | null;
+  sectionSlug?: string | null;
+}) {
+  const files = methodologyFor(subsection, sectionSlug);
   if (!files) return null;
 
   const linkClass =

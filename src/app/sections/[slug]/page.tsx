@@ -122,6 +122,12 @@ export default async function SectionPage({ params }: { params: Params }) {
           progress={{ percent: pct }}
         />
 
+        {/* Для секций без подкатегорий (subsection=null) методичка
+            привязывается к slug секции — рендерится сразу под H1. */}
+        {!groups[0]?.subsection && (
+          <SubsectionDownloads sectionSlug={section.slug} />
+        )}
+
         <SubsectionNav
           anchors={groups
             .filter((g) => g.subsection)
