@@ -46,6 +46,26 @@ const REGISTRY: Record<string, MethodologyFiles> = {
     epub: "/methodology/ts-architecture.epub",
     hint: "LEARN IT FOR 7 DAYS",
   },
+  "rendering": {
+    pdf: "/methodology/react-rendering.pdf",
+    epub: "/methodology/react-rendering.epub",
+    hint: "LEARN IT FOR 7 DAYS",
+  },
+  "hooks": {
+    pdf: "/methodology/react-hooks.pdf",
+    epub: "/methodology/react-hooks.epub",
+    hint: "LEARN IT FOR 7 DAYS",
+  },
+  "effects": {
+    pdf: "/methodology/react-effects.pdf",
+    epub: "/methodology/react-effects.epub",
+    hint: "LEARN IT FOR 7 DAYS",
+  },
+  "react 18+ / concurrency": {
+    pdf: "/methodology/react-concurrency.pdf",
+    epub: "/methodology/react-concurrency.epub",
+    hint: "LEARN IT FOR 7 DAYS",
+  },
 };
 
 function normalize(s: string): string {
