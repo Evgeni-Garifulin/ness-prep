@@ -116,7 +116,7 @@ function SocialCard({ number, text, correctAnswer }: Props) {
   const hasAnswer = correctAnswer.trim().length > 0;
 
   return (
-    <article className="border border-foreground bg-card p-4 sm:p-6">
+    <article className="flex h-full flex-col border border-foreground bg-card p-4 sm:p-6">
       <header className="flex items-baseline gap-4">
         <div className="text-sm sm:text-base leading-snug font-medium tabular-nums shrink-0 min-w-[2ch] text-muted-foreground">
           {String(number).padStart(2, "0")}
@@ -126,7 +126,7 @@ function SocialCard({ number, text, correctAnswer }: Props) {
         </h3>
       </header>
 
-      <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-2">
+      <div className="mt-auto pt-5 flex flex-wrap items-center gap-x-5 gap-y-2">
         {hasAnswer ? (
           <button
             type="button"
@@ -229,7 +229,7 @@ function TechCard({
   const hasCorrect = correctAnswer.trim().length > 0;
 
   return (
-    <article className="border border-foreground bg-card p-4 sm:p-6">
+    <article className="flex h-full flex-col border border-foreground bg-card p-4 sm:p-6">
       <header className="flex items-baseline gap-4">
         <div className="text-sm sm:text-base leading-snug font-medium tabular-nums shrink-0 min-w-[2ch] text-muted-foreground">
           {String(number).padStart(2, "0")}
@@ -317,7 +317,7 @@ function TechCard({
       {showEasy && hasEasy && <Hint label="HINT A — LIGHT">{hintEasy}</Hint>}
       {showFull && hasFull && <Hint label="HINT B — FULL">{hintFull}</Hint>}
 
-      <div className="mt-5">
+      <div className="mt-auto pt-5">
         <label className="yzy-label text-muted-foreground block mb-2">
           YOUR ANSWER
         </label>
