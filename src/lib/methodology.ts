@@ -80,6 +80,11 @@ const REGISTRY: Record<string, MethodologyFiles> = {
     epub: "/methodology/react-architecture.epub",
     hint: "LEARN IT FOR 7 DAYS",
   },
+  "browser-apis-dom": {
+    pdf: "/methodology/browser-apis-dom.pdf",
+    epub: "/methodology/browser-apis-dom.epub",
+    hint: "LEARN IT FOR 7 DAYS",
+  },
 };
 
 function normalize(s: string): string {
