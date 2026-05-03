@@ -97,6 +97,154 @@ const REGISTRY: Record<string, MethodologyFiles> = {
     epub: "/methodology/perf-react.epub",
     hint: "LEARN IT FOR 7 DAYS",
   },
+
+  // Real-time / WebSocket
+  "realtime-websocket": {
+    pdf: "/methodology/realtime-websocket.pdf",
+    epub: "/methodology/realtime-websocket.epub",
+    hint: "LEARN IT FOR 7 DAYS",
+  },
+
+  // Accessibility
+  accessibility: {
+    pdf: "/methodology/accessibility.pdf",
+    epub: "/methodology/accessibility.epub",
+    hint: "LEARN IT FOR 7 DAYS",
+  },
+
+  // Forms / Validation
+  "forms-validation": {
+    pdf: "/methodology/forms-validation.pdf",
+    epub: "/methodology/forms-validation.epub",
+    hint: "LEARN IT FOR 7 DAYS",
+  },
+
+  // Design System
+  "design-system": {
+    pdf: "/methodology/design-system.pdf",
+    epub: "/methodology/design-system.epub",
+    hint: "LEARN IT FOR 7 DAYS",
+  },
+
+  // Security
+  security: {
+    pdf: "/methodology/security.pdf",
+    epub: "/methodology/security.epub",
+    hint: "LEARN IT FOR 7 DAYS",
+  },
+
+  // API / GraphQL
+  "api-graphql": {
+    pdf: "/methodology/api-graphql.pdf",
+    epub: "/methodology/api-graphql.epub",
+    hint: "LEARN IT FOR 7 DAYS",
+  },
+
+  // Testing — две подкатегории
+  "unit / integration": {
+    pdf: "/methodology/testing-unit.pdf",
+    epub: "/methodology/testing-unit.epub",
+    hint: "LEARN IT FOR 7 DAYS",
+  },
+  "e2e / playwright": {
+    pdf: "/methodology/testing-e2e.pdf",
+    epub: "/methodology/testing-e2e.epub",
+    hint: "LEARN IT FOR 7 DAYS",
+  },
+
+  // Build tools
+  "build-tools": {
+    pdf: "/methodology/build-tools.pdf",
+    epub: "/methodology/build-tools.epub",
+    hint: "LEARN IT FOR 7 DAYS",
+  },
+
+  // Micro-frontends / Monorepo
+  "microfrontends-monorepo": {
+    pdf: "/methodology/microfrontends-monorepo.pdf",
+    epub: "/methodology/microfrontends-monorepo.epub",
+    hint: "LEARN IT FOR 7 DAYS",
+  },
+
+  // CI/CD / Delivery
+  "cicd-delivery": {
+    pdf: "/methodology/cicd-delivery.pdf",
+    epub: "/methodology/cicd-delivery.epub",
+    hint: "LEARN IT FOR 7 DAYS",
+  },
+
+  // Observability
+  observability: {
+    pdf: "/methodology/observability.pdf",
+    epub: "/methodology/observability.epub",
+    hint: "LEARN IT FOR 7 DAYS",
+  },
+
+  // Code review (теория)
+  "code-review": {
+    pdf: "/methodology/code-review.pdf",
+    epub: "/methodology/code-review.epub",
+    hint: "LEARN IT FOR 7 DAYS",
+  },
+
+  // System design
+  "system-design": {
+    pdf: "/methodology/system-design.pdf",
+    epub: "/methodology/system-design.epub",
+    hint: "LEARN IT FOR 7 DAYS",
+  },
+
+  // Live-coding — три подкатегории
+  "javascript / algorithms": {
+    pdf: "/methodology/live-coding-js.pdf",
+    epub: "/methodology/live-coding-js.epub",
+    hint: "LEARN IT FOR 7 DAYS",
+  },
+  typescript: {
+    pdf: "/methodology/live-coding-ts.pdf",
+    epub: "/methodology/live-coding-ts.epub",
+    hint: "LEARN IT FOR 7 DAYS",
+  },
+  react: {
+    pdf: "/methodology/live-coding-react.pdf",
+    epub: "/methodology/live-coding-react.epub",
+    hint: "LEARN IT FOR 7 DAYS",
+  },
+
+  // Take-home
+  "take-home": {
+    pdf: "/methodology/take-home.pdf",
+    epub: "/methodology/take-home.epub",
+    hint: "LEARN IT FOR 7 DAYS",
+  },
+
+  // Debugging
+  debugging: {
+    pdf: "/methodology/debugging.pdf",
+    epub: "/methodology/debugging.epub",
+    hint: "LEARN IT FOR 7 DAYS",
+  },
+
+  // Code-review tasks (практика)
+  "code-review-tasks": {
+    pdf: "/methodology/code-review-tasks.pdf",
+    epub: "/methodology/code-review-tasks.epub",
+    hint: "LEARN IT FOR 7 DAYS",
+  },
+
+  // Fintech scenarios
+  "fintech-scenarios": {
+    pdf: "/methodology/fintech-scenarios.pdf",
+    epub: "/methodology/fintech-scenarios.epub",
+    hint: "LEARN IT FOR 7 DAYS",
+  },
+
+  // Must-have blitz
+  "must-have-blitz": {
+    pdf: "/methodology/must-have-blitz.pdf",
+    epub: "/methodology/must-have-blitz.epub",
+    hint: "LEARN IT FOR 7 DAYS",
+  },
 };
 
 function normalize(s: string): string {
