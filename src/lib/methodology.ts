@@ -10,6 +10,9 @@ export type MethodologyFiles = {
   pdf: string;
   epub: string;
   hint?: string;
+  // Если задан — на странице рендерится кнопка REMINDER, которая
+  // скачивает .ics календарь на 7 дней по плану из data/methodology-plans.json.
+  planSlug?: string;
 };
 
 const REGISTRY: Record<string, MethodologyFiles> = {
@@ -18,16 +21,19 @@ const REGISTRY: Record<string, MethodologyFiles> = {
     pdf: "/methodology/event-loop-async.pdf",
     epub: "/methodology/event-loop-async.epub",
     hint: "LEARN IT FOR 7 DAYS",
+    planSlug: "event-loop-async",
   },
   "closures / scope / memory": {
     pdf: "/methodology/closures-scope-memory.pdf",
     epub: "/methodology/closures-scope-memory.epub",
     hint: "LEARN IT FOR 7 DAYS",
+    planSlug: "closures-scope-memory",
   },
   "prototypes / objects / classes": {
     pdf: "/methodology/prototypes-objects-classes.pdf",
     epub: "/methodology/prototypes-objects-classes.epub",
     hint: "LEARN IT FOR 7 DAYS",
+    planSlug: "prototypes-objects-classes",
   },
 
   // TypeScript

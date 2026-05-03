@@ -1,0 +1,5954 @@
+{
+  "event-loop-async": {
+    "section": "JAVASCRIPT FUNDAMENTALS",
+    "topic": "EVENT LOOP / ASYNC",
+    "subtitle": "20 ВОПРОСОВ    7 ДНЕЙ    КОНСПЕКТ ЛЕКЦИЙ",
+    "days": [
+      {
+        "day": "ДЕНЬ 1",
+        "title": "БАЗА EVENT LOOP    SETTIMEOUT    ОШИБКИ В ASYNC",
+        "lvl": "YZY LVL",
+        "questions": [
+          {
+            "id": 1,
+            "text": "Что такое event loop?"
+          },
+          {
+            "id": 19,
+            "text": "Почему setTimeout(fn, 0) не выполняется сразу?"
+          },
+          {
+            "id": 20,
+            "text": "Что произойдёт при ошибке внутри async-функции без try/catch?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 2",
+        "title": "МИКРО vs МАКРО    PAINT    БЛОКИРОВКА UI",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 2,
+            "text": "Чем task отличается от microtask?"
+          },
+          {
+            "id": 4,
+            "text": "Когда браузер получает шанс на paint?"
+          },
+          {
+            "id": 5,
+            "text": "Почему бесконечная microtask queue может заблокировать UI?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 3",
+        "title": "ПАЗЛ ПОРЯДКА    setTimeout / Promise.then / queueMicrotask / rAF",
+        "lvl": "HRD LVL",
+        "questions": [
+          {
+            "id": 3,
+            "text": "В каком порядке выполнятся setTimeout, Promise.then, queueMicrotask, requestAnimationFrame?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 4",
+        "title": "PROMISE API    AWAIT В ЦИКЛЕ    PARALLEL vs SEQUENTIAL",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 6,
+            "text": "Чем Promise.all, Promise.allSettled, Promise.race, Promise.any отличаются друг от друга?"
+          },
+          {
+            "id": 11,
+            "text": "Что происходит при await внутри цикла?"
+          },
+          {
+            "id": 12,
+            "text": "Когда лучше использовать parallel execution, а когда sequential?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 5",
+        "title": "RACE CONDITION    STALE RESPONSE В REACT",
+        "lvl": "HRD LVL",
+        "questions": [
+          {
+            "id": 9,
+            "text": "Что такое race condition в async-коде?"
+          },
+          {
+            "id": 10,
+            "text": "Как защититься от stale response в React-компоненте?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 6",
+        "title": "ПРАКТИКА    RETRY + BACKOFF    ABORT FETCH    CONCURRENCY",
+        "lvl": "HRD LVL",
+        "questions": [
+          {
+            "id": 7,
+            "text": "Как реализовать retry с backoff?"
+          },
+          {
+            "id": 8,
+            "text": "Как отменить fetch-запрос?"
+          },
+          {
+            "id": 13,
+            "text": "Как ограничить concurrency для пачки async-задач?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 7",
+        "title": "DEBOUNCE / THROTTLE    rAF / rIC    STARVATION",
+        "lvl": "YZY LVL",
+        "questions": [
+          {
+            "id": 14,
+            "text": "Что такое debounce и throttle?"
+          },
+          {
+            "id": 15,
+            "text": "Чем debounce отличается от throttle?"
+          },
+          {
+            "id": 16,
+            "text": "Где лучше использовать requestAnimationFrame?"
+          },
+          {
+            "id": 17,
+            "text": "Где лучше использовать requestIdleCallback?"
+          },
+          {
+            "id": 18,
+            "text": "Что такое starvation в контексте event loop?"
+          }
+        ]
+      }
+    ]
+  },
+  "closures-scope-memory": {
+    "section": "JAVASCRIPT FUNDAMENTALS",
+    "topic": "CLOSURES / SCOPE / MEMORY",
+    "subtitle": "20 ВОПРОСОВ    7 ДНЕЙ    КОНСПЕКТ ЛЕКЦИЙ",
+    "days": [
+      {
+        "day": "ДЕНЬ 1",
+        "title": "БАЗА    CLOSURE    LEXICAL SCOPE    var / let / const",
+        "lvl": "YZY LVL",
+        "questions": [
+          {
+            "id": 1,
+            "text": "Что такое closure?"
+          },
+          {
+            "id": 6,
+            "text": "Как работают lexical scope и scope chain?"
+          },
+          {
+            "id": 7,
+            "text": "Чем var, let, const отличаются с точки зрения scope?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 2",
+        "title": "STALE CLOSURE    БАГИ ЗАМЫКАНИЙ",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 2,
+            "text": "Где closures приводят к багам?"
+          },
+          {
+            "id": 3,
+            "text": "Что такое stale closure?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 3",
+        "title": "STALE CLOSURE В REACT HOOKS    ОБРАБОТЧИКИ СОБЫТИЙ",
+        "lvl": "HRD LVL",
+        "questions": [
+          {
+            "id": 4,
+            "text": "Почему stale closure часто возникает в React hooks?"
+          },
+          {
+            "id": 5,
+            "text": "Как избежать stale closure в обработчиках событий?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 4",
+        "title": "ПАМЯТЬ    GC    MEMORY LEAK",
+        "lvl": "HRD LVL",
+        "questions": [
+          {
+            "id": 9,
+            "text": "Как closures могут удерживать память?"
+          },
+          {
+            "id": 10,
+            "text": "Как найти memory leak в JavaScript?"
+          },
+          {
+            "id": 11,
+            "text": "Что может помешать garbage collection?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 5",
+        "title": "TDZ    СРАВНЕНИЕ ОБЪЕКТОВ    REFERENTIAL EQUALITY",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 8,
+            "text": "Что такое temporal dead zone?"
+          },
+          {
+            "id": 15,
+            "text": "Как сравнивать объекты?"
+          },
+          {
+            "id": 16,
+            "text": "Что такое referential equality?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 6",
+        "title": "КОПИРОВАНИЕ    SHALLOW vs DEEP    structuredClone",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 12,
+            "text": "Чем shallow copy отличается от deep copy?"
+          },
+          {
+            "id": 13,
+            "text": "Что такое structured cloning?"
+          },
+          {
+            "id": 14,
+            "text": "Какие проблемы есть у JSON.parse(JSON.stringify(obj))?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 7",
+        "title": "ИММУТАБЕЛЬНОСТЬ    REACT    Map / WeakMap",
+        "lvl": "YZY LVL",
+        "questions": [
+          {
+            "id": 17,
+            "text": "Почему мутация объекта может сломать React-rendering?"
+          },
+          {
+            "id": 18,
+            "text": "Что такое immutability и зачем она нужна?"
+          },
+          {
+            "id": 19,
+            "text": "Как работает WeakMap?"
+          },
+          {
+            "id": 20,
+            "text": "Когда использовать Map, а когда обычный object?"
+          }
+        ]
+      }
+    ]
+  },
+  "prototypes-objects-classes": {
+    "section": "JAVASCRIPT FUNDAMENTALS",
+    "topic": "PROTOTYPES / OBJECTS / CLASSES",
+    "subtitle": "20 ВОПРОСОВ    7 ДНЕЙ    КОНСПЕКТ ЛЕКЦИЙ",
+    "days": [
+      {
+        "day": "ДЕНЬ 1",
+        "title": "ПРОТОТИПЫ    new    Object.create / assign / freeze",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 1,
+            "text": "Что такое prototype chain?"
+          },
+          {
+            "id": 5,
+            "text": "Как работает new?"
+          },
+          {
+            "id": 9,
+            "text": "Что делают Object.create, Object.assign, Object.freeze?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 2",
+        "title": "this    ARROW vs REGULAR    call / apply / bind",
+        "lvl": "HRD LVL",
+        "questions": [
+          {
+            "id": 2,
+            "text": "Как работает this?"
+          },
+          {
+            "id": 3,
+            "text": "Чем arrow function отличается от обычной функции?"
+          },
+          {
+            "id": 4,
+            "text": "Что делают call, apply, bind?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 3",
+        "title": "КЛАССЫ В JS    PRIVATE FIELDS",
+        "lvl": "HRD LVL",
+        "questions": [
+          {
+            "id": 6,
+            "text": "Чем class в JS отличается от class в классических OOP-языках?"
+          },
+          {
+            "id": 20,
+            "text": "Что такое private fields в class?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 4",
+        "title": "PROPERTY DESCRIPTORS    ENUMERABLE",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 7,
+            "text": "Что такое property descriptor?"
+          },
+          {
+            "id": 8,
+            "text": "Чем enumerable property отличается от non-enumerable?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 5",
+        "title": "РАВЕНСТВО    COERCION    NUMBER / NaN / Infinity",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 10,
+            "text": "Чем == отличается от ===?"
+          },
+          {
+            "id": 11,
+            "text": "Что такое coercion?"
+          },
+          {
+            "id": 12,
+            "text": "Какие edge cases есть у Number, NaN, Infinity?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 6",
+        "title": "OPTIONAL CHAINING    NULLISH    || vs ??",
+        "lvl": "YZY LVL",
+        "questions": [
+          {
+            "id": 13,
+            "text": "Что такое optional chaining?"
+          },
+          {
+            "id": 14,
+            "text": "Что такое nullish coalescing?"
+          },
+          {
+            "id": 15,
+            "text": "Чем || отличается от ??"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 7",
+        "title": "ITERABLE / ITERATOR    GENERATORS    SYMBOLS",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 16,
+            "text": "Что такое iterable и iterator?"
+          },
+          {
+            "id": 17,
+            "text": "Как работает generator?"
+          },
+          {
+            "id": 18,
+            "text": "Что такое symbol?"
+          },
+          {
+            "id": 19,
+            "text": "Где используются symbols?"
+          }
+        ]
+      }
+    ]
+  },
+  "ts-basics-types": {
+    "section": "TYPESCRIPT",
+    "topic": "BASICS / TYPES",
+    "subtitle": "20 ВОПРОСОВ    7 ДНЕЙ    КОНСПЕКТ ЛЕКЦИЙ",
+    "days": [
+      {
+        "day": "ДЕНЬ 1",
+        "title": "TYPE vs INTERFACE    LITERAL TYPES",
+        "lvl": "YZY LVL",
+        "questions": [
+          {
+            "id": 1,
+            "text": "Чем type отличается от interface?"
+          },
+          {
+            "id": 2,
+            "text": "Когда использовать interface, а когда type?"
+          },
+          {
+            "id": 5,
+            "text": "Что такое literal types?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 2",
+        "title": "UNION    INTERSECTION    DISCRIMINATED UNION",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 3,
+            "text": "Что такое union type?"
+          },
+          {
+            "id": 4,
+            "text": "Что такое intersection type?"
+          },
+          {
+            "id": 6,
+            "text": "Что такое discriminated union?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 3",
+        "title": "NARROWING    typeof / in / instanceof    TYPE GUARD",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 8,
+            "text": "Что такое narrowing?"
+          },
+          {
+            "id": 9,
+            "text": "Как работают typeof, in, instanceof narrowing?"
+          },
+          {
+            "id": 10,
+            "text": "Что такое user-defined type guard?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 4",
+        "title": "unknown vs any    never vs void",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 12,
+            "text": "Чем unknown отличается от any?"
+          },
+          {
+            "id": 14,
+            "text": "Чем never отличается от void?"
+          },
+          {
+            "id": 15,
+            "text": "Где используется never?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 5",
+        "title": "ASSERTION FUNCTION    EXHAUSTIVE CHECK",
+        "lvl": "HRD LVL",
+        "questions": [
+          {
+            "id": 11,
+            "text": "Что такое assertion function?"
+          },
+          {
+            "id": 16,
+            "text": "Что такое exhaustive check?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 6",
+        "title": "IMPOSSIBLE STATES    КОГДА any    OPTIONAL",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 7,
+            "text": "Как сделать impossible states unrepresentable?"
+          },
+          {
+            "id": 13,
+            "text": "Когда допустимо использовать any?"
+          },
+          {
+            "id": 17,
+            "text": "Что такое optional property?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 7",
+        "title": "INDEXED ACCESS    MAPPED    CONDITIONAL",
+        "lvl": "HRD LVL",
+        "questions": [
+          {
+            "id": 18,
+            "text": "Что такое indexed access type?"
+          },
+          {
+            "id": 19,
+            "text": "Что такое mapped type?"
+          },
+          {
+            "id": 20,
+            "text": "Что такое conditional type?"
+          }
+        ]
+      }
+    ]
+  },
+  "ts-generics-advanced": {
+    "section": "TYPESCRIPT",
+    "topic": "GENERICS / ADVANCED TS",
+    "subtitle": "25 ВОПРОСОВ    7 ДНЕЙ    КОНСПЕКТ ЛЕКЦИЙ",
+    "days": [
+      {
+        "day": "ДЕНЬ 1",
+        "title": "БАЗА GENERICS    extends    DEFAULT",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 1,
+            "text": "Что такое generic?"
+          },
+          {
+            "id": 2,
+            "text": "Как ограничить generic через extends?"
+          },
+          {
+            "id": 3,
+            "text": "Как сделать generic function type-safe?"
+          },
+          {
+            "id": 4,
+            "text": "Что такое generic default parameter?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 2",
+        "title": "keyof    typeof    infer",
+        "lvl": "HRD LVL",
+        "questions": [
+          {
+            "id": 5,
+            "text": "Что такое keyof?"
+          },
+          {
+            "id": 6,
+            "text": "Что такое typeof в type context?"
+          },
+          {
+            "id": 7,
+            "text": "Что делает infer?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 3",
+        "title": "DISTRIBUTIVE    UTILITY TYPES",
+        "lvl": "HRD LVL",
+        "questions": [
+          {
+            "id": 8,
+            "text": "Как работает distributive conditional type?"
+          },
+          {
+            "id": 9,
+            "text": "Что такое utility types?"
+          },
+          {
+            "id": 10,
+            "text": "Как работают Pick, Omit, Partial, Required, Record, Readonly, ReturnType, Parameters?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 4",
+        "title": "API RESPONSE    ERROR    ASYNC    FORM",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 11,
+            "text": "Как типизировать API response?"
+          },
+          {
+            "id": 12,
+            "text": "Как типизировать error response?"
+          },
+          {
+            "id": 13,
+            "text": "Как типизировать async state?"
+          },
+          {
+            "id": 14,
+            "text": "Как типизировать form state?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 5",
+        "title": "REACT    POLYMORPHIC    TABLE    HANDLER    HOOK",
+        "lvl": "HRD LVL",
+        "questions": [
+          {
+            "id": 15,
+            "text": "Как типизировать polymorphic React component?"
+          },
+          {
+            "id": 16,
+            "text": "Как типизировать generic table component?"
+          },
+          {
+            "id": 17,
+            "text": "Как типизировать event handler в React?"
+          },
+          {
+            "id": 18,
+            "text": "Как типизировать custom hook?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 6",
+        "title": "EXTERNAL STORE    WS    FEATURE FLAGS",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 19,
+            "text": "Как типизировать external store?"
+          },
+          {
+            "id": 20,
+            "text": "Как типизировать WebSocket message protocol?"
+          },
+          {
+            "id": 21,
+            "text": "Как типизировать feature flags?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 7",
+        "title": "PERMISSIONS    ROUTES    STATE MACHINE    KEEP IT SIMPLE",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 22,
+            "text": "Как типизировать permissions model?"
+          },
+          {
+            "id": 23,
+            "text": "Как типизировать route params?"
+          },
+          {
+            "id": 24,
+            "text": "Как типизировать state machine?"
+          },
+          {
+            "id": 25,
+            "text": "Как не переусложнить типы?"
+          }
+        ]
+      }
+    ]
+  },
+  "ts-architecture": {
+    "section": "TYPESCRIPT",
+    "topic": "TS ARCHITECTURE",
+    "subtitle": "15 ВОПРОСОВ    7 ДНЕЙ    КОНСПЕКТ ЛЕКЦИЙ",
+    "days": [
+      {
+        "day": "ДЕНЬ 1",
+        "title": "SHARED TYPES    DTO    ДУБЛИРОВАНИЕ",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 1,
+            "text": "Где должны жить shared types?"
+          },
+          {
+            "id": 3,
+            "text": "Как избежать дублирования DTO?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 2",
+        "title": "СИНХРОНИЗАЦИЯ FE / BE",
+        "lvl": "HRD LVL",
+        "questions": [
+          {
+            "id": 2,
+            "text": "Как синхронизировать типы frontend и backend?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 3",
+        "title": "RUNTIME ВАЛИДАЦИЯ    Zod / Valibot / io-ts",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 4,
+            "text": "Как валидировать runtime данные, если TypeScript исчезает после компиляции?"
+          },
+          {
+            "id": 5,
+            "text": "Когда нужен Zod / Valibot / io-ts?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 4",
+        "title": "DOMAIN vs API MODEL",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 6,
+            "text": "Как отличать domain model от API model?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 5",
+        "title": "МИГРАЦИИ    Flow → TS    STRICT MODE",
+        "lvl": "HRD LVL",
+        "questions": [
+          {
+            "id": 7,
+            "text": "Как организовать migration с Flow на TypeScript?"
+          },
+          {
+            "id": 8,
+            "text": "Как вводить strict mode в большом проекте?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 6",
+        "title": "as    REVIEW    ЧТО ТАКОЕ ПЛОХОЙ TS",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 9,
+            "text": "Как бороться с `as` по всему проекту?"
+          },
+          {
+            "id": 10,
+            "text": "Как ревьюить TypeScript-код?"
+          },
+          {
+            "id": 11,
+            "text": "Какой TS-код ты считаешь плохим?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 7",
+        "title": "BACKWARD-COMPAT    LEGACY    STRICTNESS    REFACTOR",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 12,
+            "text": "Как проектировать типы для backwards-compatible API?"
+          },
+          {
+            "id": 13,
+            "text": "Как типизировать legacy code?"
+          },
+          {
+            "id": 14,
+            "text": "Какой уровень strictness ты считаешь must-have?"
+          },
+          {
+            "id": 15,
+            "text": "Как TS помогает в refactoring?"
+          }
+        ]
+      }
+    ]
+  },
+  "react-rendering": {
+    "section": "REACT CORE",
+    "topic": "RENDERING",
+    "subtitle": "20 ВОПРОСОВ    7 ДНЕЙ    КОНСПЕКТ ЛЕКЦИЙ",
+    "days": [
+      {
+        "day": "ДЕНЬ 1",
+        "title": "ФАЗЫ    RENDER vs COMMIT    PURE",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 1,
+            "text": "Что такое render phase?"
+          },
+          {
+            "id": 2,
+            "text": "Что такое commit phase?"
+          },
+          {
+            "id": 3,
+            "text": "Почему render должен быть pure?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 2",
+        "title": "ЧТО ВЫЗЫВАЕТ RE-RENDER",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 4,
+            "text": "Что может произойти, если делать side effects во время render?"
+          },
+          {
+            "id": 5,
+            "text": "Что вызывает re-render компонента?"
+          },
+          {
+            "id": 6,
+            "text": "Почему parent re-render может вызвать child re-render?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 3",
+        "title": "RECONCILIATION    KEYS    INDEX-AS-KEY",
+        "lvl": "HRD LVL",
+        "questions": [
+          {
+            "id": 7,
+            "text": "Как работает reconciliation?"
+          },
+          {
+            "id": 8,
+            "text": "Зачем нужны keys?"
+          },
+          {
+            "id": 9,
+            "text": "Почему index как key может быть проблемой?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 4",
+        "title": "CONTROLLED vs UNCONTROLLED INPUTS",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 10,
+            "text": "Что такое controlled component?"
+          },
+          {
+            "id": 11,
+            "text": "Что такое uncontrolled component?"
+          },
+          {
+            "id": 12,
+            "text": "Когда использовать controlled input?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 5",
+        "title": "BATCHING    AUTOMATIC BATCHING",
+        "lvl": "YZY LVL",
+        "questions": [
+          {
+            "id": 13,
+            "text": "Что такое batching?"
+          },
+          {
+            "id": 14,
+            "text": "Как работает automatic batching?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 6",
+        "title": "CONCURRENT RENDERING",
+        "lvl": "HRD LVL",
+        "questions": [
+          {
+            "id": 15,
+            "text": "Что такое concurrent rendering?"
+          },
+          {
+            "id": 16,
+            "text": "Какие проблемы решает concurrent rendering?"
+          },
+          {
+            "id": 17,
+            "text": "Почему React может прерывать rendering?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 7",
+        "title": "HYDRATION    MISMATCH    DEBUG RE-RENDERS",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 18,
+            "text": "Что такое hydration?"
+          },
+          {
+            "id": 19,
+            "text": "Какие бывают hydration mismatches?"
+          },
+          {
+            "id": 20,
+            "text": "Как отлаживать лишние re-render'ы?"
+          }
+        ]
+      }
+    ]
+  },
+  "react-hooks": {
+    "section": "REACT CORE",
+    "topic": "HOOKS",
+    "subtitle": "20 ВОПРОСОВ    7 ДНЕЙ    КОНСПЕКТ ЛЕКЦИЙ",
+    "days": [
+      {
+        "day": "ДЕНЬ 1",
+        "title": "ПРАВИЛА ХУКОВ    УСЛОВНЫЕ ВЫЗОВЫ",
+        "lvl": "YZY LVL",
+        "questions": [
+          {
+            "id": 1,
+            "text": "Какие правила hooks?"
+          },
+          {
+            "id": 2,
+            "text": "Почему hooks нельзя вызывать условно?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 2",
+        "title": "useState    useReducer",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 3,
+            "text": "Когда нужен useState?"
+          },
+          {
+            "id": 4,
+            "text": "Когда нужен useReducer?"
+          },
+          {
+            "id": 5,
+            "text": "Когда useReducer лучше useState?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 3",
+        "title": "useRef    REF vs STATE",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 6,
+            "text": "Когда нужен useRef?"
+          },
+          {
+            "id": 7,
+            "text": "Чем изменение ref отличается от state update?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 4",
+        "title": "useMemo    useCallback    React.memo — ЗАЧЕМ",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 8,
+            "text": "Когда нужен useMemo?"
+          },
+          {
+            "id": 10,
+            "text": "Когда нужен useCallback?"
+          },
+          {
+            "id": 12,
+            "text": "Когда нужен React.memo?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 5",
+        "title": "КОГДА МЕМО ВРЕДЕН    БЕСПОЛЕЗЕН    НЕ ДЕФОЛТ",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 9,
+            "text": "Когда useMemo вреден?"
+          },
+          {
+            "id": 11,
+            "text": "Когда useCallback бесполезен?"
+          },
+          {
+            "id": 13,
+            "text": "Почему memoization не должна быть дефолтной реакцией на performance-проблемы?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 6",
+        "title": "STALE CLOSURE    FUNCTIONAL UPDATE",
+        "lvl": "HRD LVL",
+        "questions": [
+          {
+            "id": 14,
+            "text": "Что такое stale closure в hook?"
+          },
+          {
+            "id": 15,
+            "text": "Как избежать stale state update?"
+          },
+          {
+            "id": 16,
+            "text": "Когда использовать functional state update?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 7",
+        "title": "CUSTOM HOOKS    ТЕСТ    HIDDEN GLOBAL",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 17,
+            "text": "Как проектировать custom hooks?"
+          },
+          {
+            "id": 18,
+            "text": "Что должно быть внутри custom hook, а что снаружи?"
+          },
+          {
+            "id": 19,
+            "text": "Как тестировать custom hook?"
+          },
+          {
+            "id": 20,
+            "text": "Как не превратить custom hook в hidden global state?"
+          }
+        ]
+      }
+    ]
+  },
+  "react-effects": {
+    "section": "REACT CORE",
+    "topic": "EFFECTS",
+    "subtitle": "20 ВОПРОСОВ    7 ДНЕЙ    КОНСПЕКТ ЛЕКЦИЙ",
+    "days": [
+      {
+        "day": "ДЕНЬ 1",
+        "title": "ЗАЧЕМ useEffect    КОГДА НЕ НУЖЕН    SYNCHRONIZE",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 1,
+            "text": "Для чего нужен useEffect?"
+          },
+          {
+            "id": 2,
+            "text": "Когда useEffect не нужен?"
+          },
+          {
+            "id": 3,
+            "text": "Что значит \"synchronize with external system\"?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 2",
+        "title": "DERIVED STATE — АНТИПАТТЕРН",
+        "lvl": "YZY LVL",
+        "questions": [
+          {
+            "id": 4,
+            "text": "Почему derived state через effect часто плохой паттерн?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 3",
+        "title": "DEPENDENCIES    EXHAUSTIVE-DEPS    ОСОЗНАННОЕ УБРАТЬ",
+        "lvl": "HRD LVL",
+        "questions": [
+          {
+            "id": 5,
+            "text": "Как правильно указывать dependencies?"
+          },
+          {
+            "id": 6,
+            "text": "Почему ESLint exhaustive-deps важен?"
+          },
+          {
+            "id": 7,
+            "text": "Когда можно осознанно убрать dependency?"
+          },
+          {
+            "id": 8,
+            "text": "Что делать, если dependency постоянно меняется?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 4",
+        "title": "INFINITE LOOP    CLEANUP",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 9,
+            "text": "Как избежать infinite effect loop?"
+          },
+          {
+            "id": 10,
+            "text": "Как правильно делать cleanup?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 5",
+        "title": "ASYNC В EFFECT    RACE CONDITION",
+        "lvl": "HRD LVL",
+        "questions": [
+          {
+            "id": 11,
+            "text": "Как отменять async work в effect?"
+          },
+          {
+            "id": 12,
+            "text": "Как избежать race condition в effect?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 6",
+        "title": "useLayoutEffect    STRICT MODE    IDEMPOTENT",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 13,
+            "text": "Когда нужен useLayoutEffect?"
+          },
+          {
+            "id": 14,
+            "text": "Чем useLayoutEffect отличается от useEffect?"
+          },
+          {
+            "id": 15,
+            "text": "Что происходит с effects в Strict Mode?"
+          },
+          {
+            "id": 16,
+            "text": "Почему effect может выполниться дважды в dev?"
+          },
+          {
+            "id": 17,
+            "text": "Как писать idempotent effects?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 7",
+        "title": "SUBSCRIPTIONS    TIMERS    DOM LISTENERS",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 18,
+            "text": "Как работать с subscriptions?"
+          },
+          {
+            "id": 19,
+            "text": "Как работать с timers?"
+          },
+          {
+            "id": 20,
+            "text": "Как работать с DOM listeners?"
+          }
+        ]
+      }
+    ]
+  },
+  "react-concurrency": {
+    "section": "REACT CORE",
+    "topic": "REACT 18+ / CONCURRENCY",
+    "subtitle": "20 ВОПРОСОВ    7 ДНЕЙ    КОНСПЕКТ ЛЕКЦИЙ",
+    "days": [
+      {
+        "day": "ДЕНЬ 1",
+        "title": "useTransition    URGENT vs TRANSITION",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 1,
+            "text": "Что такое useTransition?"
+          },
+          {
+            "id": 2,
+            "text": "Когда использовать startTransition?"
+          },
+          {
+            "id": 3,
+            "text": "Чем urgent update отличается от transition update?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 2",
+        "title": "useDeferredValue    vs DEBOUNCE    vs useTransition",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 4,
+            "text": "Что такое useDeferredValue?"
+          },
+          {
+            "id": 5,
+            "text": "Чем useDeferredValue отличается от debounce?"
+          },
+          {
+            "id": 6,
+            "text": "Чем useDeferredValue отличается от useTransition?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 3",
+        "title": "SUSPENSE    ЗАЧЕМ    РИСКИ",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 7,
+            "text": "Когда использовать Suspense?"
+          },
+          {
+            "id": 8,
+            "text": "Какие проблемы решает Suspense?"
+          },
+          {
+            "id": 9,
+            "text": "Какие риски у Suspense?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 4",
+        "title": "useSyncExternalStore    EXTERNAL STORES",
+        "lvl": "HRD LVL",
+        "questions": [
+          {
+            "id": 10,
+            "text": "Что такое useSyncExternalStore?"
+          },
+          {
+            "id": 11,
+            "text": "Когда нужен useSyncExternalStore?"
+          },
+          {
+            "id": 12,
+            "text": "Почему external store нельзя просто читать из module variable?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 5",
+        "title": "CONCURRENT-COMPATIBLE STORE    STRICT MODE",
+        "lvl": "HRD LVL",
+        "questions": [
+          {
+            "id": 13,
+            "text": "Как сделать store compatible with concurrent rendering?"
+          },
+          {
+            "id": 14,
+            "text": "Как React Strict Mode помогает находить проблемы?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 6",
+        "title": "TEARING    SUBSCRIPTION-BASED STATE",
+        "lvl": "HRD LVL",
+        "questions": [
+          {
+            "id": 15,
+            "text": "Что такое tearing?"
+          },
+          {
+            "id": 16,
+            "text": "Как избежать tearing?"
+          },
+          {
+            "id": 17,
+            "text": "Как проектировать subscription-based state?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 7",
+        "title": "EFFECTS + CONCURRENCY    ЧТО НЕ РЕШАЕТ    OVERKILL",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 18,
+            "text": "Как concurrent rendering влияет на side effects?"
+          },
+          {
+            "id": 19,
+            "text": "Какие performance-проблемы не решаются concurrency APIs?"
+          },
+          {
+            "id": 20,
+            "text": "Когда concurrency API будет overkill?"
+          }
+        ]
+      }
+    ]
+  },
+  "state-management": {
+    "section": "STATE MANAGEMENT",
+    "topic": "STATE MANAGEMENT",
+    "subtitle": "35 ВОПРОСОВ    7 ДНЕЙ    КОНСПЕКТ ЛЕКЦИЙ",
+    "days": [
+      {
+        "day": "ДЕНЬ 1",
+        "title": "LOCAL    CONTEXT    ОПТИМИЗАЦИЯ CONTEXT",
+        "lvl": "YZY LVL",
+        "questions": [
+          {
+            "id": 1,
+            "text": "Когда достаточно local state?"
+          },
+          {
+            "id": 2,
+            "text": "Когда нужен Context?"
+          },
+          {
+            "id": 3,
+            "text": "Почему Context не всегда state management?"
+          },
+          {
+            "id": 4,
+            "text": "Какие проблемы производительности может вызвать Context?"
+          },
+          {
+            "id": 5,
+            "text": "Как оптимизировать Context?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 2",
+        "title": "ВЫБОР    REDUX vs ZUSTAND vs MOBX vs XSTATE",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 6,
+            "text": "Когда нужен Redux?"
+          },
+          {
+            "id": 7,
+            "text": "Когда Redux будет overkill?"
+          },
+          {
+            "id": 8,
+            "text": "Когда выбрать Zustand?"
+          },
+          {
+            "id": 9,
+            "text": "Когда выбрать MobX?"
+          },
+          {
+            "id": 10,
+            "text": "Когда выбрать XState?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 3",
+        "title": "SERVER STATE    REACT QUERY",
+        "lvl": "HRD LVL",
+        "questions": [
+          {
+            "id": 11,
+            "text": "Когда выбрать React Query / TanStack Query?"
+          },
+          {
+            "id": 12,
+            "text": "Чем server state отличается от client state?"
+          },
+          {
+            "id": 13,
+            "text": "Почему server state не стоит класть в Redux без необходимости?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 4",
+        "title": "BOUNDARIES    URL / STORAGE / MEMORY    TABS",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 14,
+            "text": "Как проектировать state boundaries?"
+          },
+          {
+            "id": 15,
+            "text": "Что должно жить в URL?"
+          },
+          {
+            "id": 16,
+            "text": "Что должно жить в localStorage/sessionStorage?"
+          },
+          {
+            "id": 17,
+            "text": "Что должно жить в memory state?"
+          },
+          {
+            "id": 18,
+            "text": "Как синхронизировать tabs?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 5",
+        "title": "OPTIMISTIC    ROLLBACK    STALE    INVALIDATION",
+        "lvl": "HRD LVL",
+        "questions": [
+          {
+            "id": 19,
+            "text": "Как работать с optimistic updates?"
+          },
+          {
+            "id": 20,
+            "text": "Как откатывать optimistic update?"
+          },
+          {
+            "id": 21,
+            "text": "Как обрабатывать stale data?"
+          },
+          {
+            "id": 22,
+            "text": "Как инвалидировать cache?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 6",
+        "title": "NORMALIZATION    DERIVED    DUPLICATED    ASYNC FSM",
+        "lvl": "HRD LVL",
+        "questions": [
+          {
+            "id": 23,
+            "text": "Как проектировать normalized store?"
+          },
+          {
+            "id": 24,
+            "text": "Когда normalization нужна?"
+          },
+          {
+            "id": 25,
+            "text": "Когда normalization усложняет жизнь?"
+          },
+          {
+            "id": 26,
+            "text": "Как работать с derived state?"
+          },
+          {
+            "id": 27,
+            "text": "Как избежать duplicated state?"
+          },
+          {
+            "id": 28,
+            "text": "Как проектировать async state machine?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 7",
+        "title": "PERMISSIONS    FLAGS    REAL-TIME    PERF    TESTS    MIGRATION",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 29,
+            "text": "Как хранить permissions?"
+          },
+          {
+            "id": 30,
+            "text": "Как хранить feature flags?"
+          },
+          {
+            "id": 31,
+            "text": "Как проектировать real-time state?"
+          },
+          {
+            "id": 32,
+            "text": "Как избежать re-render storm при частых updates?"
+          },
+          {
+            "id": 33,
+            "text": "Как подписывать компоненты только на нужный slice?"
+          },
+          {
+            "id": 34,
+            "text": "Как тестировать store?"
+          },
+          {
+            "id": 35,
+            "text": "Как мигрировать state management без big bang rewrite?"
+          }
+        ]
+      }
+    ]
+  },
+  "react-architecture": {
+    "section": "REACT ARCHITECTURE",
+    "topic": "REACT ARCHITECTURE",
+    "subtitle": "35 ВОПРОСОВ    7 ДНЕЙ    КОНСПЕКТ ЛЕКЦИЙ",
+    "days": [
+      {
+        "day": "ДЕНЬ 1",
+        "title": "СТРУКТУРА    FSD    SHARED / ENTITIES / FEATURES / PAGES",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 1,
+            "text": "Как ты структурируешь большое React-приложение?"
+          },
+          {
+            "id": 2,
+            "text": "Что думаешь про Feature-Sliced Design?"
+          },
+          {
+            "id": 3,
+            "text": "Как разделяешь shared, entities, features, pages?"
+          },
+          {
+            "id": 4,
+            "text": "Как не превратить shared в помойку?"
+          },
+          {
+            "id": 5,
+            "text": "Где должны жить API clients?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 2",
+        "title": "ГДЕ ЖИТЬ    HOOKS    DOMAIN    UI    DESIGN SYSTEM",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 6,
+            "text": "Где должны жить hooks?"
+          },
+          {
+            "id": 7,
+            "text": "Где должны жить domain services?"
+          },
+          {
+            "id": 8,
+            "text": "Где должны жить UI components?"
+          },
+          {
+            "id": 9,
+            "text": "Как проектировать design system?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 3",
+        "title": "DOMAIN ↔ UI    DATA FETCHING ↔ RENDER    TABLE",
+        "lvl": "HRD LVL",
+        "questions": [
+          {
+            "id": 10,
+            "text": "Как отделять domain logic от UI?"
+          },
+          {
+            "id": 11,
+            "text": "Как отделять data fetching от rendering?"
+          },
+          {
+            "id": 12,
+            "text": "Как проектировать reusable table?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 4",
+        "title": "FORM    WIZARD    DASHBOARD    LOADING/EMPTY/ERROR",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 13,
+            "text": "Как проектировать complex form?"
+          },
+          {
+            "id": 14,
+            "text": "Как проектировать wizard flow?"
+          },
+          {
+            "id": 15,
+            "text": "Как проектировать dashboard?"
+          },
+          {
+            "id": 21,
+            "text": "Как проектировать loading / empty / error states?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 5",
+        "title": "ROLES    PERMISSIONS    UNAUTHORIZED    ERROR BOUNDARIES",
+        "lvl": "HRD LVL",
+        "questions": [
+          {
+            "id": 16,
+            "text": "Как проектировать role-based UI?"
+          },
+          {
+            "id": 17,
+            "text": "Как проектировать frontend permissions?"
+          },
+          {
+            "id": 18,
+            "text": "Как защититься от unauthorized UI states?"
+          },
+          {
+            "id": 19,
+            "text": "Как организовать error boundaries?"
+          },
+          {
+            "id": 20,
+            "text": "Где ставить error boundaries?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 6",
+        "title": "DEGRADATION    FLAGS    ROLLOUT    i18n    THEMING",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 22,
+            "text": "Как проектировать graceful degradation?"
+          },
+          {
+            "id": 23,
+            "text": "Как проектировать feature flags?"
+          },
+          {
+            "id": 24,
+            "text": "Как делать gradual rollout на frontend?"
+          },
+          {
+            "id": 25,
+            "text": "Как организовать i18n?"
+          },
+          {
+            "id": 26,
+            "text": "Как проектировать theming?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 7",
+        "title": "RESPONSIVE    SHARED API    DRILLING    REVIEW    ADR",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 27,
+            "text": "Как проектировать responsive layout?"
+          },
+          {
+            "id": 28,
+            "text": "Как проектировать shared component API?"
+          },
+          {
+            "id": 29,
+            "text": "Как избежать prop drilling?"
+          },
+          {
+            "id": 30,
+            "text": "Как избежать over-abstraction?"
+          },
+          {
+            "id": 31,
+            "text": "Как проводить frontend architecture review?"
+          },
+          {
+            "id": 32,
+            "text": "Как документировать frontend architecture?"
+          },
+          {
+            "id": 33,
+            "text": "Как принять архитектурное решение?"
+          },
+          {
+            "id": 34,
+            "text": "Когда писать ADR?"
+          },
+          {
+            "id": 35,
+            "text": "Как оценивать архитектурный trade-off?"
+          }
+        ]
+      }
+    ]
+  },
+  "browser-apis-dom": {
+    "section": "BROWSER APIs / DOM",
+    "topic": "BROWSER APIs / DOM",
+    "subtitle": "30 ВОПРОСОВ    7 ДНЕЙ    КОНСПЕКТ ЛЕКЦИЙ",
+    "days": [
+      {
+        "day": "ДЕНЬ 1",
+        "title": "OBSERVERS    INTERSECTION    RESIZE    MUTATION",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 1,
+            "text": "Когда использовать IntersectionObserver?"
+          },
+          {
+            "id": 2,
+            "text": "Когда использовать ResizeObserver?"
+          },
+          {
+            "id": 3,
+            "text": "Когда использовать MutationObserver?"
+          },
+          {
+            "id": 4,
+            "text": "Какие риски у observer APIs?"
+          },
+          {
+            "id": 5,
+            "text": "Как правильно чистить observers?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 2",
+        "title": "EVENT DELEGATION    PASSIVE LISTENERS",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 6,
+            "text": "Что такое event delegation?"
+          },
+          {
+            "id": 7,
+            "text": "Когда event delegation полезен?"
+          },
+          {
+            "id": 8,
+            "text": "Что такое passive event listener?"
+          },
+          {
+            "id": 9,
+            "text": "Почему passive listeners важны для scroll?"
+          },
+          {
+            "id": 10,
+            "text": "Когда passive listener нельзя использовать?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 3",
+        "title": "CAPTURE / BUBBLE    stopPropagation    preventDefault",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 11,
+            "text": "Как работает capturing и bubbling?"
+          },
+          {
+            "id": 12,
+            "text": "Что делает stopPropagation?"
+          },
+          {
+            "id": 13,
+            "text": "Что делает preventDefault?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 4",
+        "title": "SHADOW DOM EVENTS    FOCUS MANAGEMENT",
+        "lvl": "HRD LVL",
+        "questions": [
+          {
+            "id": 14,
+            "text": "Что такое composed events?"
+          },
+          {
+            "id": 15,
+            "text": "Как работают events в Shadow DOM?"
+          },
+          {
+            "id": 16,
+            "text": "Как работает focus management?"
+          },
+          {
+            "id": 17,
+            "text": "Как программно управлять focus?"
+          },
+          {
+            "id": 18,
+            "text": "Как избежать focus trap bugs?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 5",
+        "title": "WEB WORKERS    COMMUNICATION    TRANSFERABLE",
+        "lvl": "HRD LVL",
+        "questions": [
+          {
+            "id": 19,
+            "text": "Что такое Web Worker?"
+          },
+          {
+            "id": 20,
+            "text": "Когда использовать Web Worker?"
+          },
+          {
+            "id": 21,
+            "text": "Что нельзя делать в Web Worker?"
+          },
+          {
+            "id": 22,
+            "text": "Как происходит communication с Worker?"
+          },
+          {
+            "id": 23,
+            "text": "Что такое transferable objects?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 6",
+        "title": "SERVICE WORKER    CACHE API    OFFLINE",
+        "lvl": "HRD LVL",
+        "questions": [
+          {
+            "id": 24,
+            "text": "Что такое Service Worker?"
+          },
+          {
+            "id": 25,
+            "text": "Чем Service Worker отличается от Web Worker?"
+          },
+          {
+            "id": 26,
+            "text": "Что такое Cache API?"
+          },
+          {
+            "id": 27,
+            "text": "Как работает offline fallback?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 7",
+        "title": "PWA    UPDATES    DEBUG SW",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 28,
+            "text": "Как проектировать PWA?"
+          },
+          {
+            "id": 29,
+            "text": "Как обновлять PWA без плохого UX?"
+          },
+          {
+            "id": 30,
+            "text": "Как отлаживать Service Worker?"
+          }
+        ]
+      }
+    ]
+  },
+  "perf-runtime": {
+    "section": "PERFORMANCE",
+    "topic": "BROWSER / RUNTIME",
+    "subtitle": "20 ВОПРОСОВ    7 ДНЕЙ    КОНСПЕКТ ЛЕКЦИЙ",
+    "days": [
+      {
+        "day": "ДЕНЬ 1",
+        "title": "CORE WEB VITALS    LCP    INP    CLS",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 1,
+            "text": "Что такое Core Web Vitals?"
+          },
+          {
+            "id": 2,
+            "text": "Что такое LCP?"
+          },
+          {
+            "id": 3,
+            "text": "Что такое INP?"
+          },
+          {
+            "id": 4,
+            "text": "Что такое CLS?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 2",
+        "title": "ИЗМЕРЕНИЯ    LAB vs FIELD    RUM    FINTECH",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 5,
+            "text": "Как измерять frontend performance?"
+          },
+          {
+            "id": 6,
+            "text": "Чем lab metrics отличаются от field metrics?"
+          },
+          {
+            "id": 7,
+            "text": "Что такое RUM?"
+          },
+          {
+            "id": 8,
+            "text": "Какие performance-метрики важны для trading/fintech UI?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 3",
+        "title": "LONG TASKS    LONG ANIMATION FRAME",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 9,
+            "text": "Как найти long task?"
+          },
+          {
+            "id": 10,
+            "text": "Как найти long animation frame?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 4",
+        "title": "RENDERING PIPELINE    LAYOUT THRASHING    FORCED SYNC",
+        "lvl": "HRD LVL",
+        "questions": [
+          {
+            "id": 11,
+            "text": "Как работает browser rendering pipeline?"
+          },
+          {
+            "id": 12,
+            "text": "Что такое layout thrashing?"
+          },
+          {
+            "id": 13,
+            "text": "Как избежать forced synchronous layout?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 5",
+        "title": "REFLOW    REPAINT    COMPOSITING",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 14,
+            "text": "Что вызывает reflow?"
+          },
+          {
+            "id": 15,
+            "text": "Что вызывает repaint?"
+          },
+          {
+            "id": 16,
+            "text": "Что такое compositing?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 6",
+        "title": "ДЕШЁВЫЕ CSS-СВОЙСТВА    will-change",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 17,
+            "text": "Какие CSS-свойства дешевле анимировать?"
+          },
+          {
+            "id": 18,
+            "text": "Когда использовать will-change?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 7",
+        "title": "will-change ВРЕД    SCROLL PERFORMANCE",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 19,
+            "text": "Почему will-change может навредить?"
+          },
+          {
+            "id": 20,
+            "text": "Как оптимизировать scroll performance?"
+          }
+        ]
+      }
+    ]
+  },
+  "perf-react": {
+    "section": "PERFORMANCE",
+    "topic": "REACT PERFORMANCE",
+    "subtitle": "30 ВОПРОСОВ    7 ДНЕЙ    КОНСПЕКТ ЛЕКЦИЙ",
+    "days": [
+      {
+        "day": "ДЕНЬ 1",
+        "title": "ПОИСК ПРОБЛЕМ    PROFILER    RENDER vs NETWORK",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 1,
+            "text": "Как найти лишние renders?"
+          },
+          {
+            "id": 2,
+            "text": "Как использовать React Profiler?"
+          },
+          {
+            "id": 3,
+            "text": "Как понять, что проблема в render, а не в network?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 2",
+        "title": "RENDER SURFACE    RE-RENDER STORM    CONTEXT",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 4,
+            "text": "Как уменьшить render surface?"
+          },
+          {
+            "id": 5,
+            "text": "Как избежать re-render storm?"
+          },
+          {
+            "id": 14,
+            "text": "Как оптимизировать context updates?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 3",
+        "title": "VIRTUALIZATION    BIG TABLE",
+        "lvl": "HRD LVL",
+        "questions": [
+          {
+            "id": 6,
+            "text": "Когда нужна virtualization?"
+          },
+          {
+            "id": 7,
+            "text": "Какие edge cases есть у virtualization?"
+          },
+          {
+            "id": 8,
+            "text": "Как оптимизировать таблицу на 10 000 строк?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 4",
+        "title": "LIVE TABLE    SEARCH    FILTER    useDeferredValue",
+        "lvl": "HRD LVL",
+        "questions": [
+          {
+            "id": 9,
+            "text": "Как оптимизировать live-updating table?"
+          },
+          {
+            "id": 10,
+            "text": "Как оптимизировать search input?"
+          },
+          {
+            "id": 11,
+            "text": "Как оптимизировать expensive filtering?"
+          },
+          {
+            "id": 12,
+            "text": "Как использовать useDeferredValue для тяжёлого списка?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 5",
+        "title": "BATCHING    SELECTORS    DERIVED    BUNDLE",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 13,
+            "text": "Как использовать batching для real-time updates?"
+          },
+          {
+            "id": 15,
+            "text": "Как оптимизировать selector-based subscriptions?"
+          },
+          {
+            "id": 16,
+            "text": "Как избежать expensive derived calculations?"
+          },
+          {
+            "id": 17,
+            "text": "Как оптимизировать bundle size?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 6",
+        "title": "DEPENDENCIES    CODE SPLITTING    LAZY",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 18,
+            "text": "Как найти тяжёлые dependencies?"
+          },
+          {
+            "id": 19,
+            "text": "Что такое code splitting?"
+          },
+          {
+            "id": 20,
+            "text": "Что такое route-based splitting?"
+          },
+          {
+            "id": 21,
+            "text": "Что такое component-level lazy loading?"
+          },
+          {
+            "id": 22,
+            "text": "Когда lazy loading ухудшает UX?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 7",
+        "title": "SKELETONS    IMAGES    FONTS    HYDRATION    MEMORY    BUDGET",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 23,
+            "text": "Как проектировать skeleton/loading state?"
+          },
+          {
+            "id": 24,
+            "text": "Как оптимизировать images?"
+          },
+          {
+            "id": 25,
+            "text": "Как оптимизировать fonts?"
+          },
+          {
+            "id": 26,
+            "text": "Как оптимизировать hydration?"
+          },
+          {
+            "id": 27,
+            "text": "Как работать с memory leaks?"
+          },
+          {
+            "id": 28,
+            "text": "Как найти detached DOM nodes?"
+          },
+          {
+            "id": 29,
+            "text": "Как профилировать memory?"
+          },
+          {
+            "id": 30,
+            "text": "Как поставить performance budget?"
+          }
+        ]
+      }
+    ]
+  },
+  "realtime-websocket": {
+    "section": "REAL-TIME UI / WEBSOCKET / STREAMING",
+    "topic": "REALTIME / WEBSOCKET",
+    "subtitle": "35 ВОПРОСОВ    7 ДНЕЙ    КОНСПЕКТ ЛЕКЦИЙ",
+    "days": [
+      {
+        "day": "ДЕНЬ 1",
+        "title": "WS    SSE    POLLING    ВЫБОР",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 1,
+            "text": "Как устроен WebSocket?"
+          },
+          {
+            "id": 2,
+            "text": "Чем WebSocket отличается от SSE?"
+          },
+          {
+            "id": 3,
+            "text": "Чем WebSocket отличается от polling?"
+          },
+          {
+            "id": 4,
+            "text": "Когда выбрать polling?"
+          },
+          {
+            "id": 5,
+            "text": "Когда выбрать SSE?"
+          },
+          {
+            "id": 6,
+            "text": "Когда выбрать WebSocket?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 2",
+        "title": "BROWSER WS API    BACKPRESSURE    HIGH-FREQ    БАТЧИНГ    rAF FLUSH",
+        "lvl": "HRD LVL",
+        "questions": [
+          {
+            "id": 7,
+            "text": "Какие проблемы есть у browser WebSocket API?"
+          },
+          {
+            "id": 8,
+            "text": "Что такое backpressure?"
+          },
+          {
+            "id": 9,
+            "text": "Как обрабатывать поток 100+ сообщений в секунду?"
+          },
+          {
+            "id": 10,
+            "text": "Как не делать setState на каждое сообщение?"
+          },
+          {
+            "id": 11,
+            "text": "Как батчить updates?"
+          },
+          {
+            "id": 12,
+            "text": "Как использовать requestAnimationFrame для flush?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 3",
+        "title": "DEDUP    ORDER    STALE    RECONNECT    BACKOFF",
+        "lvl": "HRD LVL",
+        "questions": [
+          {
+            "id": 13,
+            "text": "Как дедуплицировать сообщения?"
+          },
+          {
+            "id": 14,
+            "text": "Как обрабатывать out-of-order messages?"
+          },
+          {
+            "id": 15,
+            "text": "Как обрабатывать stale packets?"
+          },
+          {
+            "id": 16,
+            "text": "Как обрабатывать reconnect?"
+          },
+          {
+            "id": 17,
+            "text": "Как проектировать exponential backoff?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 4",
+        "title": "DISCONNECT vs STALE    DEGRADED    LAST KNOWN VALUE",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 18,
+            "text": "Как отличать disconnect от stale connection?"
+          },
+          {
+            "id": 19,
+            "text": "Как показывать degraded real-time state?"
+          },
+          {
+            "id": 20,
+            "text": "Как хранить last known value?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 5",
+        "title": "MARKET WATCH    PRICE TICKER    ORDER BOOK    NOTIFICATIONS",
+        "lvl": "HRD LVL",
+        "questions": [
+          {
+            "id": 21,
+            "text": "Как проектировать market watch UI?"
+          },
+          {
+            "id": 22,
+            "text": "Как проектировать price ticker?"
+          },
+          {
+            "id": 23,
+            "text": "Как проектировать order book UI?"
+          },
+          {
+            "id": 24,
+            "text": "Как проектировать real-time notifications?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 6",
+        "title": "CONSISTENCY    PARTIAL FAILURE    TESTING    MOCK    MONITORING",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 25,
+            "text": "Как обеспечить consistency в UI?"
+          },
+          {
+            "id": 26,
+            "text": "Как обрабатывать partial failure?"
+          },
+          {
+            "id": 27,
+            "text": "Как тестировать WebSocket logic?"
+          },
+          {
+            "id": 28,
+            "text": "Как мокать WebSocket в тестах?"
+          },
+          {
+            "id": 29,
+            "text": "Как мониторить reconnect rate?"
+          },
+          {
+            "id": 30,
+            "text": "Как мониторить stale data rate?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 7",
+        "title": "INGEST    INGEST vs VIEW    SNAPSHOT+DELTA    MEMORY    WORKER",
+        "lvl": "HRD LVL",
+        "questions": [
+          {
+            "id": 31,
+            "text": "Как проектировать ingest layer?"
+          },
+          {
+            "id": 32,
+            "text": "Как отделить ingest model от view model?"
+          },
+          {
+            "id": 33,
+            "text": "Как реализовать snapshot + incremental updates?"
+          },
+          {
+            "id": 34,
+            "text": "Как защититься от memory growth в буфере?"
+          },
+          {
+            "id": 35,
+            "text": "Когда переносить обработку в Web Worker?"
+          }
+        ]
+      }
+    ]
+  },
+  "accessibility": {
+    "section": "ACCESSIBILITY",
+    "topic": "ACCESSIBILITY",
+    "subtitle": "30 ВОПРОСОВ    7 ДНЕЙ    КОНСПЕКТ ЛЕКЦИЙ",
+    "days": [
+      {
+        "day": "ДЕНЬ 1",
+        "title": "SEMANTIC HTML    NATIVE BUTTON    ARIA",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 1,
+            "text": "Что такое semantic HTML?"
+          },
+          {
+            "id": 2,
+            "text": "Почему native button лучше div с role button?"
+          },
+          {
+            "id": 3,
+            "text": "Когда использовать ARIA?"
+          },
+          {
+            "id": 4,
+            "text": "Когда ARIA вреден?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 2",
+        "title": "ACCESSIBLE NAME    SCREEN READER    CUSTOM BUTTON",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 5,
+            "text": "Что такое accessible name?"
+          },
+          {
+            "id": 6,
+            "text": "Как screen reader понимает кнопку?"
+          },
+          {
+            "id": 7,
+            "text": "Как сделать custom button accessible?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 3",
+        "title": "MODAL    DROPDOWN    COMBOBOX",
+        "lvl": "HRD LVL",
+        "questions": [
+          {
+            "id": 8,
+            "text": "Как сделать modal accessible?"
+          },
+          {
+            "id": 9,
+            "text": "Как сделать dropdown accessible?"
+          },
+          {
+            "id": 10,
+            "text": "Как сделать combobox accessible?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 4",
+        "title": "TABS    TOOLTIP    TABLE    SORTABLE TABLE",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 11,
+            "text": "Как сделать tabs accessible?"
+          },
+          {
+            "id": 12,
+            "text": "Как сделать tooltip accessible?"
+          },
+          {
+            "id": 13,
+            "text": "Как сделать table accessible?"
+          },
+          {
+            "id": 14,
+            "text": "Как сделать sortable table accessible?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 5",
+        "title": "ARIA-SORT    ARIA-LIVE    ALERT    STATUS",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 15,
+            "text": "Что такое aria-sort?"
+          },
+          {
+            "id": 16,
+            "text": "Что такое aria-live?"
+          },
+          {
+            "id": 17,
+            "text": "Когда использовать role=\"alert\"?"
+          },
+          {
+            "id": 18,
+            "text": "Когда использовать role=\"status\"?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 6",
+        "title": "FOCUS MANAGEMENT    KEYBOARD NAV    TESTING    TOOLS    PLAYWRIGHT",
+        "lvl": "HRD LVL",
+        "questions": [
+          {
+            "id": 19,
+            "text": "Как управлять focus после открытия modal?"
+          },
+          {
+            "id": 20,
+            "text": "Как вернуть focus после закрытия modal?"
+          },
+          {
+            "id": 21,
+            "text": "Как обеспечить keyboard navigation?"
+          },
+          {
+            "id": 22,
+            "text": "Как тестировать accessibility?"
+          },
+          {
+            "id": 23,
+            "text": "Какие инструменты использовать для a11y testing?"
+          },
+          {
+            "id": 24,
+            "text": "Как писать Playwright-тесты с getByRole?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 7",
+        "title": "CONTRAST    REDUCED MOTION    ZOOM    ERRORS    QUALITY BAR",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 25,
+            "text": "Как проверить contrast?"
+          },
+          {
+            "id": 26,
+            "text": "Как учитывать reduced motion?"
+          },
+          {
+            "id": 27,
+            "text": "Как учитывать zoom 200%?"
+          },
+          {
+            "id": 28,
+            "text": "Как сделать error messages accessible?"
+          },
+          {
+            "id": 29,
+            "text": "Как сделать form validation accessible?"
+          },
+          {
+            "id": 30,
+            "text": "Как объяснить accessibility как часть quality bar?"
+          }
+        ]
+      }
+    ]
+  },
+  "forms-validation": {
+    "section": "FORMS / VALIDATION",
+    "topic": "FORMS / VALIDATION",
+    "subtitle": "20 ВОПРОСОВ    7 ДНЕЙ    КОНСПЕКТ ЛЕКЦИЙ",
+    "days": [
+      {
+        "day": "ДЕНЬ 1",
+        "title": "СТРУКТУРА    CONTROLLED vs UNCONTROLLED",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 1,
+            "text": "Как проектировать сложную форму?"
+          },
+          {
+            "id": 2,
+            "text": "Controlled или uncontrolled inputs?"
+          },
+          {
+            "id": 3,
+            "text": "Когда использовать React Hook Form?"
+          },
+          {
+            "id": 4,
+            "text": "Когда форма без библиотеки лучше?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 2",
+        "title": "ВАЛИДАЦИЯ    CLIENT / SERVER / СИНХРОНИЗАЦИЯ",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 5,
+            "text": "Как валидировать на client?"
+          },
+          {
+            "id": 6,
+            "text": "Как валидировать на server?"
+          },
+          {
+            "id": 7,
+            "text": "Как синхронизировать client и server validation?"
+          },
+          {
+            "id": 8,
+            "text": "Как показывать ошибки доступно?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 3",
+        "title": "TOUCHED / DIRTY    ASYNC VALIDATION    STALE",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 9,
+            "text": "Как управлять touched/dirty state?"
+          },
+          {
+            "id": 10,
+            "text": "Как проектировать async validation?"
+          },
+          {
+            "id": 11,
+            "text": "Как отменять stale validation request?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 4",
+        "title": "MULTI-STEP    DRAFTS    AUTOSAVE",
+        "lvl": "HRD LVL",
+        "questions": [
+          {
+            "id": 12,
+            "text": "Как проектировать multi-step form?"
+          },
+          {
+            "id": 13,
+            "text": "Как сохранять draft?"
+          },
+          {
+            "id": 14,
+            "text": "Как обрабатывать autosave?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 5",
+        "title": "OPTIMISTIC SUBMIT    DOUBLE SUBMIT    DISABLED",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 15,
+            "text": "Как делать optimistic form submit?"
+          },
+          {
+            "id": 16,
+            "text": "Как защищаться от double submit?"
+          },
+          {
+            "id": 17,
+            "text": "Как обрабатывать disabled submit?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 6",
+        "title": "FILE UPLOAD    LARGE FORM PERFORMANCE",
+        "lvl": "HRD LVL",
+        "questions": [
+          {
+            "id": 18,
+            "text": "Как проектировать file upload?"
+          },
+          {
+            "id": 19,
+            "text": "Как проектировать large form performance?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 7",
+        "title": "ТЕСТИРОВАНИЕ COMPLEX FORM",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 20,
+            "text": "Как тестировать complex form?"
+          }
+        ]
+      }
+    ]
+  },
+  "design-system": {
+    "section": "DESIGN SYSTEM / UI COMPONENTS",
+    "topic": "DESIGN SYSTEM",
+    "subtitle": "25 ВОПРОСОВ    7 ДНЕЙ    КОНСПЕКТ ЛЕКЦИЙ",
+    "days": [
+      {
+        "day": "ДЕНЬ 1",
+        "title": "ЧТО ТАКОЕ DS    DS vs LIBRARY    BUTTON API",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 1,
+            "text": "Что такое design system?"
+          },
+          {
+            "id": 2,
+            "text": "Чем design system отличается от component library?"
+          },
+          {
+            "id": 3,
+            "text": "Как проектировать Button API?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 2",
+        "title": "MODAL    TABLE    FORM API",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 4,
+            "text": "Как проектировать Modal API?"
+          },
+          {
+            "id": 5,
+            "text": "Как проектировать Table API?"
+          },
+          {
+            "id": 6,
+            "text": "Как проектировать Form components?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 3",
+        "title": "TOKENS    DARK MODE    RESPONSIVE",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 7,
+            "text": "Как проектировать theme tokens?"
+          },
+          {
+            "id": 8,
+            "text": "Как работать с dark mode?"
+          },
+          {
+            "id": 9,
+            "text": "Как работать с responsive tokens?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 4",
+        "title": "A11Y BY DEFAULT    DOCS    STORYBOOK",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 10,
+            "text": "Как обеспечить accessibility by default?"
+          },
+          {
+            "id": 11,
+            "text": "Как документировать components?"
+          },
+          {
+            "id": 12,
+            "text": "Как использовать Storybook?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 5",
+        "title": "TESTING DS    VERSIONING    BREAKING CHANGES",
+        "lvl": "HRD LVL",
+        "questions": [
+          {
+            "id": 13,
+            "text": "Как тестировать design system?"
+          },
+          {
+            "id": 14,
+            "text": "Как версионировать UI library?"
+          },
+          {
+            "id": 15,
+            "text": "Как избежать breaking changes?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 6",
+        "title": "FEEDBACK    API НЕ МОНСТР    CONTROLLED    COMPOUND    HEADLESS",
+        "lvl": "HRD LVL",
+        "questions": [
+          {
+            "id": 16,
+            "text": "Как собирать feedback от product teams?"
+          },
+          {
+            "id": 17,
+            "text": "Как не превратить component API в монстра?"
+          },
+          {
+            "id": 18,
+            "text": "Когда компонент должен быть controlled?"
+          },
+          {
+            "id": 19,
+            "text": "Когда компонент должен быть compound component?"
+          },
+          {
+            "id": 20,
+            "text": "Когда нужен headless component?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 7",
+        "title": "STYLE/BEHAVIOR    VISUAL REGRESSION    ICONS    SPACING    MF CONSISTENCY",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 21,
+            "text": "Как разделять styling и behavior?"
+          },
+          {
+            "id": 22,
+            "text": "Как делать visual regression tests?"
+          },
+          {
+            "id": 23,
+            "text": "Как проектировать icons?"
+          },
+          {
+            "id": 24,
+            "text": "Как проектировать spacing system?"
+          },
+          {
+            "id": 25,
+            "text": "Как обеспечивать consistency across microfrontends?"
+          }
+        ]
+      }
+    ]
+  },
+  "security": {
+    "section": "SECURITY",
+    "topic": "SECURITY",
+    "subtitle": "35 ВОПРОСОВ    7 ДНЕЙ    КОНСПЕКТ ЛЕКЦИЙ",
+    "days": [
+      {
+        "day": "ДЕНЬ 1",
+        "title": "XSS    REACT XSS    dangerouslySetInnerHTML",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 1,
+            "text": "Что такое XSS?"
+          },
+          {
+            "id": 2,
+            "text": "Какие бывают виды XSS?"
+          },
+          {
+            "id": 3,
+            "text": "Как React защищает от XSS по умолчанию?"
+          },
+          {
+            "id": 4,
+            "text": "Когда React не защищает от XSS?"
+          },
+          {
+            "id": 5,
+            "text": "Чем опасен dangerouslySetInnerHTML?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 2",
+        "title": "SANITIZATION    ESCAPING    CSP",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 6,
+            "text": "Как безопасно рендерить user-generated HTML?"
+          },
+          {
+            "id": 7,
+            "text": "Что такое sanitization?"
+          },
+          {
+            "id": 8,
+            "text": "Что такое escaping?"
+          },
+          {
+            "id": 9,
+            "text": "Чем sanitization отличается от escaping?"
+          },
+          {
+            "id": 10,
+            "text": "Что такое CSP?"
+          },
+          {
+            "id": 11,
+            "text": "Как CSP помогает против XSS?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 3",
+        "title": "CSRF    CORS    PREFLIGHT",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 12,
+            "text": "Что такое CSRF?"
+          },
+          {
+            "id": 13,
+            "text": "Когда CSRF актуален для frontend?"
+          },
+          {
+            "id": 14,
+            "text": "Что такое CORS?"
+          },
+          {
+            "id": 15,
+            "text": "Почему CORS не является auth?"
+          },
+          {
+            "id": 16,
+            "text": "Что такое preflight request?"
+          },
+          {
+            "id": 17,
+            "text": "Какие CORS-настройки опасны?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 4",
+        "title": "TOKEN STORAGE    localStorage vs cookies    HttpOnly / SameSite",
+        "lvl": "HRD LVL",
+        "questions": [
+          {
+            "id": 18,
+            "text": "Где хранить access token?"
+          },
+          {
+            "id": 19,
+            "text": "Где хранить refresh token?"
+          },
+          {
+            "id": 20,
+            "text": "Какие риски у localStorage?"
+          },
+          {
+            "id": 21,
+            "text": "Какие риски у cookies?"
+          },
+          {
+            "id": 22,
+            "text": "Что такое HttpOnly cookie?"
+          },
+          {
+            "id": 23,
+            "text": "Что такое SameSite cookie?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 5",
+        "title": "LOGOUT    PROTECTED ROUTES    FE GUARD    PERMISSIONS",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 24,
+            "text": "Как обрабатывать logout?"
+          },
+          {
+            "id": 25,
+            "text": "Как защищать sensitive routes?"
+          },
+          {
+            "id": 26,
+            "text": "Почему frontend auth guard недостаточен?"
+          },
+          {
+            "id": 27,
+            "text": "Как работать с permissions на frontend?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 6",
+        "title": "SECRETS IN BUNDLE    LOGGING PII    SUPPLY CHAIN",
+        "lvl": "HRD LVL",
+        "questions": [
+          {
+            "id": 28,
+            "text": "Как не раскрывать sensitive data в bundle?"
+          },
+          {
+            "id": 29,
+            "text": "Какие данные нельзя логировать?"
+          },
+          {
+            "id": 30,
+            "text": "Как защищать error reporting от утечки PII?"
+          },
+          {
+            "id": 31,
+            "text": "Что такое supply chain attack?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 7",
+        "title": "DEPS    AUDIT    SECURE DEFAULTS    REVIEW",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 32,
+            "text": "Как проверять npm dependencies?"
+          },
+          {
+            "id": 33,
+            "text": "Как работать с dependency audit?"
+          },
+          {
+            "id": 34,
+            "text": "Как проектировать secure defaults?"
+          },
+          {
+            "id": 35,
+            "text": "Какие security-рецензии нужны перед релизом fintech-фичи?"
+          }
+        ]
+      }
+    ]
+  },
+  "api-graphql": {
+    "section": "API / GRAPHQL / NETWORKING",
+    "topic": "API / GRAPHQL / NETWORKING",
+    "subtitle": "30 ВОПРОСОВ    7 ДНЕЙ    КОНСПЕКТ ЛЕКЦИЙ",
+    "days": [
+      {
+        "day": "ДЕНЬ 1",
+        "title": "REST vs GRAPHQL    OVER/UNDERFETCH",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 1,
+            "text": "REST или GraphQL — что выбрать?"
+          },
+          {
+            "id": 2,
+            "text": "Какие плюсы GraphQL для frontend?"
+          },
+          {
+            "id": 3,
+            "text": "Какие минусы GraphQL?"
+          },
+          {
+            "id": 4,
+            "text": "Что такое overfetching?"
+          },
+          {
+            "id": 5,
+            "text": "Что такое underfetching?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 2",
+        "title": "GQL TYPES    ERRORS    CACHE",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 6,
+            "text": "Как типизировать GraphQL queries?"
+          },
+          {
+            "id": 7,
+            "text": "Как обрабатывать GraphQL errors?"
+          },
+          {
+            "id": 8,
+            "text": "Как кешировать GraphQL data?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 3",
+        "title": "PAGINATION    OPTIMISTIC    CLIENT DESIGN",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 9,
+            "text": "Как работать с pagination?"
+          },
+          {
+            "id": 10,
+            "text": "Cursor pagination или offset pagination?"
+          },
+          {
+            "id": 11,
+            "text": "Как обрабатывать optimistic mutations?"
+          },
+          {
+            "id": 12,
+            "text": "Как проектировать API client?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 4",
+        "title": "CANCELLATION    RETRY    NO-RETRY    IDEMPOTENCY",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 13,
+            "text": "Как проектировать request cancellation?"
+          },
+          {
+            "id": 14,
+            "text": "Как проектировать retry policy?"
+          },
+          {
+            "id": 15,
+            "text": "Какие запросы нельзя retry?"
+          },
+          {
+            "id": 16,
+            "text": "Как проектировать idempotency?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 5",
+        "title": "RATE LIMIT    401/403    TOKEN REFRESH",
+        "lvl": "HRD LVL",
+        "questions": [
+          {
+            "id": 17,
+            "text": "Как обрабатывать rate limits?"
+          },
+          {
+            "id": 18,
+            "text": "Как обрабатывать 401/403?"
+          },
+          {
+            "id": 19,
+            "text": "Как обновлять token?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 6",
+        "title": "WATERFALL    PREFETCH    DUPS    BFF",
+        "lvl": "HRD LVL",
+        "questions": [
+          {
+            "id": 20,
+            "text": "Как избежать request waterfall?"
+          },
+          {
+            "id": 21,
+            "text": "Как prefetch data?"
+          },
+          {
+            "id": 22,
+            "text": "Как избежать duplicate requests?"
+          },
+          {
+            "id": 23,
+            "text": "Как проектировать BFF?"
+          },
+          {
+            "id": 24,
+            "text": "Когда нужен BFF?"
+          },
+          {
+            "id": 25,
+            "text": "Какие риски у BFF?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 7",
+        "title": "CONTRACT    BACKWARDS COMPAT    MIGRATION    PARTIAL    SLOW",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 26,
+            "text": "Как делать contract testing?"
+          },
+          {
+            "id": 27,
+            "text": "Как обрабатывать backwards compatibility?"
+          },
+          {
+            "id": 28,
+            "text": "Как мигрировать API contract?"
+          },
+          {
+            "id": 29,
+            "text": "Как работать с partial response?"
+          },
+          {
+            "id": 30,
+            "text": "Как обрабатывать slow API?"
+          }
+        ]
+      }
+    ]
+  },
+  "testing-unit": {
+    "section": "TESTING",
+    "topic": "UNIT / INTEGRATION",
+    "subtitle": "30 ВОПРОСОВ    7 ДНЕЙ    КОНСПЕКТ ЛЕКЦИЙ",
+    "days": [
+      {
+        "day": "ДЕНЬ 1",
+        "title": "ЧТО ТЕСТИРОВАТЬ    PYRAMID    TROPHY",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 1,
+            "text": "Что тестировать unit-тестами?"
+          },
+          {
+            "id": 2,
+            "text": "Что не стоит тестировать unit-тестами?"
+          },
+          {
+            "id": 3,
+            "text": "Что тестировать integration-тестами?"
+          },
+          {
+            "id": 4,
+            "text": "Что тестировать e2e-тестами?"
+          },
+          {
+            "id": 5,
+            "text": "Как выбрать testing pyramid для frontend?"
+          },
+          {
+            "id": 6,
+            "text": "Когда testing trophy лучше pyramid?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 2",
+        "title": "PURE FN    REDUCERS    HOOKS    ASYNC HOOKS",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 7,
+            "text": "Как тестировать pure functions?"
+          },
+          {
+            "id": 8,
+            "text": "Как тестировать reducers?"
+          },
+          {
+            "id": 9,
+            "text": "Как тестировать custom hooks?"
+          },
+          {
+            "id": 10,
+            "text": "Как тестировать async hooks?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 3",
+        "title": "REACT COMPONENTS    USER-CENTRIC    NO IMPL    TESTID",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 11,
+            "text": "Как тестировать React components?"
+          },
+          {
+            "id": 12,
+            "text": "Почему Testing Library советует тестировать как пользователь?"
+          },
+          {
+            "id": 13,
+            "text": "Почему не стоит тестировать implementation details?"
+          },
+          {
+            "id": 14,
+            "text": "Когда допустим data-testid?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 4",
+        "title": "MOCK API    MSW    TIME    TIMERS    WS",
+        "lvl": "HRD LVL",
+        "questions": [
+          {
+            "id": 15,
+            "text": "Как мокать API?"
+          },
+          {
+            "id": 16,
+            "text": "Когда использовать MSW?"
+          },
+          {
+            "id": 17,
+            "text": "Как мокать time?"
+          },
+          {
+            "id": 18,
+            "text": "Как мокать timers?"
+          },
+          {
+            "id": 19,
+            "text": "Как мокать WebSocket?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 5",
+        "title": "ABORT    RACE    LOADING    ERROR    EMPTY",
+        "lvl": "HRD LVL",
+        "questions": [
+          {
+            "id": 20,
+            "text": "Как тестировать AbortController?"
+          },
+          {
+            "id": 21,
+            "text": "Как тестировать race conditions?"
+          },
+          {
+            "id": 22,
+            "text": "Как тестировать loading state?"
+          },
+          {
+            "id": 23,
+            "text": "Как тестировать error state?"
+          },
+          {
+            "id": 24,
+            "text": "Как тестировать empty state?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 6",
+        "title": "OPTIMISTIC    A11Y    KEYBOARD    FORMS    VALIDATION",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 25,
+            "text": "Как тестировать optimistic update?"
+          },
+          {
+            "id": 26,
+            "text": "Как тестировать accessibility?"
+          },
+          {
+            "id": 27,
+            "text": "Как тестировать keyboard navigation?"
+          },
+          {
+            "id": 28,
+            "text": "Как тестировать forms?"
+          },
+          {
+            "id": 29,
+            "text": "Как тестировать validation?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 7",
+        "title": "FLAKY",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 30,
+            "text": "Как избежать flaky tests?"
+          }
+        ]
+      }
+    ]
+  },
+  "testing-e2e": {
+    "section": "TESTING",
+    "topic": "E2E / PLAYWRIGHT",
+    "subtitle": "25 ВОПРОСОВ    7 ДНЕЙ    КОНСПЕКТ ЛЕКЦИЙ",
+    "days": [
+      {
+        "day": "ДЕНЬ 1",
+        "title": "ЧТО ТЕСТИРОВАТЬ E2E    LOCATORS    getByRole",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 1,
+            "text": "Что тестировать в Playwright?"
+          },
+          {
+            "id": 2,
+            "text": "Что не стоит тестировать в Playwright?"
+          },
+          {
+            "id": 3,
+            "text": "Как выбирать locators?"
+          },
+          {
+            "id": 4,
+            "text": "Почему getByRole часто лучше CSS selector?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 2",
+        "title": "AUTO-WAITING    SLEEPS    RETRIES    FLAKY DETECT",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 5,
+            "text": "Что такое auto-waiting?"
+          },
+          {
+            "id": 6,
+            "text": "Почему explicit sleeps плохие?"
+          },
+          {
+            "id": 7,
+            "text": "Как работать с retries?"
+          },
+          {
+            "id": 8,
+            "text": "Как отличать flaky test от product bug?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 3",
+        "title": "AUTH    STORAGE STATE    ISOLATION    NETWORK FAIL    SLOW",
+        "lvl": "HRD LVL",
+        "questions": [
+          {
+            "id": 9,
+            "text": "Как тестировать auth?"
+          },
+          {
+            "id": 10,
+            "text": "Как шарить storage state?"
+          },
+          {
+            "id": 11,
+            "text": "Как изолировать тесты?"
+          },
+          {
+            "id": 12,
+            "text": "Как тестировать network failures?"
+          },
+          {
+            "id": 13,
+            "text": "Как тестировать slow network?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 4",
+        "title": "PERMISSIONS    FLAGS    VISUAL REGRESSION",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 14,
+            "text": "Как тестировать permissions?"
+          },
+          {
+            "id": 15,
+            "text": "Как тестировать feature flags?"
+          },
+          {
+            "id": 16,
+            "text": "Как тестировать visual regressions?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 5",
+        "title": "RESPONSIVE    REAL-TIME    CI    SUITE TIME",
+        "lvl": "HRD LVL",
+        "questions": [
+          {
+            "id": 17,
+            "text": "Как тестировать responsive UI?"
+          },
+          {
+            "id": 18,
+            "text": "Как тестировать real-time UI?"
+          },
+          {
+            "id": 19,
+            "text": "Как запускать e2e в CI?"
+          },
+          {
+            "id": 20,
+            "text": "Как уменьшить время e2e suite?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 6",
+        "title": "SMOKE    TEST DATA    CLEANUP",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 21,
+            "text": "Какие smoke tests должны быть перед production?"
+          },
+          {
+            "id": 22,
+            "text": "Как проектировать test data?"
+          },
+          {
+            "id": 23,
+            "text": "Как чистить test data?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 7",
+        "title": "ANALYTICS    OBSERVABILITY",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 24,
+            "text": "Как тестировать analytics events?"
+          },
+          {
+            "id": 25,
+            "text": "Как тестировать frontend observability?"
+          }
+        ]
+      }
+    ]
+  },
+  "build-tools": {
+    "section": "BUILD TOOLS / BUNDLING",
+    "topic": "BUILD TOOLS",
+    "subtitle": "30 ВОПРОСОВ    7 ДНЕЙ    КОНСПЕКТ ЛЕКЦИЙ",
+    "days": [
+      {
+        "day": "ДЕНЬ 1",
+        "title": "BUNDLER    VITE vs WEBPACK    DEV SERVER    ESM    HMR",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 1,
+            "text": "Что делает bundler?"
+          },
+          {
+            "id": 2,
+            "text": "Чем Vite отличается от Webpack?"
+          },
+          {
+            "id": 3,
+            "text": "Как работает Vite dev server?"
+          },
+          {
+            "id": 4,
+            "text": "Что такое native ESM?"
+          },
+          {
+            "id": 5,
+            "text": "Что такое HMR?"
+          },
+          {
+            "id": 6,
+            "text": "Почему HMR может ломаться?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 2",
+        "title": "VITE PROD BUILD    ROLLUP    ESBUILD",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 7,
+            "text": "Как работает production build в Vite?"
+          },
+          {
+            "id": 8,
+            "text": "Что такое Rollup?"
+          },
+          {
+            "id": 9,
+            "text": "Что такое esbuild?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 3",
+        "title": "TREE SHAKING    SIDE EFFECTS    CODE SPLITTING",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 10,
+            "text": "Что такое tree shaking?"
+          },
+          {
+            "id": 11,
+            "text": "Почему tree shaking может не сработать?"
+          },
+          {
+            "id": 12,
+            "text": "Что такое side effects в package.json?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 4",
+        "title": "DYNAMIC IMPORT    CHUNK    CHUNK SPLITTING    BUNDLE SIZE",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 13,
+            "text": "Что такое code splitting?"
+          },
+          {
+            "id": 14,
+            "text": "Что такое dynamic import?"
+          },
+          {
+            "id": 15,
+            "text": "Что такое chunk?"
+          },
+          {
+            "id": 16,
+            "text": "Как контролировать chunk splitting?"
+          },
+          {
+            "id": 17,
+            "text": "Как анализировать bundle size?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 5",
+        "title": "SOURCE MAPS    CACHE BUSTING    LONG-TERM CACHING",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 18,
+            "text": "Что такое source map?"
+          },
+          {
+            "id": 19,
+            "text": "Какие риски у source maps в production?"
+          },
+          {
+            "id": 20,
+            "text": "Как работает cache busting?"
+          },
+          {
+            "id": 21,
+            "text": "Как именовать assets для long-term caching?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 6",
+        "title": "DEPS    POLYFILLS    LEGACY    ENV",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 22,
+            "text": "Как оптимизировать dependencies?"
+          },
+          {
+            "id": 23,
+            "text": "Как работать с polyfills?"
+          },
+          {
+            "id": 24,
+            "text": "Как поддерживать legacy browsers?"
+          },
+          {
+            "id": 25,
+            "text": "Как организовать environment variables?"
+          },
+          {
+            "id": 26,
+            "text": "Какие env-переменные нельзя попадать в frontend bundle?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 7",
+        "title": "BUILD ENVS    WHITE-LABEL    SHARED PKG    DEDUP",
+        "lvl": "HRD LVL",
+        "questions": [
+          {
+            "id": 27,
+            "text": "Как настроить build для нескольких environments?"
+          },
+          {
+            "id": 28,
+            "text": "Как проектировать build для white-label UI?"
+          },
+          {
+            "id": 29,
+            "text": "Как проектировать shared UI package?"
+          },
+          {
+            "id": 30,
+            "text": "Как избежать dependency duplication?"
+          }
+        ]
+      }
+    ]
+  },
+  "microfrontends-monorepo": {
+    "section": "MICROFRONTENDS / MODULE FEDERATION / MONOREPO",
+    "topic": "MICROFRONTENDS / MONOREPO",
+    "subtitle": "35 ВОПРОСОВ    7 ДНЕЙ    КОНСПЕКТ ЛЕКЦИЙ",
+    "days": [
+      {
+        "day": "ДЕНЬ 1",
+        "title": "MFE    КОГДА    OVERENGINEERING    MF",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 1,
+            "text": "Что такое microfrontend?"
+          },
+          {
+            "id": 2,
+            "text": "Когда microfrontends оправданы?"
+          },
+          {
+            "id": 3,
+            "text": "Когда microfrontends являются overengineering?"
+          },
+          {
+            "id": 4,
+            "text": "Что такое Module Federation?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 2",
+        "title": "HOST    REMOTE    SHARED    РИСКИ    VERSION SKEW",
+        "lvl": "HRD LVL",
+        "questions": [
+          {
+            "id": 5,
+            "text": "Что такое host?"
+          },
+          {
+            "id": 6,
+            "text": "Что такое remote?"
+          },
+          {
+            "id": 7,
+            "text": "Что такое shared dependency?"
+          },
+          {
+            "id": 8,
+            "text": "Какие риски у shared dependencies?"
+          },
+          {
+            "id": 9,
+            "text": "Что такое version skew?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 3",
+        "title": "REACT VERSION    INDEPENDENT DEPLOY    RUNTIME COMPAT    CONTRACTS",
+        "lvl": "HRD LVL",
+        "questions": [
+          {
+            "id": 10,
+            "text": "Как контролировать shared React version?"
+          },
+          {
+            "id": 11,
+            "text": "Как обеспечить independent deployment?"
+          },
+          {
+            "id": 12,
+            "text": "Как обеспечить runtime compatibility?"
+          },
+          {
+            "id": 13,
+            "text": "Как проектировать contracts между shell и remotes?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 4",
+        "title": "SHARE TYPES    DS    AUTH    ROUTING",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 14,
+            "text": "Как шарить типы между remotes?"
+          },
+          {
+            "id": 15,
+            "text": "Как шарить design system?"
+          },
+          {
+            "id": 16,
+            "text": "Как шарить auth context?"
+          },
+          {
+            "id": 17,
+            "text": "Как шарить routing?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 5",
+        "title": "ERROR ISOLATION    FALLBACK    MONITORING    ROLLBACK",
+        "lvl": "HRD LVL",
+        "questions": [
+          {
+            "id": 18,
+            "text": "Как изолировать ошибки remote app?"
+          },
+          {
+            "id": 19,
+            "text": "Как сделать fallback, если remote не загрузился?"
+          },
+          {
+            "id": 20,
+            "text": "Как мониторить remote loading failures?"
+          },
+          {
+            "id": 21,
+            "text": "Как делать rollback remote app?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 6",
+        "title": "TESTING    LOCAL DEV    UX CONSISTENCY    MIGRATION    STRANGLER",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 22,
+            "text": "Как тестировать federated modules?"
+          },
+          {
+            "id": 23,
+            "text": "Как делать local development с несколькими remotes?"
+          },
+          {
+            "id": 24,
+            "text": "Как обеспечить consistent UX между командами?"
+          },
+          {
+            "id": 25,
+            "text": "Как мигрировать SPA в microfrontends?"
+          },
+          {
+            "id": 26,
+            "text": "Что такое strangler pattern?"
+          },
+          {
+            "id": 27,
+            "text": "Как избежать big bang rewrite?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 7",
+        "title": "MONOREPO vs MF    КОГДА MONOREPO    РИСКИ    PACKAGES    SHARED CONFIG    AFFECTED    VERSIONING    MODULAR MONOLITH",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 28,
+            "text": "Чем monorepo отличается от microfrontends?"
+          },
+          {
+            "id": 29,
+            "text": "Когда monorepo полезен?"
+          },
+          {
+            "id": 30,
+            "text": "Какие риски у monorepo?"
+          },
+          {
+            "id": 31,
+            "text": "Как организовать packages в monorepo?"
+          },
+          {
+            "id": 32,
+            "text": "Как организовать shared lint/test/build conventions?"
+          },
+          {
+            "id": 33,
+            "text": "Как делать affected builds?"
+          },
+          {
+            "id": 34,
+            "text": "Как версионировать shared packages?"
+          },
+          {
+            "id": 35,
+            "text": "Когда лучше modular monolith, а не microfrontends?"
+          }
+        ]
+      }
+    ]
+  },
+  "cicd-delivery": {
+    "section": "CI/CD / GITOPS / DELIVERY",
+    "topic": "CI/CD / DELIVERY",
+    "subtitle": "35 ВОПРОСОВ    7 ДНЕЙ    КОНСПЕКТ ЛЕКЦИЙ",
+    "days": [
+      {
+        "day": "ДЕНЬ 1",
+        "title": "PIPELINE    QUALITY GATES    TYPE/LINT/UNIT/INT/E2E",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 1,
+            "text": "Какой pipeline ты бы сделал для frontend-приложения?"
+          },
+          {
+            "id": 2,
+            "text": "Какие quality gates должны быть в CI?"
+          },
+          {
+            "id": 3,
+            "text": "Где запускать typecheck?"
+          },
+          {
+            "id": 4,
+            "text": "Где запускать lint?"
+          },
+          {
+            "id": 5,
+            "text": "Где запускать unit tests?"
+          },
+          {
+            "id": 6,
+            "text": "Где запускать integration tests?"
+          },
+          {
+            "id": 7,
+            "text": "Где запускать Playwright smoke?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 2",
+        "title": "BUNDLE    DEP AUDIT    ARTIFACTS    BUILD ONCE",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 8,
+            "text": "Где проверять bundle size?"
+          },
+          {
+            "id": 9,
+            "text": "Где проверять dependency audit?"
+          },
+          {
+            "id": 10,
+            "text": "Как хранить build artifacts?"
+          },
+          {
+            "id": 11,
+            "text": "Почему build once, deploy many?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 3",
+        "title": "PROMOTE    ROLLBACK    CANARY    BLUE-GREEN",
+        "lvl": "HRD LVL",
+        "questions": [
+          {
+            "id": 12,
+            "text": "Как продвигать artifact между environments?"
+          },
+          {
+            "id": 13,
+            "text": "Как делать rollback?"
+          },
+          {
+            "id": 14,
+            "text": "Как делать canary release?"
+          },
+          {
+            "id": 15,
+            "text": "Как делать blue-green deployment?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 4",
+        "title": "FLAGS    KILL FEATURE    HEALTH CHECKS    MONITORING",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 16,
+            "text": "Как использовать feature flags?"
+          },
+          {
+            "id": 17,
+            "text": "Как выключить плохую frontend-фичу без redeploy?"
+          },
+          {
+            "id": 18,
+            "text": "Как проверять health после deployment?"
+          },
+          {
+            "id": 19,
+            "text": "Какие frontend health checks нужны?"
+          },
+          {
+            "id": 20,
+            "text": "Как связать deployment с monitoring?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 5",
+        "title": "GITOPS    ARGO CD    NO PROD ACCESS    ENV CONFIG    SECRETS",
+        "lvl": "HRD LVL",
+        "questions": [
+          {
+            "id": 21,
+            "text": "Что такое GitOps?"
+          },
+          {
+            "id": 22,
+            "text": "Как Argo CD вписывается в delivery?"
+          },
+          {
+            "id": 23,
+            "text": "Почему CI не должен иметь прямой доступ к production cluster?"
+          },
+          {
+            "id": 24,
+            "text": "Как организовать environment-specific config?"
+          },
+          {
+            "id": 25,
+            "text": "Как хранить secrets?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 6",
+        "title": "FE SECRETS    SOURCEMAPS    MFE RELEASE    SHARED RELEASE    DOCS",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 26,
+            "text": "Почему secrets не должны попадать в frontend?"
+          },
+          {
+            "id": 27,
+            "text": "Как работать с Sentry/source maps?"
+          },
+          {
+            "id": 28,
+            "text": "Как релизить microfrontend remote?"
+          },
+          {
+            "id": 29,
+            "text": "Как релизить shared UI package?"
+          },
+          {
+            "id": 30,
+            "text": "Как документировать release process?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 7",
+        "title": "FAILED DEPLOY    PARTIAL OUTAGE    POST-RELEASE    CHANGELOG    OBS DoD",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 31,
+            "text": "Что делать при failed deployment?"
+          },
+          {
+            "id": 32,
+            "text": "Что делать при partial outage?"
+          },
+          {
+            "id": 33,
+            "text": "Как проводить post-release validation?"
+          },
+          {
+            "id": 34,
+            "text": "Как делать changelog?"
+          },
+          {
+            "id": 35,
+            "text": "Как включить frontend observability в Definition of Done?"
+          }
+        ]
+      }
+    ]
+  },
+  "observability": {
+    "section": "OBSERVABILITY",
+    "topic": "OBSERVABILITY",
+    "subtitle": "30 ВОПРОСОВ    7 ДНЕЙ    КОНСПЕКТ ЛЕКЦИЙ",
+    "days": [
+      {
+        "day": "ДЕНЬ 1",
+        "title": "ЧТО ТАКОЕ FRONTEND OBS    LOGS/METRICS/TRACES    METRICS",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 1,
+            "text": "Что такое frontend observability?"
+          },
+          {
+            "id": 2,
+            "text": "Чем logs, metrics и traces отличаются?"
+          },
+          {
+            "id": 3,
+            "text": "Какие frontend metrics ты бы собирал?"
+          },
+          {
+            "id": 4,
+            "text": "Какие business metrics ты бы связывал с frontend?"
+          },
+          {
+            "id": 5,
+            "text": "Какие Web Vitals важны?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 2",
+        "title": "ERRORS    GROUPING    PII    API FAILS",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 6,
+            "text": "Как собирать JS errors?"
+          },
+          {
+            "id": 7,
+            "text": "Как группировать errors?"
+          },
+          {
+            "id": 8,
+            "text": "Как не логировать PII?"
+          },
+          {
+            "id": 9,
+            "text": "Как отслеживать failed API requests?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 3",
+        "title": "ROUTE LATENCY    WS    STALE DATA    LONG TASKS",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 10,
+            "text": "Как отслеживать route-level latency?"
+          },
+          {
+            "id": 11,
+            "text": "Как отслеживать WebSocket reconnects?"
+          },
+          {
+            "id": 12,
+            "text": "Как отслеживать stale data?"
+          },
+          {
+            "id": 13,
+            "text": "Как отслеживать long tasks?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 4",
+        "title": "RENDER REGRESSION    BUNDLE    TRACE LINK    OTEL",
+        "lvl": "HRD LVL",
+        "questions": [
+          {
+            "id": 14,
+            "text": "Как отслеживать render regression?"
+          },
+          {
+            "id": 15,
+            "text": "Как отслеживать bundle regression?"
+          },
+          {
+            "id": 16,
+            "text": "Как связывать frontend event с backend trace?"
+          },
+          {
+            "id": 17,
+            "text": "Когда использовать OpenTelemetry в браузере?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 5",
+        "title": "CLIENT TRACING RISKS    SAMPLING    DASHBOARDS    ALERTS",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 18,
+            "text": "Какие риски у client-side tracing?"
+          },
+          {
+            "id": 19,
+            "text": "Как семплировать telemetry?"
+          },
+          {
+            "id": 20,
+            "text": "Как проектировать dashboard для frontend module?"
+          },
+          {
+            "id": 21,
+            "text": "Какие alerts нужны frontend-команде?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 6",
+        "title": "FE vs BE BUG    INCIDENT    PERF REGRESSION    ERROR GROWTH",
+        "lvl": "HRD LVL",
+        "questions": [
+          {
+            "id": 22,
+            "text": "Как отличить frontend bug от backend incident?"
+          },
+          {
+            "id": 23,
+            "text": "Как проводить incident debugging?"
+          },
+          {
+            "id": 24,
+            "text": "Как расследовать performance regression?"
+          },
+          {
+            "id": 25,
+            "text": "Как расследовать рост ошибок после релиза?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 7",
+        "title": "POST-ROLLOUT    UX IMPACT    FLAGS    RELEASE ANNOT    REVIEW",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 26,
+            "text": "Какие метрики смотреть после rollout?"
+          },
+          {
+            "id": 27,
+            "text": "Как измерять UX-impact?"
+          },
+          {
+            "id": 28,
+            "text": "Как связать observability с feature flags?"
+          },
+          {
+            "id": 29,
+            "text": "Как сделать release annotations?"
+          },
+          {
+            "id": 30,
+            "text": "Как использовать observability в code review?"
+          }
+        ]
+      }
+    ]
+  },
+  "code-review": {
+    "section": "CODE REVIEW / ENGINEERING MATURITY",
+    "topic": "CODE REVIEW",
+    "subtitle": "20 ВОПРОСОВ    7 ДНЕЙ    КОНСПЕКТ ЛЕКЦИЙ",
+    "days": [
+      {
+        "day": "ДЕНЬ 1",
+        "title": "ОБЩИЙ ПОДХОД    BLOCKER vs SUGGESTION",
+        "lvl": "YZY LVL",
+        "questions": [
+          {
+            "id": 1,
+            "text": "На что ты смотришь в code review?"
+          },
+          {
+            "id": 2,
+            "text": "Что для тебя blocker comment?"
+          },
+          {
+            "id": 3,
+            "text": "Что для тебя non-blocking suggestion?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 2",
+        "title": "ТОН    SPOR    КОГДА СОЗВОН",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 4,
+            "text": "Как давать жёсткий feedback без токсичности?"
+          },
+          {
+            "id": 5,
+            "text": "Как спорить о решении в PR?"
+          },
+          {
+            "id": 6,
+            "text": "Когда лучше созвониться, а не писать комментарии?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 3",
+        "title": "АРХИТЕКТУРА    HOOKS    TS",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 7,
+            "text": "Как ревьюить архитектурные изменения?"
+          },
+          {
+            "id": 8,
+            "text": "Как ревьюить React hooks?"
+          },
+          {
+            "id": 9,
+            "text": "Как ревьюить TypeScript types?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 4",
+        "title": "PERFORMANCE    SECURITY    A11Y",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 10,
+            "text": "Как ревьюить performance-sensitive code?"
+          },
+          {
+            "id": 11,
+            "text": "Как ревьюить security-sensitive code?"
+          },
+          {
+            "id": 12,
+            "text": "Как ревьюить accessibility?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 5",
+        "title": "TESTS    БОЛЬШОЙ PR    РАЗБИВКА",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 13,
+            "text": "Как ревьюить tests?"
+          },
+          {
+            "id": 14,
+            "text": "Как понять, что PR слишком большой?"
+          },
+          {
+            "id": 15,
+            "text": "Как разбить большой PR?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 6",
+        "title": "RUBBER-STAMP    CHECKLIST    КАЧЕСТВО",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 16,
+            "text": "Как бороться с rubber-stamp review?"
+          },
+          {
+            "id": 17,
+            "text": "Как вводить review checklist?"
+          },
+          {
+            "id": 18,
+            "text": "Как улучшать code quality в команде?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 7",
+        "title": "LEGACY    ПЕРФЕКЦИОНИЗМ",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 19,
+            "text": "Как работать с legacy PR?"
+          },
+          {
+            "id": 20,
+            "text": "Как не блокировать delivery перфекционизмом?"
+          }
+        ]
+      }
+    ]
+  },
+  "system-design": {
+    "section": "SYSTEM DESIGN FOR FRONTEND",
+    "topic": "SYSTEM DESIGN",
+    "subtitle": "30 ЗАДАНИЙ    7 ДНЕЙ    КОНСПЕКТ ЛЕКЦИЙ",
+    "days": [
+      {
+        "day": "ДЕНЬ 1",
+        "title": "TRADING DASHBOARD    MARKET WATCH    POSITIONS    ORDER BOOK",
+        "lvl": "HRD LVL",
+        "questions": [
+          {
+            "id": 1,
+            "text": "Спроектируй frontend для real-time trading dashboard."
+          },
+          {
+            "id": 2,
+            "text": "Спроектируй Market Watch UI."
+          },
+          {
+            "id": 3,
+            "text": "Спроектируй Positions Table с real-time updates."
+          },
+          {
+            "id": 4,
+            "text": "Спроектируй Order Book UI."
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 2",
+        "title": "NOTIFICATIONS    EMPLOYEE PORTAL    DESIGN SYSTEM",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 5,
+            "text": "Спроектируй notification center."
+          },
+          {
+            "id": 6,
+            "text": "Спроектируй employee portal как microfrontend platform."
+          },
+          {
+            "id": 7,
+            "text": "Спроектируй design system для нескольких продуктовых команд."
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 3",
+        "title": "OBSERVABILITY    RELEASE PIPELINE    AUTH/PERMS",
+        "lvl": "HRD LVL",
+        "questions": [
+          {
+            "id": 8,
+            "text": "Спроектируй frontend observability platform."
+          },
+          {
+            "id": 9,
+            "text": "Спроектируй release pipeline для high-risk fintech UI."
+          },
+          {
+            "id": 10,
+            "text": "Спроектируй frontend auth/permissions model."
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 4",
+        "title": "MULTI-TENANT    FEATURE FLAGS    OFFLINE PWA",
+        "lvl": "HRD LVL",
+        "questions": [
+          {
+            "id": 11,
+            "text": "Спроектируй multi-tenant frontend."
+          },
+          {
+            "id": 12,
+            "text": "Спроектируй feature flag system на frontend."
+          },
+          {
+            "id": 13,
+            "text": "Спроектируй offline-capable PWA."
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 5",
+        "title": "BIG TABLE    DASHBOARD BUILDER    FORM ENGINE",
+        "lvl": "HRD LVL",
+        "questions": [
+          {
+            "id": 14,
+            "text": "Спроектируй large data table с sorting/filtering/pagination."
+          },
+          {
+            "id": 15,
+            "text": "Спроектируй dashboard builder."
+          },
+          {
+            "id": 16,
+            "text": "Спроектируй form engine."
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 6",
+        "title": "MIGRATIONS: LEGACY/REDUX→RQ/JS→TS/WP→VITE/MF/MONOREPO",
+        "lvl": "HRD LVL",
+        "questions": [
+          {
+            "id": 17,
+            "text": "Спроектируй migration с legacy SPA на новую архитектуру."
+          },
+          {
+            "id": 18,
+            "text": "Спроектируй migration с Redux на React Query + local state."
+          },
+          {
+            "id": 19,
+            "text": "Спроектируй migration с JS на TypeScript."
+          },
+          {
+            "id": 20,
+            "text": "Спроектируй migration с Webpack на Vite."
+          },
+          {
+            "id": 21,
+            "text": "Спроектируй migration на microfrontends."
+          },
+          {
+            "id": 22,
+            "text": "Спроектируй shared package strategy в monorepo."
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 7",
+        "title": "ERROR HANDLING    CACHE    i18n    A/B    ANALYTICS    AUTH    WS    ROLLBACK",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 23,
+            "text": "Спроектируй frontend error handling strategy."
+          },
+          {
+            "id": 24,
+            "text": "Спроектируй frontend caching strategy."
+          },
+          {
+            "id": 25,
+            "text": "Спроектируй i18n architecture."
+          },
+          {
+            "id": 26,
+            "text": "Спроектируй A/B testing architecture."
+          },
+          {
+            "id": 27,
+            "text": "Спроектируй analytics event tracking."
+          },
+          {
+            "id": 28,
+            "text": "Спроектируй secure token handling flow."
+          },
+          {
+            "id": 29,
+            "text": "Спроектируй resilient WebSocket client."
+          },
+          {
+            "id": 30,
+            "text": "Спроектируй rollback strategy для federated frontend."
+          }
+        ]
+      }
+    ]
+  },
+  "live-coding-js": {
+    "section": "LIVE-CODING",
+    "topic": "JAVASCRIPT / ALGORITHMS",
+    "subtitle": "30 ЗАДАЧ    7 ДНЕЙ    КОНСПЕКТ ЛЕКЦИЙ",
+    "days": [
+      {
+        "day": "ДЕНЬ 1",
+        "title": "DEBOUNCE    THROTTLE    ONCE    MEMOIZE    CURRY",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 1,
+            "text": "Реализуй debounce(fn, delay)"
+          },
+          {
+            "id": 2,
+            "text": "Реализуй throttle(fn, interval)"
+          },
+          {
+            "id": 3,
+            "text": "Реализуй once(fn)"
+          },
+          {
+            "id": 4,
+            "text": "Реализуй memoize(fn)"
+          },
+          {
+            "id": 5,
+            "text": "Реализуй curry(fn)"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 2",
+        "title": "DEEP CLONE    DEEP EQUAL    FLAT    UNFLATTEN",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 6,
+            "text": "Реализуй deepClone(obj)"
+          },
+          {
+            "id": 7,
+            "text": "Реализуй deepEqual(a, b)"
+          },
+          {
+            "id": 8,
+            "text": "Реализуй flat(arr, depth = 1)"
+          },
+          {
+            "id": 9,
+            "text": "Реализуй unflatten({a.b.c: 1})"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 3",
+        "title": "PROMISE.ALL    POOL    RETRY    TIMEOUT    SEQUENTIAL",
+        "lvl": "HRD LVL",
+        "questions": [
+          {
+            "id": 10,
+            "text": "Реализуй Promise.all(promises)"
+          },
+          {
+            "id": 11,
+            "text": "Реализуй promisePool(tasks, concurrency)"
+          },
+          {
+            "id": 12,
+            "text": "Реализуй retry(fn, retries, delay)"
+          },
+          {
+            "id": 13,
+            "text": "Реализуй timeout(promise, ms)"
+          },
+          {
+            "id": 14,
+            "text": "Реализуй sequentialPromises(tasks)"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 4",
+        "title": "CHUNK    GROUP    UNIQ    INTERSECT    DIFF",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 15,
+            "text": "Реализуй chunk(arr, size)"
+          },
+          {
+            "id": 16,
+            "text": "Реализуй groupBy(arr, key)"
+          },
+          {
+            "id": 17,
+            "text": "Реализуй uniq(arr) и uniqBy(arr, key)"
+          },
+          {
+            "id": 18,
+            "text": "Реализуй intersection(a, b)"
+          },
+          {
+            "id": 19,
+            "text": "Реализуй difference(a, b)"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 5",
+        "title": "EVENT EMITTER    OBSERVABLE    ITERATOR    GENERATOR",
+        "lvl": "HRD LVL",
+        "questions": [
+          {
+            "id": 20,
+            "text": "Реализуй EventEmitter"
+          },
+          {
+            "id": 21,
+            "text": "Реализуй простой Observable"
+          },
+          {
+            "id": 22,
+            "text": "Реализуй Iterator-protocol"
+          },
+          {
+            "id": 23,
+            "text": "Реализуй generator function для range"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 6",
+        "title": "FETCH POLLING    STREAM    CACHE    LRU",
+        "lvl": "HRD LVL",
+        "questions": [
+          {
+            "id": 24,
+            "text": "Реализуй polling fetch с интервалом"
+          },
+          {
+            "id": 25,
+            "text": "Реализуй stream-обработку через ReadableStream"
+          },
+          {
+            "id": 26,
+            "text": "Реализуй простой in-memory cache с TTL"
+          },
+          {
+            "id": 27,
+            "text": "Реализуй LRU-cache"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 7",
+        "title": "SCHEDULER    PRIORITY QUEUE    SHEDULE",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 28,
+            "text": "Реализуй scheduler с queue"
+          },
+          {
+            "id": 29,
+            "text": "Реализуй priority-queue"
+          },
+          {
+            "id": 30,
+            "text": "Реализуй scheduleAt(date, fn)"
+          }
+        ]
+      }
+    ]
+  },
+  "live-coding-ts": {
+    "section": "LIVE-CODING",
+    "topic": "TYPESCRIPT",
+    "subtitle": "20 ЗАДАЧ    7 ДНЕЙ    КОНСПЕКТ ЛЕКЦИЙ",
+    "days": [
+      {
+        "day": "ДЕНЬ 1",
+        "title": "PARTIAL    REQUIRED    READONLY    PICK    OMIT",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 1,
+            "text": "Реализуй MyPartial<T>"
+          },
+          {
+            "id": 2,
+            "text": "Реализуй MyRequired<T>"
+          },
+          {
+            "id": 3,
+            "text": "Реализуй MyPick<T, K>"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 2",
+        "title": "DEEP PARTIAL    DEEP READONLY",
+        "lvl": "HRD LVL",
+        "questions": [
+          {
+            "id": 4,
+            "text": "Реализуй DeepPartial<T>"
+          },
+          {
+            "id": 5,
+            "text": "Реализуй DeepReadonly<T>"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 3",
+        "title": "AWAITED    PROMISE TYPE    RETURN TYPE    PARAMETERS",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 6,
+            "text": "Реализуй MyAwaited<T>"
+          },
+          {
+            "id": 7,
+            "text": "Реализуй MyReturnType<T>"
+          },
+          {
+            "id": 8,
+            "text": "Реализуй MyParameters<T>"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 4",
+        "title": "UNION TO INTERSECT    TUPLE TO UNION    KEYS",
+        "lvl": "HRD LVL",
+        "questions": [
+          {
+            "id": 9,
+            "text": "Реализуй UnionToIntersection<U>"
+          },
+          {
+            "id": 10,
+            "text": "Реализуй TupleToUnion<T>"
+          },
+          {
+            "id": 11,
+            "text": "Реализуй ObjectKeys<T>"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 5",
+        "title": "GET TYPE BY PATH    SET TYPE BY PATH",
+        "lvl": "HRD LVL",
+        "questions": [
+          {
+            "id": 12,
+            "text": "Реализуй Get<T, Path> для dot-path access"
+          },
+          {
+            "id": 13,
+            "text": "Реализуй Set<T, Path, Value> для dot-path mutation"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 6",
+        "title": "BRANDED    NOMINAL    OPAQUE    TYPED EVENT",
+        "lvl": "HRD LVL",
+        "questions": [
+          {
+            "id": 14,
+            "text": "Реализуй Branded<T, Brand>"
+          },
+          {
+            "id": 15,
+            "text": "Реализуй Opaque<T, Token>"
+          },
+          {
+            "id": 16,
+            "text": "Реализуй TypedEventEmitter<Events>"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 7",
+        "title": "BUILDER    REDUCER    DISCRIMINATED FN",
+        "lvl": "HRD LVL",
+        "questions": [
+          {
+            "id": 17,
+            "text": "Реализуй Builder<T> с fluent API"
+          },
+          {
+            "id": 18,
+            "text": "Реализуй type-safe reducer с discriminated union"
+          },
+          {
+            "id": 19,
+            "text": "Реализуй generic-функцию pluck<T, K>"
+          },
+          {
+            "id": 20,
+            "text": "Реализуй ExhaustiveCheck для switch"
+          }
+        ]
+      }
+    ]
+  },
+  "live-coding-react": {
+    "section": "LIVE-CODING",
+    "topic": "REACT",
+    "subtitle": "25 ЗАДАЧ    7 ДНЕЙ    КОНСПЕКТ ЛЕКЦИЙ",
+    "days": [
+      {
+        "day": "ДЕНЬ 1",
+        "title": "USE-DEBOUNCE    USE-THROTTLE    USE-PREVIOUS",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 1,
+            "text": "Напиши useDebounce(value, delay)"
+          },
+          {
+            "id": 2,
+            "text": "Напиши useThrottle(value, interval)"
+          },
+          {
+            "id": 3,
+            "text": "Напиши usePrevious(value)"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 2",
+        "title": "USE-FETCH    USE-ASYNC    USE-LOCALSTORAGE",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 4,
+            "text": "Напиши useFetch(url)"
+          },
+          {
+            "id": 5,
+            "text": "Напиши useAsync(asyncFn, deps)"
+          },
+          {
+            "id": 6,
+            "text": "Напиши useLocalStorage(key, initial)"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 3",
+        "title": "AUTOCOMPLETE    SEARCH WITH ABORT",
+        "lvl": "HRD LVL",
+        "questions": [
+          {
+            "id": 7,
+            "text": "Напиши Autocomplete-компонент"
+          },
+          {
+            "id": 8,
+            "text": "Напиши search-input с AbortController"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 4",
+        "title": "INFINITE SCROLL    VIRTUAL LIST",
+        "lvl": "HRD LVL",
+        "questions": [
+          {
+            "id": 9,
+            "text": "Напиши Infinite Scroll"
+          },
+          {
+            "id": 10,
+            "text": "Напиши Virtual List (react-window-like)"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 5",
+        "title": "MODAL    PORTAL    FOCUS TRAP    OUTSIDE CLICK",
+        "lvl": "HRD LVL",
+        "questions": [
+          {
+            "id": 11,
+            "text": "Напиши Modal с Portal"
+          },
+          {
+            "id": 12,
+            "text": "Напиши useFocusTrap для modal"
+          },
+          {
+            "id": 13,
+            "text": "Напиши useOnClickOutside(ref, handler)"
+          },
+          {
+            "id": 14,
+            "text": "Напиши Dropdown / Select с keyboard nav"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 6",
+        "title": "FORM    VALIDATION    DROPDOWN    TABS    ACCORDION",
+        "lvl": "HRD LVL",
+        "questions": [
+          {
+            "id": 15,
+            "text": "Напиши контролируемую форму с валидацией"
+          },
+          {
+            "id": 16,
+            "text": "Напиши Tabs-компонент с keyboard nav"
+          },
+          {
+            "id": 17,
+            "text": "Напиши Accordion с single / multi mode"
+          },
+          {
+            "id": 18,
+            "text": "Напиши Toast-нотификации"
+          },
+          {
+            "id": 19,
+            "text": "Напиши Tooltip-компонент"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 7",
+        "title": "DRAG    SORT    TIC-TAC-TOE    UNDO    KANBAN",
+        "lvl": "HRD LVL",
+        "questions": [
+          {
+            "id": 20,
+            "text": "Напиши Drag & Drop сортировку"
+          },
+          {
+            "id": 21,
+            "text": "Напиши Tic-Tac-Toe"
+          },
+          {
+            "id": 22,
+            "text": "Напиши Undo / Redo с history"
+          },
+          {
+            "id": 23,
+            "text": "Напиши Calculator"
+          },
+          {
+            "id": 24,
+            "text": "Напиши Color Picker (RGB sliders)"
+          },
+          {
+            "id": 25,
+            "text": "Напиши простой Kanban (3 колонки + drag)"
+          }
+        ]
+      }
+    ]
+  },
+  "take-home": {
+    "section": "TAKE-HOME ЗАДАЧИ",
+    "topic": "TAKE-HOME",
+    "subtitle": "25 ЗАДАЧ    7 ДНЕЙ    КОНСПЕКТ ЛЕКЦИЙ",
+    "days": [
+      {
+        "day": "ДЕНЬ 1",
+        "title": "MARKET WATCH    POSITIONS    TRADING DASHBOARD",
+        "lvl": "HRD LVL",
+        "questions": [
+          {
+            "id": 1,
+            "text": "Market Watch widget с real-time котировками."
+          },
+          {
+            "id": 2,
+            "text": "Positions Table с search/sort/filter/pagination."
+          },
+          {
+            "id": 3,
+            "text": "Trading dashboard с WebSocket feed."
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 2",
+        "title": "ORDER BOOK    NOTIFICATION CENTER    ADMIN TABLE",
+        "lvl": "HRD LVL",
+        "questions": [
+          {
+            "id": 4,
+            "text": "Order Book UI с high-frequency updates."
+          },
+          {
+            "id": 5,
+            "text": "Notification center с read/unread state."
+          },
+          {
+            "id": 6,
+            "text": "Admin table с permissions и audit log."
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 3",
+        "title": "PORTAL AUTH    PWA OFFLINE    FEDERATED REMOTE",
+        "lvl": "HRD LVL",
+        "questions": [
+          {
+            "id": 7,
+            "text": "Internal portal module с auth boundary."
+          },
+          {
+            "id": 8,
+            "text": "PWA dashboard с offline fallback."
+          },
+          {
+            "id": 9,
+            "text": "Federated remote app, подключаемый к shell."
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 4",
+        "title": "MINI DESIGN SYSTEM    DASHBOARD URL STATE    FORM BUILDER",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 10,
+            "text": "Mini design system с Button/Input/Modal/Table."
+          },
+          {
+            "id": 11,
+            "text": "Dashboard с charts, filters и URL state."
+          },
+          {
+            "id": 12,
+            "text": "Form builder с validation schema."
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 5",
+        "title": "FLAGS UI    A/B UI    ANALYTICS DEBUGGER    ERROR DASH    PERF PLAYGROUND",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 13,
+            "text": "Feature flag admin UI."
+          },
+          {
+            "id": 14,
+            "text": "A/B test assignment UI."
+          },
+          {
+            "id": 15,
+            "text": "Analytics event debugger."
+          },
+          {
+            "id": 16,
+            "text": "Error monitoring dashboard."
+          },
+          {
+            "id": 17,
+            "text": "Frontend performance playground."
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 6",
+        "title": "JS→TS MIGRATION    REFACTOR LEGACY    QUERY OPTIMISTIC    A11Y PACKAGE    WS CLIENT",
+        "lvl": "HRD LVL",
+        "questions": [
+          {
+            "id": 18,
+            "text": "Migration небольшого JS-модуля на TypeScript."
+          },
+          {
+            "id": 19,
+            "text": "Refactor legacy React component."
+          },
+          {
+            "id": 20,
+            "text": "React Query cache + optimistic mutation."
+          },
+          {
+            "id": 21,
+            "text": "Accessible modal/dropdown/tabs package."
+          },
+          {
+            "id": 22,
+            "text": "WebSocket client library with reconnect/backoff."
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 7",
+        "title": "VIRTUALIZED TABLE    MF SHELL    CI PIPELINE",
+        "lvl": "HRD LVL",
+        "questions": [
+          {
+            "id": 23,
+            "text": "Virtualized table with dynamic row height."
+          },
+          {
+            "id": 24,
+            "text": "Microfrontend shell + one remote."
+          },
+          {
+            "id": 25,
+            "text": "CI pipeline для frontend app."
+          }
+        ]
+      }
+    ]
+  },
+  "debugging": {
+    "section": "DEBUGGING",
+    "topic": "DEBUGGING",
+    "subtitle": "20 ЗАДАЧ    7 ДНЕЙ    КОНСПЕКТ ЛЕКЦИЙ",
+    "days": [
+      {
+        "day": "ДЕНЬ 1",
+        "title": "ИНФИНИТНЫЙ RENDER    INFINITE EFFECT    ЛАГ INPUT",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 1,
+            "text": "Компонент бесконечно re-render'ится — найди причину."
+          },
+          {
+            "id": 2,
+            "text": "useEffect вызывается бесконечно — исправь."
+          },
+          {
+            "id": 3,
+            "text": "Input лагает при фильтрации большого списка — исправь."
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 2",
+        "title": "WS FREEZE    STALE QUOTES    STALE SEARCH",
+        "lvl": "HRD LVL",
+        "questions": [
+          {
+            "id": 4,
+            "text": "WebSocket UI фризит страницу — исправь."
+          },
+          {
+            "id": 5,
+            "text": "Старая котировка перетирает новую — исправь."
+          },
+          {
+            "id": 6,
+            "text": "После быстрого поиска показываются результаты старого запроса — исправь."
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 3",
+        "title": "MEMORY LEAK    MODAL KEYBOARD    DROPDOWN A11Y",
+        "lvl": "HRD LVL",
+        "questions": [
+          {
+            "id": 7,
+            "text": "Memory leak после ухода со страницы — найди."
+          },
+          {
+            "id": 8,
+            "text": "Modal ломает keyboard navigation — исправь."
+          },
+          {
+            "id": 9,
+            "text": "Dropdown недоступен для screen reader — исправь."
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 4",
+        "title": "TABLE FOCUS    REACT KEY    CONTEXT RE-RENDER",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 10,
+            "text": "Table теряет focus при sort — исправь."
+          },
+          {
+            "id": 11,
+            "text": "React key bug ломает список — исправь."
+          },
+          {
+            "id": 12,
+            "text": "Context вызывает re-render всего приложения — исправь."
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 5",
+        "title": "useMemo НЕ ПОМОГАЕТ    BUNDLE +500KB    PLAYWRIGHT FLAKY",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 13,
+            "text": "useMemo не помогает performance — объясни и исправь."
+          },
+          {
+            "id": 14,
+            "text": "Bundle внезапно вырос на 500KB — найди причину."
+          },
+          {
+            "id": 15,
+            "text": "Playwright test flaky — найди причину."
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 6",
+        "title": "HYDRATION MISMATCH    PROD-ONLY ERROR    CORS",
+        "lvl": "HRD LVL",
+        "questions": [
+          {
+            "id": 16,
+            "text": "Hydration mismatch — найди причину."
+          },
+          {
+            "id": 17,
+            "text": "Ошибка появляется только в production build — расследуй."
+          },
+          {
+            "id": 18,
+            "text": "CORS request падает — объясни возможные причины."
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 7",
+        "title": "XSS    TOKEN REFRESH RACE",
+        "lvl": "HRD LVL",
+        "questions": [
+          {
+            "id": 19,
+            "text": "XSS vulnerability в preview HTML — исправь."
+          },
+          {
+            "id": 20,
+            "text": "Race condition в token refresh — исправь."
+          }
+        ]
+      }
+    ]
+  },
+  "code-review-tasks": {
+    "section": "CODE REVIEW TASKS",
+    "topic": "CODE REVIEW TASKS",
+    "subtitle": "20 ЗАДАНИЙ    7 ДНЕЙ    КОНСПЕКТ ЛЕКЦИЙ",
+    "days": [
+      {
+        "day": "ДЕНЬ 1",
+        "title": "HOOKS DEPS    DERIVED IN EFFECT    INDEX KEYS",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 1,
+            "text": "Проведи review компонента с плохими hooks dependencies."
+          },
+          {
+            "id": 2,
+            "text": "Проведи review компонента с derived state в useEffect."
+          },
+          {
+            "id": 3,
+            "text": "Проведи review таблицы с index keys."
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 2",
+        "title": "FORM A11Y    WS CLEANUP    API CANCELLATION",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 4,
+            "text": "Проведи review формы без accessible errors."
+          },
+          {
+            "id": 5,
+            "text": "Проведи review WebSocket клиента без cleanup."
+          },
+          {
+            "id": 6,
+            "text": "Проведи review API client без cancellation."
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 3",
+        "title": "REDUCER    TS ANY    dangerouslySetInnerHTML",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 7,
+            "text": "Проведи review reducer с impossible states."
+          },
+          {
+            "id": 8,
+            "text": "Проведи review TypeScript-кода с any."
+          },
+          {
+            "id": 9,
+            "text": "Проведи review компонента с dangerouslySetInnerHTML."
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 4",
+        "title": "BIG SHARED API    OVER-ABSTRACTION    NO TESTS",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 10,
+            "text": "Проведи review PR с большим shared component API."
+          },
+          {
+            "id": 11,
+            "text": "Проведи review PR с over-abstraction."
+          },
+          {
+            "id": 12,
+            "text": "Проведи review PR без тестов."
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 5",
+        "title": "FLAKY E2E    BUNDLE REGRESSION    MF SHARED CONFIG",
+        "lvl": "HRD LVL",
+        "questions": [
+          {
+            "id": 13,
+            "text": "Проведи review flaky e2e test."
+          },
+          {
+            "id": 14,
+            "text": "Проведи review bundle-size regression."
+          },
+          {
+            "id": 15,
+            "text": "Проведи review microfrontend shared dependency config."
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 6",
+        "title": "CI    FLAGS ROLLOUT    TELEMETRY",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 16,
+            "text": "Проведи review CI pipeline."
+          },
+          {
+            "id": 17,
+            "text": "Проведи review feature flag rollout."
+          },
+          {
+            "id": 18,
+            "text": "Проведи review frontend telemetry events."
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 7",
+        "title": "ERROR HANDLING    PERF PR",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 19,
+            "text": "Проведи review error handling strategy."
+          },
+          {
+            "id": 20,
+            "text": "Проведи review performance optimization PR."
+          }
+        ]
+      }
+    ]
+  },
+  "fintech-scenarios": {
+    "section": "FINTECH SCENARIOS",
+    "topic": "FINTECH SCENARIOS",
+    "subtitle": "20 ВОПРОСОВ    7 ДНЕЙ    КОНСПЕКТ ЛЕКЦИЙ",
+    "days": [
+      {
+        "day": "ДЕНЬ 1",
+        "title": "ВЫСОКОЧАСТОТНЫЕ ЦЕНЫ    STALE DATA    DELAY",
+        "lvl": "HRD LVL",
+        "questions": [
+          {
+            "id": 1,
+            "text": "Как проектировать UI, где цена меняется много раз в секунду?"
+          },
+          {
+            "id": 2,
+            "text": "Как не показывать пользователю устаревшие финансовые данные?"
+          },
+          {
+            "id": 3,
+            "text": "Как обозначить stale market data?"
+          },
+          {
+            "id": 4,
+            "text": "Как обрабатывать задержку real-time feed?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 2",
+        "title": "AUDITABILITY    SENSITIVE LOGGING",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 5,
+            "text": "Как проектировать auditability на frontend?"
+          },
+          {
+            "id": 6,
+            "text": "Как не логировать sensitive financial data?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 3",
+        "title": "TRADING FORM    DOUBLE SUBMIT    PENDING TX",
+        "lvl": "HRD LVL",
+        "questions": [
+          {
+            "id": 7,
+            "text": "Как проектировать безопасный trading form?"
+          },
+          {
+            "id": 8,
+            "text": "Как защититься от double submit order?"
+          },
+          {
+            "id": 9,
+            "text": "Как показывать pending transaction state?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 4",
+        "title": "IDEMPOTENCY    INCONSISTENT BACKEND",
+        "lvl": "HRD LVL",
+        "questions": [
+          {
+            "id": 10,
+            "text": "Как проектировать idempotent frontend flow?"
+          },
+          {
+            "id": 11,
+            "text": "Как обрабатывать inconsistent backend state?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 5",
+        "title": "RBAC    KILL SWITCH    HIGH-RISK TESTING",
+        "lvl": "HRD LVL",
+        "questions": [
+          {
+            "id": 12,
+            "text": "Как проектировать role-based access для финансовых операций?"
+          },
+          {
+            "id": 13,
+            "text": "Как проектировать kill switch для рискованной фичи?"
+          },
+          {
+            "id": 14,
+            "text": "Как тестировать high-risk UI перед релизом?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 6",
+        "title": "ПОСТ-РЕЛИЗ MONITORING    DEGRADED FALLBACK    PARTIAL OUTAGE",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 15,
+            "text": "Как мониторить frontend после релиза trading-фичи?"
+          },
+          {
+            "id": 16,
+            "text": "Как проектировать fallback при degraded backend?"
+          },
+          {
+            "id": 17,
+            "text": "Как объяснить пользователю partial outage?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 7",
+        "title": "PRECISION/ROUNDING    MONEY FORMATTING    TIMEZONE",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 18,
+            "text": "Как работать с precision/rounding в financial UI?"
+          },
+          {
+            "id": 19,
+            "text": "Как тестировать formatting денежных значений?"
+          },
+          {
+            "id": 20,
+            "text": "Как работать с timezone в финансовых данных?"
+          }
+        ]
+      }
+    ]
+  },
+  "must-have-blitz": {
+    "section": "MUST-HAVE",
+    "topic": "BLITZ",
+    "subtitle": "50 ВОПРОСОВ    7 ДНЕЙ    КОНСПЕКТ ЛЕКЦИЙ",
+    "days": [
+      {
+        "day": "ДЕНЬ 1",
+        "title": "JS CORE   ===   HOIST   THIS   ARROW   CLOSURE",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 1,
+            "text": "== vs ==="
+          },
+          {
+            "id": 2,
+            "text": "Hoisting var / let / const"
+          },
+          {
+            "id": 3,
+            "text": "this в разных контекстах"
+          },
+          {
+            "id": 4,
+            "text": "Arrow function vs regular function"
+          },
+          {
+            "id": 5,
+            "text": "Closure"
+          },
+          {
+            "id": 6,
+            "text": "Prototype chain"
+          },
+          {
+            "id": 7,
+            "text": "call / apply / bind"
+          },
+          {
+            "id": 8,
+            "text": "Spread vs rest"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 2",
+        "title": "EVENT LOOP   PROMISE   MICROTASK   ASYNC",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 9,
+            "text": "Event loop основы"
+          },
+          {
+            "id": 10,
+            "text": "Promise states"
+          },
+          {
+            "id": 11,
+            "text": "async / await"
+          },
+          {
+            "id": 12,
+            "text": "Microtask vs Macrotask"
+          },
+          {
+            "id": 13,
+            "text": "Promise.all vs allSettled vs race vs any"
+          },
+          {
+            "id": 14,
+            "text": "AbortController"
+          },
+          {
+            "id": 15,
+            "text": "setTimeout vs setInterval vs requestAnimationFrame"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 3",
+        "title": "REACT   KEYS   LIFTING   MEMO   USECALLBACK",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 16,
+            "text": "Зачем key в списке?"
+          },
+          {
+            "id": 17,
+            "text": "Lifting state up"
+          },
+          {
+            "id": 18,
+            "text": "React.memo когда полезен"
+          },
+          {
+            "id": 19,
+            "text": "useCallback когда полезен"
+          },
+          {
+            "id": 20,
+            "text": "useMemo когда полезен"
+          },
+          {
+            "id": 21,
+            "text": "Controlled vs Uncontrolled"
+          },
+          {
+            "id": 22,
+            "text": "Что такое children prop?"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 4",
+        "title": "HOOKS   USEEFFECT   USEREF   CONTEXT",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 23,
+            "text": "useEffect vs useLayoutEffect"
+          },
+          {
+            "id": 24,
+            "text": "Cleanup в useEffect"
+          },
+          {
+            "id": 25,
+            "text": "Dependency array"
+          },
+          {
+            "id": 26,
+            "text": "useRef vs useState"
+          },
+          {
+            "id": 27,
+            "text": "forwardRef"
+          },
+          {
+            "id": 28,
+            "text": "Context — когда и зачем"
+          },
+          {
+            "id": 29,
+            "text": "useReducer vs useState"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 5",
+        "title": "BROWSER   CORS   COOKIE   STORAGE   CSP",
+        "lvl": "HRD LVL",
+        "questions": [
+          {
+            "id": 30,
+            "text": "CORS — что это и как работает"
+          },
+          {
+            "id": 31,
+            "text": "Cookie атрибуты — Secure, HttpOnly, SameSite"
+          },
+          {
+            "id": 32,
+            "text": "localStorage vs sessionStorage vs cookie"
+          },
+          {
+            "id": 33,
+            "text": "CSP — что и зачем"
+          },
+          {
+            "id": 34,
+            "text": "XSS — типы и защита"
+          },
+          {
+            "id": 35,
+            "text": "CSRF — что и защита"
+          },
+          {
+            "id": 36,
+            "text": "Service Worker — для чего"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 6",
+        "title": "PERF   LCP   INP   CLS   BUNDLE",
+        "lvl": "HRD LVL",
+        "questions": [
+          {
+            "id": 37,
+            "text": "LCP — что измеряет, целевые значения"
+          },
+          {
+            "id": 38,
+            "text": "INP — что измеряет"
+          },
+          {
+            "id": 39,
+            "text": "CLS — что измеряет"
+          },
+          {
+            "id": 40,
+            "text": "Code splitting"
+          },
+          {
+            "id": 41,
+            "text": "Tree shaking"
+          },
+          {
+            "id": 42,
+            "text": "Lazy loading images"
+          },
+          {
+            "id": 43,
+            "text": "Bundle analysis"
+          }
+        ]
+      },
+      {
+        "day": "ДЕНЬ 7",
+        "title": "TS   GIT   TOOLS   A11Y",
+        "lvl": "MDM LVL",
+        "questions": [
+          {
+            "id": 44,
+            "text": "TypeScript: any vs unknown"
+          },
+          {
+            "id": 45,
+            "text": "TypeScript: type vs interface"
+          },
+          {
+            "id": 46,
+            "text": "TypeScript: generics"
+          },
+          {
+            "id": 47,
+            "text": "git rebase vs merge"
+          },
+          {
+            "id": 48,
+            "text": "Webpack vs Vite"
+          },
+          {
+            "id": 49,
+            "text": "Semantic HTML — почему важно"
+          },
+          {
+            "id": 50,
+            "text": "ARIA — когда использовать"
+          }
+        ]
+      }
+    ]
+  }
+}
