@@ -80,7 +80,8 @@ function foldLine(line: string): string {
   return chunks.join("\r\n");
 }
 
-// Описание события: тема + Q01 ... + LVL + ссылки на PDF и EPUB.
+// Описание события: тема + Q01 ... + ссылки на PDF и EPUB.
+// LVL не дублируем — он уже в SUMMARY (ITW PREP STDY / <LVL>).
 function buildDescription(d: PlanDay, urls?: IcsUrls): string {
   const lines: string[] = [];
   lines.push(`${d.day}    ${d.title}`);
@@ -88,8 +89,6 @@ function buildDescription(d: PlanDay, urls?: IcsUrls): string {
   for (const q of d.questions) {
     lines.push(`Q${pad(q.id)}    ${q.text}`);
   }
-  lines.push("");
-  lines.push(d.lvl);
   if (urls) {
     lines.push("");
     lines.push(`PDF    ${urls.pdf}`);
