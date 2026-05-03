@@ -85,6 +85,18 @@ const REGISTRY: Record<string, MethodologyFiles> = {
     epub: "/methodology/browser-apis-dom.epub",
     hint: "LEARN IT FOR 7 DAYS",
   },
+
+  // Performance — две подкатегории
+  "browser / runtime": {
+    pdf: "/methodology/perf-runtime.pdf",
+    epub: "/methodology/perf-runtime.epub",
+    hint: "LEARN IT FOR 7 DAYS",
+  },
+  "react performance": {
+    pdf: "/methodology/perf-react.pdf",
+    epub: "/methodology/perf-react.epub",
+    hint: "LEARN IT FOR 7 DAYS",
+  },
 };
 
 function normalize(s: string): string {
