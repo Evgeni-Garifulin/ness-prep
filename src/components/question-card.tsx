@@ -150,7 +150,7 @@ function SocialCard({ number, text, correctAnswer }: Props) {
       </div>
 
       {hasAnswer && open && (
-        <div className="mt-3 border border-foreground p-4">
+        <div className="mt-3">
           <div className="yzy-label text-muted-foreground mb-2">
             RECOMMENDED ANSWER WAY
           </div>
@@ -339,7 +339,7 @@ function TechCard({
       </div>
 
       {note.trim().length > 0 && (
-        <div className="mt-5 border border-foreground p-4">
+        <div className="mt-5">
           <div className="flex items-center justify-between gap-3 mb-2">
             <div className="yzy-label text-muted-foreground">NOTE</div>
             <div className="flex items-center gap-4">
@@ -376,7 +376,7 @@ function TechCard({
       )}
 
       {showCorrect && hasCorrect && (
-        <div className="mt-5 border border-foreground p-4">
+        <div className="mt-5">
           <div className="yzy-label text-muted-foreground mb-2">REFERENCE ANSWER</div>
           <p className="text-sm leading-relaxed whitespace-pre-wrap">{correctAnswer}</p>
         </div>
@@ -550,7 +550,7 @@ function ToggleLink({
 
 function Hint({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div className="mt-4 border border-foreground p-4">
+    <div className="mt-4">
       <div className="yzy-label text-muted-foreground mb-2">{label}</div>
       <p className="text-sm leading-relaxed whitespace-pre-wrap">{children}</p>
     </div>
