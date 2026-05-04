@@ -12,7 +12,7 @@ type User = { username: string; password: string };
 
 function loadUsers(): User[] {
   const users: User[] = [];
-  for (let i = 1; i <= 5; i++) {
+  for (let i = 1; i <= 10; i++) {
     const username = process.env[`AUTH_USER_${i}`];
     const password = process.env[`AUTH_PASS_${i}`];
     if (username && password) {
