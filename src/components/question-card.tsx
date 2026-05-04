@@ -242,36 +242,18 @@ function TechCard({
         >
           {text}
         </h3>
-        {/* +/− справа: явный жест «ответ дан / забран». Когда confirmed=true,
+        {/* Один тоггл справа: показываем только актуальное действие.
+            confirmed=false → «+» (пометить ответ данным).
+            confirmed=true  → «−» (забрать). Когда confirmed=true,
             остальное тело карточки прячется (см. {!confirmed && ...}). */}
-        <div className="flex items-center gap-3 shrink-0">
+        <div className="flex items-center shrink-0">
           <button
             type="button"
-            onClick={() => setConfirmedRemote(true)}
-            aria-label="Пометить ответ данным"
-            disabled={confirmed}
-            className={cn(
-              "h-7 w-7 leading-none text-xl font-medium transition-colors",
-              confirmed
-                ? "text-muted-foreground/40 cursor-default"
-                : "text-foreground hover:text-muted-foreground",
-            )}
+            onClick={() => setConfirmedRemote(!confirmed)}
+            aria-label={confirmed ? "Забрать ответ" : "Пометить ответ данным"}
+            className="h-7 w-7 leading-none text-xl font-medium text-foreground hover:text-muted-foreground transition-colors"
           >
-            +
-          </button>
-          <button
-            type="button"
-            onClick={() => setConfirmedRemote(false)}
-            aria-label="Забрать ответ"
-            disabled={!confirmed}
-            className={cn(
-              "h-7 w-7 leading-none text-xl font-medium transition-colors",
-              !confirmed
-                ? "text-muted-foreground/40 cursor-default"
-                : "text-foreground hover:text-muted-foreground",
-            )}
-          >
-            −
+            {confirmed ? "−" : "+"}
           </button>
         </div>
       </header>
