@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
+import { unstable_cache } from "next/cache";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { SiteHeader } from "@/components/site-header";
@@ -9,6 +10,23 @@ import { ResetButton } from "@/components/reset-button";
 import { TRACKS, categoryFor } from "@/lib/categories";
 
 export const dynamic = "force-dynamic";
+
+// Sections + questionIds одинаковы для всех пользователей и меняются только
+// при пересеве БД, поэтому держим их в Next-кеше и не дёргаем Postgres на
+// каждый рендер главной. Тег `sections` оставлен на будущее — при ребилде
+// можно будет вызвать revalidateTag после `npm run db:seed`.
+const getSectionsWithCounts = unstable_cache(
+  async () =>
+    prisma.section.findMany({
+      orderBy: { order: "asc" },
+      include: {
+        _count: { select: { questions: true } },
+        questions: { select: { id: true } },
+      },
+    }),
+  ["home:sections-with-counts"],
+  { revalidate: 3600, tags: ["sections"] },
+);
 
 export const metadata: Metadata = {
   title: "MAIN",
@@ -19,15 +37,10 @@ export default async function HomePage() {
   const username = getCurrentUser();
   if (!username) redirect("/login");
 
-  const sections = await prisma.section.findMany({
-    orderBy: { order: "asc" },
-    include: {
-      _count: { select: { questions: true } },
-      questions: { select: { id: true } },
-    },
-  });
-
-  const [answers, trainerStats, notes] = await Promise.all([
+  // Все запросы стартуют параллельно: sections тянутся из Next-кеша
+  // (горячий путь — без обращения к Postgres), три пользовательских — из БД.
+  const [sections, answers, trainerStats, notes] = await Promise.all([
+    getSectionsWithCounts(),
     prisma.answer.findMany({
       where: { username },
       select: { questionId: true, text: true },

@@ -6,7 +6,9 @@ import "./globals.css";
 
 const plexMono = IBM_Plex_Mono({
   subsets: ["latin", "cyrillic"],
-  weight: ["300", "400", "500", "600", "700"],
+  // В UI реально используются только 400/500/700 (font-medium, font-bold).
+  // 300 и 600 выкинуты — экономит 4 woff2-файла из прелоада.
+  weight: ["400", "500", "700"],
   variable: "--font-plex-mono",
   display: "swap",
 });
