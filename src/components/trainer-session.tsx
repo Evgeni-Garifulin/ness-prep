@@ -24,12 +24,14 @@ type Question = {
   hintFull: string;
   answer: string;
   section: string;
+  sectionSlug: string;
 };
 
 type Stat = {
   questionId: string;
   text: string;
   section: string;
+  sectionSlug: string;
   knownCount: number;
   unknownCount: number;
 };
@@ -89,6 +91,7 @@ export function TrainerSession({
       questionId: q.id,
       text: q.text,
       section: q.section,
+      sectionSlug: q.sectionSlug,
       knownCount: 0,
       unknownCount: 0,
     };
@@ -143,6 +146,7 @@ export function TrainerSession({
       hintFull: q.hintFull,
       answer: q.answer,
       section: q.sectionTitle,
+      sectionSlug: q.sectionSlug,
     }));
     setQuestions(session);
     setIndex(0);
@@ -272,6 +276,7 @@ export function TrainerSession({
                 questionId: questions[index].id,
                 text: questions[index].text,
                 section: questions[index].section,
+                sectionSlug: questions[index].sectionSlug,
                 knownCount: 0,
                 unknownCount: 0,
               }
@@ -470,6 +475,7 @@ function Hint({ label, children }: { label: string; children: React.ReactNode })
 
 type SectionGroup = {
   section: string;
+  sectionSlug: string;
   count: number;
   questions: { questionId: string; text: string; count: number }[];
 };
@@ -485,7 +491,7 @@ function groupBySection(
     const key = s.section || "—";
     let g = m.get(key);
     if (!g) {
-      g = { section: key, count: 0, questions: [] };
+      g = { section: key, sectionSlug: s.sectionSlug, count: 0, questions: [] };
       m.set(key, g);
     }
     g.count += 1;
@@ -526,9 +532,12 @@ function StatList({
           {entries.map((g) => (
             <li key={g.section}>
               <div className="flex items-baseline gap-3">
-                <span className="flex-1 min-w-0 yzy-label text-muted-foreground">
+                <a
+                  href={`/sections/${g.sectionSlug}`}
+                  className="flex-1 min-w-0 yzy-label text-muted-foreground hover:text-foreground transition-colors"
+                >
                   {g.section}
-                </span>
+                </a>
                 <span className="yzy-label tabular-nums text-muted-foreground whitespace-nowrap">
                   {g.count}
                 </span>

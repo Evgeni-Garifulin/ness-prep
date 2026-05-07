@@ -53,6 +53,7 @@ export default async function TrainerPage() {
       question: {
         select: {
           text: true,
+          sectionSlug: true,
           section: { select: { title: true } },
         },
       },
@@ -102,6 +103,7 @@ export default async function TrainerPage() {
             questionId: s.questionId,
             text: s.question.text,
             section: stripSectionPrefix(s.question.section.title).toUpperCase(),
+            sectionSlug: s.question.sectionSlug,
             knownCount: s.knownCount,
             unknownCount: s.unknownCount,
           }))}
