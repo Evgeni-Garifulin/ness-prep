@@ -16,25 +16,10 @@ type Question = {
 type Stat = {
   questionId: string;
   text: string;
+  section: string;
   knownCount: number;
   unknownCount: number;
 };
-
-function buildPrompt(question: string) {
-  return `Я готовлюсь к собеседованию на senior frontend. Помоги разобрать тему по вопросу:
-
-«${question}»
-
-Цель — понять, а не зазубрить. Структурируй ответ так:
-1. Что это и зачем нужно — простыми словами
-2. Как работает под капотом (но без занудства)
-3. Минимальный наглядный пример
-4. Реальные кейсы из фронтенд-разработки, где это пригождается
-5. Типичные ошибки и подводные камни
-6. Что часто спрашивают рядом, если копают глубже
-
-Пиши по-русски, без воды и без маркетинга. Если есть несколько подходов — сравни.`;
-}
 
 type Phase = "idle" | "running" | "done";
 
@@ -56,7 +41,6 @@ export function TrainerSession({
   const [showEasy, setShowEasy] = useState(false);
   const [showFull, setShowFull] = useState(false);
   const [showAnswer, setShowAnswer] = useState(false);
-  const [copyState, setCopyState] = useState<"idle" | "copied" | "error">("idle");
   const [busy, setBusy] = useState(false);
 
   const total = questions.length;
@@ -72,6 +56,7 @@ export function TrainerSession({
     const prev = stats.get(q.id) ?? {
       questionId: q.id,
       text: q.text,
+      section: q.section,
       knownCount: 0,
       unknownCount: 0,
     };
@@ -107,18 +92,6 @@ export function TrainerSession({
         setShowFull(false);
         setShowAnswer(false);
       }
-    }
-  };
-
-  const onCopy = async (text: string) => {
-    const prompt = buildPrompt(text);
-    try {
-      await navigator.clipboard.writeText(prompt);
-      setCopyState("copied");
-      setTimeout(() => setCopyState("idle"), 1500);
-    } catch {
-      setCopyState("error");
-      setTimeout(() => setCopyState("idle"), 1500);
     }
   };
 
@@ -162,19 +135,15 @@ export function TrainerSession({
     }
   };
 
-  // Сводка для нижнего списка
-  const knownList = useMemo(
-    () =>
-      Array.from(stats.values())
-        .filter((s) => s.knownCount > 0)
-        .sort((a, b) => b.knownCount - a.knownCount),
+  // Сводка для нижнего списка — группируем по теме (section), считаем сколько
+  // уникальных вопросов из этой темы попало в +/− список. Если вопрос отмечен
+  // и так и этак — он учитывается в обоих списках, но один раз в каждом.
+  const knownBySection = useMemo(
+    () => groupBySection(stats, "known"),
     [stats],
   );
-  const unknownList = useMemo(
-    () =>
-      Array.from(stats.values())
-        .filter((s) => s.unknownCount > 0)
-        .sort((a, b) => b.unknownCount - a.unknownCount),
+  const unknownBySection = useMemo(
+    () => groupBySection(stats, "unknown"),
     [stats],
   );
 
@@ -240,6 +209,7 @@ export function TrainerSession({
               stats.get(questions[index].id) ?? {
                 questionId: questions[index].id,
                 text: questions[index].text,
+                section: questions[index].section,
                 knownCount: 0,
                 unknownCount: 0,
               }
@@ -250,8 +220,6 @@ export function TrainerSession({
             onToggleEasy={() => setShowEasy((v) => !v)}
             onToggleFull={() => setShowFull((v) => !v)}
             onToggleAnswer={() => setShowAnswer((v) => !v)}
-            copyState={copyState}
-            onCopy={() => onCopy(questions[index].text)}
             busy={busy}
             onPlus={() => onMark("known")}
             onMinus={() => onMark("unknown")}
@@ -278,10 +246,11 @@ export function TrainerSession({
         )}
       </div>
 
-      {/* Нижний список — простые две колонки без бордеров */}
+      {/* Нижний список — простые две колонки без бордеров. Группируем по
+          теме: слева тема, справа сколько вопросов из неё в списке. */}
       <section className="mt-12 grid grid-cols-1 sm:grid-cols-2 gap-x-10 gap-y-6">
-        <StatList label="KNOWN" sign="+" entries={knownList} kind="known" />
-        <StatList label="UNKNOWN" sign="−" entries={unknownList} kind="unknown" />
+        <StatList label="KNOWN" sign="+" entries={knownBySection} kind="known" />
+        <StatList label="UNKNOWN" sign="−" entries={unknownBySection} kind="unknown" />
       </section>
 
       {/* Кнопка очистки базы — только на странице тренера, внизу */}
@@ -307,8 +276,6 @@ function RunningCard({
   onToggleEasy,
   onToggleFull,
   onToggleAnswer,
-  copyState,
-  onCopy,
   busy,
   onPlus,
   onMinus,
@@ -321,8 +288,6 @@ function RunningCard({
   onToggleEasy: () => void;
   onToggleFull: () => void;
   onToggleAnswer: () => void;
-  copyState: "idle" | "copied" | "error";
-  onCopy: () => void;
   busy: boolean;
   onPlus: () => void;
   onMinus: () => void;
@@ -357,29 +322,13 @@ function RunningCard({
         >
           {showAnswer ? "HIDE ANSWER" : "REVEAL ANSWER"}
         </ToggleLink>
-        <button
-          type="button"
-          onClick={onCopy}
-          className={cn(
-            "yzy-label transition-colors whitespace-nowrap",
-            copyState === "copied"
-              ? "text-foreground"
-              : "text-muted-foreground hover:text-foreground",
-          )}
-        >
-          {copyState === "copied"
-            ? "COPIED"
-            : copyState === "error"
-              ? "ERROR"
-              : "COPY PROMPT"}
-        </button>
       </div>
 
       {showEasy && q.hintEasy && <Hint label="HINT A — LIGHT">{q.hintEasy}</Hint>}
       {showFull && q.hintFull && <Hint label="HINT B — FULL">{q.hintFull}</Hint>}
 
       {showAnswer && q.answer && (
-        <div className="mt-4 border border-foreground p-4">
+        <div className="mt-4">
           <div className="yzy-label text-muted-foreground mb-2">REFERENCE ANSWER</div>
           <p className="text-sm leading-relaxed whitespace-pre-wrap">{q.answer}</p>
         </div>
@@ -450,11 +399,29 @@ function ToggleLink({
 
 function Hint({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div className="mt-4 border border-foreground p-4">
+    <div className="mt-4">
       <div className="yzy-label text-muted-foreground mb-2">{label}</div>
       <p className="text-sm leading-relaxed whitespace-pre-wrap">{children}</p>
     </div>
   );
+}
+
+type SectionEntry = { section: string; count: number };
+
+function groupBySection(
+  stats: Map<string, Stat>,
+  kind: "known" | "unknown",
+): SectionEntry[] {
+  const m = new Map<string, number>();
+  for (const s of stats.values()) {
+    const flag = kind === "known" ? s.knownCount > 0 : s.unknownCount > 0;
+    if (!flag) continue;
+    const key = s.section || "—";
+    m.set(key, (m.get(key) ?? 0) + 1);
+  }
+  return Array.from(m.entries())
+    .map(([section, count]) => ({ section, count }))
+    .sort((a, b) => (b.count - a.count) || a.section.localeCompare(b.section));
 }
 
 function StatList({
@@ -465,7 +432,7 @@ function StatList({
 }: {
   label: string;
   sign: string;
-  entries: Stat[];
+  entries: SectionEntry[];
   kind: "known" | "unknown";
 }) {
   return (
@@ -482,10 +449,12 @@ function StatList({
       ) : (
         <ul className="space-y-2">
           {entries.map((e) => (
-            <li key={e.questionId} className="flex items-baseline gap-3">
-              <span className="flex-1 min-w-0 text-sm leading-snug">{e.text}</span>
+            <li key={e.section} className="flex items-baseline gap-3">
+              <span className="flex-1 min-w-0 text-sm leading-snug text-muted-foreground">
+                {e.section}
+              </span>
               <span className="yzy-label tabular-nums text-muted-foreground whitespace-nowrap">
-                {kind === "known" ? e.knownCount : e.unknownCount}
+                {e.count}
               </span>
             </li>
           ))}

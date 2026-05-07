@@ -48,10 +48,18 @@ export default async function TrainerPage() {
   const shuffled = [...techPool].sort(() => Math.random() - 0.5);
   const session = shuffled.slice(0, SESSION_SIZE);
 
-  // Статы пользователя по всем вопросам — для нижнего списка.
+  // Статы пользователя по всем вопросам — для нижнего списка. Тянем секцию
+  // вместе с вопросом, чтобы группировать +/− по теме на клиенте.
   const allStats = await prisma.trainerStat.findMany({
     where: { username },
-    include: { question: { select: { text: true } } },
+    include: {
+      question: {
+        select: {
+          text: true,
+          section: { select: { title: true } },
+        },
+      },
+    },
     orderBy: { updatedAt: "desc" },
   });
 
@@ -92,6 +100,7 @@ export default async function TrainerPage() {
           initialStats={allStats.map((s) => ({
             questionId: s.questionId,
             text: s.question.text,
+            section: stripSectionPrefix(s.question.section.title).toUpperCase(),
             knownCount: s.knownCount,
             unknownCount: s.unknownCount,
           }))}
