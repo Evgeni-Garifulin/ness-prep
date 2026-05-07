@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
+import { unstable_cache } from "next/cache";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { SiteHeader } from "@/components/site-header";
@@ -26,15 +27,37 @@ export const dynamic = "force-dynamic";
 
 type Params = { slug: string };
 
+// Содержимое секции (вопросы, подсказки, эталоны) одинаково для всех и
+// меняется только при пересеве БД, поэтому кешируем целиком. На каждом
+// заходе на /sections/* теперь вместо двух запросов в Postgres (секция +
+// навигация) — один поход в Next-кеш.
+const getSectionBySlug = unstable_cache(
+  async (slug: string) =>
+    prisma.section.findUnique({
+      where: { slug },
+      include: { questions: { orderBy: { order: "asc" } } },
+    }),
+  ["section:full-by-slug"],
+  { revalidate: 3600, tags: ["sections"] },
+);
+
+const getNavSections = unstable_cache(
+  async () =>
+    prisma.section.findMany({
+      select: { slug: true, title: true, order: true },
+      orderBy: { order: "asc" },
+    }),
+  ["sections:nav-list"],
+  { revalidate: 3600, tags: ["sections"] },
+);
+
 export async function generateMetadata({
   params,
 }: {
   params: Params;
 }): Promise<Metadata> {
-  const section = await prisma.section.findUnique({
-    where: { slug: params.slug },
-    select: { title: true },
-  });
+  // Используем тот же кеш, что и страница — повторного запроса в БД нет.
+  const section = await getSectionBySlug(params.slug);
   if (!section) return { title: "SECTION" };
   return {
     title: stripSectionPrefix(section.title).toUpperCase(),
@@ -46,20 +69,24 @@ export default async function SectionPage({ params }: { params: Params }) {
   const username = getCurrentUser();
   if (!username) redirect("/login");
 
-  const section = await prisma.section.findUnique({
-    where: { slug: params.slug },
-    include: { questions: { orderBy: { order: "asc" } } },
-  });
+  // Кешируемые запросы стартуют параллельно. Навигационный список не
+  // зависит от текущей секции, поэтому летит в фоне сразу.
+  const sectionPromise = getSectionBySlug(params.slug);
+  const navPromise = getNavSections();
+
+  const section = await sectionPromise;
   if (!section) notFound();
 
   const questionIds = section.questions.map((q) => q.id);
-  const [answers, qNotes] = await Promise.all([
+  // user-specific запросы плюс уже летящий navPromise — всё в одном await.
+  const [answers, qNotes, all] = await Promise.all([
     prisma.answer.findMany({
       where: { username, questionId: { in: questionIds } },
     }),
     prisma.questionNote.findMany({
       where: { username, questionId: { in: questionIds } },
     }),
+    navPromise,
   ]);
   const byQuestionId = new Map(answers.map((a) => [a.questionId, a.text]));
   const confirmedByQuestionId = new Map(
@@ -85,10 +112,7 @@ export default async function SectionPage({ params }: { params: Params }) {
   const trackHref = category === "social" ? "/social" : "/tech";
   const trackLabel = category === "social" ? "SOCIAL" : "TECH";
 
-  const all = await prisma.section.findMany({
-    select: { slug: true, title: true, order: true },
-    orderBy: { order: "asc" },
-  });
+  // `all` пришёл выше из navPromise / unstable_cache.
   const sameTrack = all
     .filter((s) => categoryFor(s.slug) === category)
     .sort(
