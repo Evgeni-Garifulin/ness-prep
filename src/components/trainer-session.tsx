@@ -406,22 +406,35 @@ function Hint({ label, children }: { label: string; children: React.ReactNode })
   );
 }
 
-type SectionEntry = { section: string; count: number };
+type SectionGroup = {
+  section: string;
+  count: number;
+  questions: { questionId: string; text: string; count: number }[];
+};
 
 function groupBySection(
   stats: Map<string, Stat>,
   kind: "known" | "unknown",
-): SectionEntry[] {
-  const m = new Map<string, number>();
+): SectionGroup[] {
+  const m = new Map<string, SectionGroup>();
   for (const s of stats.values()) {
-    const flag = kind === "known" ? s.knownCount > 0 : s.unknownCount > 0;
-    if (!flag) continue;
+    const c = kind === "known" ? s.knownCount : s.unknownCount;
+    if (c <= 0) continue;
     const key = s.section || "—";
-    m.set(key, (m.get(key) ?? 0) + 1);
+    let g = m.get(key);
+    if (!g) {
+      g = { section: key, count: 0, questions: [] };
+      m.set(key, g);
+    }
+    g.count += 1;
+    g.questions.push({ questionId: s.questionId, text: s.text, count: c });
   }
-  return Array.from(m.entries())
-    .map(([section, count]) => ({ section, count }))
-    .sort((a, b) => (b.count - a.count) || a.section.localeCompare(b.section));
+  for (const g of m.values()) {
+    g.questions.sort((a, b) => (b.count - a.count) || a.text.localeCompare(b.text));
+  }
+  return Array.from(m.values()).sort(
+    (a, b) => (b.count - a.count) || a.section.localeCompare(b.section),
+  );
 }
 
 function StatList({
@@ -432,7 +445,7 @@ function StatList({
 }: {
   label: string;
   sign: string;
-  entries: SectionEntry[];
+  entries: SectionGroup[];
   kind: "known" | "unknown";
 }) {
   return (
@@ -447,15 +460,29 @@ function StatList({
           {kind === "known" ? "Nothing marked yet" : "All clean so far"}
         </p>
       ) : (
-        <ul className="space-y-2">
-          {entries.map((e) => (
-            <li key={e.section} className="flex items-baseline gap-3">
-              <span className="flex-1 min-w-0 text-sm leading-snug text-muted-foreground">
-                {e.section}
-              </span>
-              <span className="yzy-label tabular-nums text-muted-foreground whitespace-nowrap">
-                {e.count}
-              </span>
+        <ul className="space-y-4">
+          {entries.map((g) => (
+            <li key={g.section}>
+              <div className="flex items-baseline gap-3">
+                <span className="flex-1 min-w-0 yzy-label text-muted-foreground">
+                  {g.section}
+                </span>
+                <span className="yzy-label tabular-nums text-muted-foreground whitespace-nowrap">
+                  {g.count}
+                </span>
+              </div>
+              <ul className="mt-2 pl-6 space-y-1">
+                {g.questions.map((q) => (
+                  <li key={q.questionId} className="flex items-baseline gap-3">
+                    <span className="flex-1 min-w-0 text-sm leading-snug text-muted-foreground">
+                      {q.text}
+                    </span>
+                    <span className="yzy-label tabular-nums text-muted-foreground whitespace-nowrap">
+                      {q.count}
+                    </span>
+                  </li>
+                ))}
+              </ul>
             </li>
           ))}
         </ul>
