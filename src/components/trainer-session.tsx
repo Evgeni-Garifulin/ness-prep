@@ -474,10 +474,10 @@ function StatList({
               <ul className="mt-2 pl-6 space-y-1">
                 {g.questions.map((q) => (
                   <li key={q.questionId} className="flex items-baseline gap-3">
-                    <span className="flex-1 min-w-0 text-sm leading-snug text-muted-foreground">
+                    <span className="flex-1 min-w-0 text-sm leading-snug text-foreground">
                       {q.text}
                     </span>
-                    <span className="yzy-label tabular-nums text-muted-foreground whitespace-nowrap">
+                    <span className="yzy-label tabular-nums text-foreground whitespace-nowrap">
                       {q.count}
                     </span>
                   </li>
