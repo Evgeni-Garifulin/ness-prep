@@ -243,18 +243,13 @@ export function TrainerSession({
       <div className="mt-6">
         {phase === "idle" && (
           <div className="py-12 sm:py-16 flex flex-col items-center text-center">
-            <TopicPicker
-              tree={topicTree}
-              selected={selected}
-              onChange={setSelected}
-            />
             <button
               type="button"
               onClick={onStart}
               disabled={plannedCount === 0}
               aria-label="Start trainer"
               className={cn(
-                "mt-12 text-6xl sm:text-7xl font-bold uppercase tracking-tight leading-none transition-colors",
+                "text-6xl sm:text-7xl font-bold uppercase tracking-tight leading-none transition-colors",
                 plannedCount === 0
                   ? "text-muted-foreground/40 cursor-not-allowed"
                   : "text-foreground hover:text-muted-foreground",
@@ -265,6 +260,13 @@ export function TrainerSession({
             <p className="mt-8 yzy-label text-muted-foreground whitespace-pre-wrap">
               {plannedCount} CARDS    SELF-ASSESS EACH ONE
             </p>
+            <div className="mt-8 w-full flex justify-center">
+              <TopicPicker
+                tree={topicTree}
+                selected={selected}
+                onChange={setSelected}
+              />
+            </div>
           </div>
         )}
 
@@ -702,7 +704,17 @@ function TopicPicker({
         aria-expanded={open}
       >
         <span>{label}</span>
-        <span className="ml-3">{open ? "−" : "+"}</span>
+        <svg
+          viewBox="0 0 10 8"
+          className={cn(
+            "ml-3 h-2 w-2.5 transition-transform",
+            open && "rotate-180",
+          )}
+          fill="currentColor"
+          aria-hidden
+        >
+          <path d="M0 0 L10 0 L5 8 Z" />
+        </svg>
       </button>
       {open && (
         <div className="absolute left-0 right-0 mt-2 bg-background z-20 max-h-[60vh] overflow-y-auto py-3 px-1">
