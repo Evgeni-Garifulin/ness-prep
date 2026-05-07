@@ -1,7 +1,20 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
+
+type PoolQuestion = {
+  id: string;
+  number: number;
+  text: string;
+  hintEasy: string;
+  hintFull: string;
+  answer: string;
+  sectionSlug: string;
+  sectionTitle: string;
+  sectionOrder: number;
+  subsection: string | null;
+};
 
 type Question = {
   id: string;
@@ -23,12 +36,21 @@ type Stat = {
 
 type Phase = "idle" | "running" | "done";
 
+// Селектор: либо вся секция (subsection === null), либо конкретная подсекция.
+// Храним как строковый ключ "<slug>" или "<slug>::<subsection>" — это удобно
+// для Set'а в state и сравнений.
+const ALL_KEY = "__all__";
+const sectionKey = (slug: string) => slug;
+const subKey = (slug: string, sub: string) => `${slug}::${sub}`;
+
 export function TrainerSession({
-  questions,
+  pool,
   initialStats,
+  sessionSize,
 }: {
-  questions: Question[];
+  pool: PoolQuestion[];
   initialStats: Stat[];
+  sessionSize: number;
 }) {
   const [phase, setPhase] = useState<Phase>("idle");
   const [index, setIndex] = useState(0);
@@ -43,6 +65,16 @@ export function TrainerSession({
   const [showAnswer, setShowAnswer] = useState(false);
   const [busy, setBusy] = useState(false);
 
+  // Дерево тем: section -> [subsections]. Если у секции нет подсекций — она
+  // выбирается одна целиком. Если есть — отображаем вложенный список и
+  // считаем секцию выбранной только когда выбраны все её подсекции.
+  const topicTree = useMemo(() => buildTopicTree(pool), [pool]);
+
+  // По умолчанию — выбраны все темы (ALL).
+  const [selected, setSelected] = useState<Set<string>>(() => allLeafKeys(topicTree));
+
+  // Текущая сессия из 25 (или меньше) вопросов, выбранных по фильтру.
+  const [questions, setQuestions] = useState<Question[]>([]);
   const total = questions.length;
 
   const onMark = async (result: "known" | "unknown") => {
@@ -95,7 +127,24 @@ export function TrainerSession({
     }
   };
 
+  const filteredPool = useMemo(
+    () => filterPool(pool, selected),
+    [pool, selected],
+  );
+
   const onStart = () => {
+    if (filteredPool.length === 0) return;
+    const shuffled = [...filteredPool].sort(() => Math.random() - 0.5);
+    const session = shuffled.slice(0, sessionSize).map((q) => ({
+      id: q.id,
+      number: q.number,
+      text: q.text,
+      hintEasy: q.hintEasy,
+      hintFull: q.hintFull,
+      answer: q.answer,
+      section: q.sectionTitle,
+    }));
+    setQuestions(session);
     setIndex(0);
     setRound({ known: 0, unknown: 0 });
     setShowEasy(false);
@@ -147,7 +196,7 @@ export function TrainerSession({
     [stats],
   );
 
-  if (total === 0) {
+  if (pool.length === 0) {
     return (
       <p className="mt-6 yzy-meta text-muted-foreground">
         NO QUESTIONS WITH FILLED ANSWERS YET — TRAINER NEEDS REFERENCE ANSWERS
@@ -155,6 +204,8 @@ export function TrainerSession({
       </p>
     );
   }
+
+  const plannedCount = Math.min(filteredPool.length, sessionSize);
 
   return (
     <div className="mt-6 max-w-3xl mx-auto">
@@ -187,17 +238,28 @@ export function TrainerSession({
       {/* Карточка / экран начала / экран финала */}
       <div className="mt-6">
         {phase === "idle" && (
-          <div className="py-16 sm:py-24 flex flex-col items-center text-center">
+          <div className="py-12 sm:py-16 flex flex-col items-center text-center">
+            <TopicPicker
+              tree={topicTree}
+              selected={selected}
+              onChange={setSelected}
+            />
             <button
               type="button"
               onClick={onStart}
+              disabled={plannedCount === 0}
               aria-label="Start trainer"
-              className="text-6xl sm:text-7xl font-bold uppercase tracking-tight leading-none text-foreground hover:text-muted-foreground transition-colors"
+              className={cn(
+                "mt-12 text-6xl sm:text-7xl font-bold uppercase tracking-tight leading-none transition-colors",
+                plannedCount === 0
+                  ? "text-muted-foreground/40 cursor-not-allowed"
+                  : "text-foreground hover:text-muted-foreground",
+              )}
             >
               START
             </button>
             <p className="mt-8 yzy-label text-muted-foreground whitespace-pre-wrap">
-              {total} CARDS    SELF-ASSESS EACH ONE
+              {plannedCount} CARDS    SELF-ASSESS EACH ONE
             </p>
           </div>
         )}
@@ -488,5 +550,278 @@ function StatList({
         </ul>
       )}
     </div>
+  );
+}
+
+// ─── TopicPicker ──────────────────────────────────────────────────────────
+
+type TopicNode = {
+  slug: string;
+  title: string;
+  order: number;
+  // Если у секции есть подсекции — листья это подсекции; иначе листом считается
+  // сама секция (выбирается по slug одним ключом).
+  subs: { name: string; key: string }[];
+};
+
+function buildTopicTree(pool: PoolQuestion[]): TopicNode[] {
+  const m = new Map<string, TopicNode>();
+  for (const q of pool) {
+    let node = m.get(q.sectionSlug);
+    if (!node) {
+      node = {
+        slug: q.sectionSlug,
+        title: q.sectionTitle,
+        order: q.sectionOrder,
+        subs: [],
+      };
+      m.set(q.sectionSlug, node);
+    }
+    if (q.subsection) {
+      const k = subKey(q.sectionSlug, q.subsection);
+      if (!node.subs.some((s) => s.key === k)) {
+        node.subs.push({ name: q.subsection, key: k });
+      }
+    }
+  }
+  for (const node of m.values()) {
+    node.subs.sort((a, b) => a.name.localeCompare(b.name));
+  }
+  return Array.from(m.values()).sort((a, b) => a.order - b.order);
+}
+
+// Все «листовые» ключи в дереве — для дефолтного полностью выбранного состояния
+// и для проверок ALL.
+function allLeafKeys(tree: TopicNode[]): Set<string> {
+  const s = new Set<string>();
+  for (const n of tree) {
+    if (n.subs.length === 0) s.add(sectionKey(n.slug));
+    else for (const sub of n.subs) s.add(sub.key);
+  }
+  return s;
+}
+
+// Лист считается выбранным, если: (а) для секции без подсекций — её sectionKey
+// в Set; (б) для подсекции — её subKey в Set.
+function filterPool(pool: PoolQuestion[], selected: Set<string>): PoolQuestion[] {
+  return pool.filter((q) => {
+    if (q.subsection) return selected.has(subKey(q.sectionSlug, q.subsection));
+    return selected.has(sectionKey(q.sectionSlug));
+  });
+}
+
+function isSectionFullySelected(node: TopicNode, selected: Set<string>): boolean {
+  if (node.subs.length === 0) return selected.has(sectionKey(node.slug));
+  return node.subs.every((s) => selected.has(s.key));
+}
+
+function isSectionPartiallySelected(
+  node: TopicNode,
+  selected: Set<string>,
+): boolean {
+  if (node.subs.length === 0) return false;
+  const some = node.subs.some((s) => selected.has(s.key));
+  const all = node.subs.every((s) => selected.has(s.key));
+  return some && !all;
+}
+
+function TopicPicker({
+  tree,
+  selected,
+  onChange,
+}: {
+  tree: TopicNode[];
+  selected: Set<string>;
+  onChange: (next: Set<string>) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  // Закрытие по клику вне.
+  useEffect(() => {
+    if (!open) return;
+    const onDoc = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener("mousedown", onDoc);
+    return () => document.removeEventListener("mousedown", onDoc);
+  }, [open]);
+
+  const leaves = useMemo(() => allLeafKeys(tree), [tree]);
+  const allChecked = leaves.size > 0 && leaves.size === selected.size
+    && Array.from(leaves).every((k) => selected.has(k));
+
+  const toggleAll = () => {
+    if (allChecked) onChange(new Set());
+    else onChange(new Set(leaves));
+  };
+
+  const toggleSection = (node: TopicNode) => {
+    const next = new Set(selected);
+    if (node.subs.length === 0) {
+      const k = sectionKey(node.slug);
+      if (next.has(k)) next.delete(k);
+      else next.add(k);
+    } else {
+      const fully = isSectionFullySelected(node, selected);
+      if (fully) for (const s of node.subs) next.delete(s.key);
+      else for (const s of node.subs) next.add(s.key);
+    }
+    onChange(next);
+  };
+
+  const toggleSub = (key: string) => {
+    const next = new Set(selected);
+    if (next.has(key)) next.delete(key);
+    else next.add(key);
+    onChange(next);
+  };
+
+  // Лейбл кнопки: ALL / N TOPICS / NONE.
+  const label = allChecked
+    ? "ALL TOPICS"
+    : selected.size === 0
+      ? "NO TOPICS"
+      : `${countSelectedTopics(tree, selected)} TOPICS`;
+
+  return (
+    <div ref={ref} className="relative w-full max-w-md text-left">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className="yzy-label text-muted-foreground hover:text-foreground transition-colors flex items-center justify-between w-full py-2"
+        aria-expanded={open}
+      >
+        <span>{label}</span>
+        <span className="ml-3">{open ? "−" : "+"}</span>
+      </button>
+      {open && (
+        <div className="absolute left-0 right-0 mt-2 bg-background z-20 max-h-[60vh] overflow-y-auto py-3 px-1">
+          <ul className="space-y-1">
+            <li>
+              <CheckboxRow
+                checked={allChecked}
+                indeterminate={!allChecked && selected.size > 0}
+                onClick={toggleAll}
+                label="ALL"
+                bold
+              />
+            </li>
+            {tree.map((node) => {
+              const fully = isSectionFullySelected(node, selected);
+              const partial = isSectionPartiallySelected(node, selected);
+              return (
+                <li key={node.slug}>
+                  <CheckboxRow
+                    checked={fully}
+                    indeterminate={partial}
+                    onClick={() => toggleSection(node)}
+                    label={node.title}
+                  />
+                  {node.subs.length > 0 && (
+                    <ul className="mt-1 mb-2 pl-6 space-y-1">
+                      {node.subs.map((sub) => (
+                        <li key={sub.key}>
+                          <CheckboxRow
+                            checked={selected.has(sub.key)}
+                            onClick={() => toggleSub(sub.key)}
+                            label={sub.name.toUpperCase()}
+                            small
+                          />
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Сколько «верхних» тем выбрано — для лейбла. Секция с подсекциями считается
+// одной темой если выбрана хоть одна её подсекция.
+function countSelectedTopics(tree: TopicNode[], selected: Set<string>): number {
+  let n = 0;
+  for (const node of tree) {
+    if (node.subs.length === 0) {
+      if (selected.has(sectionKey(node.slug))) n++;
+    } else {
+      if (node.subs.some((s) => selected.has(s.key))) n++;
+    }
+  }
+  return n;
+}
+
+function CheckboxRow({
+  checked,
+  indeterminate,
+  onClick,
+  label,
+  bold,
+  small,
+}: {
+  checked: boolean;
+  indeterminate?: boolean;
+  onClick: () => void;
+  label: string;
+  bold?: boolean;
+  small?: boolean;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="flex items-center gap-3 w-full py-1 text-left group"
+    >
+      <CheckBox checked={checked} indeterminate={indeterminate} />
+      <span
+        className={cn(
+          small ? "text-xs" : "yzy-label",
+          bold ? "text-foreground" : "text-foreground",
+          "group-hover:text-muted-foreground transition-colors",
+        )}
+      >
+        {label}
+      </span>
+    </button>
+  );
+}
+
+function CheckBox({
+  checked,
+  indeterminate,
+}: {
+  checked: boolean;
+  indeterminate?: boolean;
+}) {
+  return (
+    <span
+      className={cn(
+        "inline-flex items-center justify-center h-4 w-4 rounded-[5px] shrink-0 transition-colors",
+        checked || indeterminate
+          ? "bg-foreground text-background"
+          : "border border-muted-foreground/60 bg-background",
+      )}
+      aria-hidden
+    >
+      {checked && (
+        <svg viewBox="0 0 12 12" className="h-3 w-3" fill="none">
+          <path
+            d="M2.5 6.5L5 9L9.5 3.5"
+            stroke="currentColor"
+            strokeWidth="1.6"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      )}
+      {!checked && indeterminate && (
+        <span className="block h-[2px] w-2 bg-background" />
+      )}
+    </span>
   );
 }

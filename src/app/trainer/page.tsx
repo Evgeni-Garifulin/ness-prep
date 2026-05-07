@@ -37,16 +37,13 @@ export default async function TrainerPage() {
       hintFull: true,
       answer: true,
       sectionSlug: true,
-      section: { select: { title: true } },
+      subsection: true,
+      section: { select: { title: true, order: true } },
     },
   });
   const techPool = allQuestions.filter(
     (q) => categoryFor(q.sectionSlug) === "tech",
   );
-
-  // Шафлим случайно при каждой загрузке. Берём 25 (или сколько есть).
-  const shuffled = [...techPool].sort(() => Math.random() - 0.5);
-  const session = shuffled.slice(0, SESSION_SIZE);
 
   // Статы пользователя по всем вопросам — для нижнего списка. Тянем секцию
   // вместе с вопросом, чтобы группировать +/− по теме на клиенте.
@@ -88,14 +85,18 @@ export default async function TrainerPage() {
         />
 
         <TrainerSession
-          questions={session.map((q) => ({
+          sessionSize={SESSION_SIZE}
+          pool={techPool.map((q) => ({
             id: q.id,
             number: q.number,
             text: q.text,
             hintEasy: q.hintEasy,
             hintFull: q.hintFull,
             answer: q.answer,
-            section: stripSectionPrefix(q.section.title).toUpperCase(),
+            sectionSlug: q.sectionSlug,
+            sectionTitle: stripSectionPrefix(q.section.title).toUpperCase(),
+            sectionOrder: q.section.order,
+            subsection: q.subsection,
           }))}
           initialStats={allStats.map((s) => ({
             questionId: s.questionId,
