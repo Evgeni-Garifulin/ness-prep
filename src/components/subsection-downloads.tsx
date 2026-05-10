@@ -1,18 +1,19 @@
-"use client";
-
-import plansData from "@/../data/methodology-plans.json";
-import { downloadIcs, type Plan } from "@/lib/ics";
 import { methodologyFor } from "@/lib/methodology";
+import { IcsButton } from "@/components/ics-button";
 
+// Серверный компонент. Раньше он был "use client" и тянул в клиентский
+// бандл data/methodology-plans.json (~164KB) + lib/ics.ts на каждой
+// секционной странице. Сейчас:
+//   - lookup методички делается на сервере;
+//   - PDF/IBOOKS — обычные ссылки (без JS);
+//   - .ics — отдельный маленький клиентский компонент IcsButton, который
+//     подгружает план календаря и генератор только в момент клика.
+//
 // Мета-блок под заголовком подсекции (или под H1 для секций без
 // подкатегорий). Две строки в стиле yzy-label, без рамок и без иконок:
 //
 //   LEARN IT FOR 7 DAYS    PDF    IBOOKS
 //   ADD IT TO CALENDAR .ICS
-//
-// PDF / IBOOKS — ссылки на статические файлы. ADD IT TO CALENDAR .ICS
-// рендерится только если у методички есть planSlug; клик собирает
-// .ics на лету (даты — от текущего дня) и триггерит скачивание.
 export function SubsectionDownloads({
   subsection,
   sectionSlug,
@@ -25,9 +26,6 @@ export function SubsectionDownloads({
 
   const linkClass =
     "yzy-label text-muted-foreground hover:text-foreground transition-colors";
-
-  const plans = plansData as Record<string, Plan>;
-  const plan = files.planSlug ? plans[files.planSlug] : undefined;
 
   return (
     <div className="mt-2 flex flex-col gap-y-1">
@@ -53,26 +51,13 @@ export function SubsectionDownloads({
           IBOOKS
         </a>
       </div>
-      {plan ? (
-        <button
-          type="button"
-          onClick={() => {
-            // Абсолютные URL для ссылок внутри события — берутся из
-            // window.location.origin в момент клика, чтобы работало
-            // на любом домене, где задеплоено.
-            const origin =
-              typeof window !== "undefined" ? window.location.origin : "";
-            downloadIcs(plan, `itw-prep-${files.planSlug}.ics`, {
-              pdf: `${origin}${files.pdf}`,
-              epub: `${origin}${files.epub}`,
-            });
-          }}
+      {files.planSlug ? (
+        <IcsButton
+          planSlug={files.planSlug}
+          pdf={files.pdf}
+          epub={files.epub}
           className={`${linkClass} self-start bg-transparent border-0 p-0 cursor-pointer`}
-          aria-label="Скачать .ics — календарь на 7 дней с занятиями"
-          title="Календарь на 7 дней — события с 19:00 до 21:00, напоминания утром в 10:00 и за час до начала. В описании — ссылки на PDF и EPUB методички."
-        >
-          ADD IT TO CALENDAR .ICS
-        </button>
+        />
       ) : null}
     </div>
   );
